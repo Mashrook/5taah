@@ -29,6 +29,14 @@ var fallbackOffers = [
 var activeFilter = 'all';
 
 $w.onReady(async function () {
+
+  /* Safe storage helper */
+  var _storage = null;
+  try { _storage = wixWindow.storage.local; } catch(e) {}
+  function safeGet(key, fallback) { try { return _storage ? (_storage.getItem(key) || fallback) : fallback; } catch(e) { return fallback; } }
+  function safeSet(key, val) { try { if (_storage) _storage.setItem(key, val); } catch(e) {} }
+  function safeRemove(key) { try { if (_storage) _storage.removeItem(key); } catch(e) {} }
+
  wixSeo.title = 'عروض السفر | 5ATTH خته';
  wixSeo.description = 'أفضل عروض وصفقات السفر من السعودية - طيران وفنادق وباقات سياحية بأسعار حصرية';
 
@@ -99,7 +107,7 @@ function renderOffers(offers) {
  try { $i('#offerExpires').text = d.expires; } catch (e) {}
  try {
  $i('#offerDetailsBtn').onClick(function () {
- wixWindow.storage.local.setItem('selectedOfferId', d._id);
+ safeSet('selectedOfferId', d._id);
  wixLocation.to('/checkout');
  });
  } catch (e) {}

@@ -17,6 +17,14 @@ function btn(id, fn) { try { var e = el(id); if (e) e.onClick(fn); } catch (e) {
 var TENANT = 'default';
 
 $w.onReady(async function () {
+
+  /* Safe storage helper */
+  var _storage = null;
+  try { _storage = wixWindow.storage.local; } catch(e) {}
+  function safeGet(key, fallback) { try { return _storage ? (_storage.getItem(key) || fallback) : fallback; } catch(e) { return fallback; } }
+  function safeSet(key, val) { try { if (_storage) _storage.setItem(key, val); } catch(e) {} }
+  function safeRemove(key) { try { if (_storage) _storage.removeItem(key); } catch(e) {} }
+
  wixSeo.title = 'تأجير سيارات | 5ATTH خته';
  wixSeo.description = 'استأجر سيارتك بأفضل الأسعار في السعودية والخليج والعالم';
 
@@ -28,17 +36,17 @@ $w.onReady(async function () {
  setText('#driverAgeLabel', 'عمر السائق');
  setLabel('#searchCarsBtn', 'بحث عن سيارات');
 
- var currency = wixWindow.storage.local.getItem('selectedCurrency') || 'SAR';
+ var currency = safeGet('selectedCurrency', 'SAR');
 
  /* ——— Pre-fill from storage ——————————————————— */
- var stored = wixWindow.storage.local.getItem('searchParams');
+ var stored = safeGet('searchParams', null);
  if (stored) {
  try {
  var p = JSON.parse(stored);
  try { el('#pickupCity').value = p.cityCode || ''; } catch (e) {}
  try { el('#pickupDate').value = p.startDate || ''; } catch (e) {}
  try { el('#returnDate').value = p.endDate || ''; } catch (e) {}
- wixWindow.storage.local.removeItem('searchParams');
+ safeRemove('searchParams');
  await doSearch(p);
  } catch (e) {}
  }
@@ -165,7 +173,7 @@ function renderCars(offers) {
  try {
  $i('#carBookBtn').onClick(function () {
  var offer = currentOffers.find(function (x) { return x.providerOfferId === d._id; });
- wixWindow.storage.local.setItem('selectedOffer', JSON.stringify(offer));
+ safeSet('selectedOffer', JSON.stringify(offer));
  wixLocation.to('/checkout');
  });
  } catch (e) {}

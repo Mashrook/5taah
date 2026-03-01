@@ -11,6 +11,14 @@ import { createInvoice, getPublishableKey } from 'backend/paymentMoyasar.web';
 const TENANT_ID = 'default';
 
 $w.onReady(async function () {
+
+  /* Safe storage helper */
+  var _storage = null;
+  try { _storage = wixWindow.storage.local; } catch(e) {}
+  function safeGet(key, fallback) { try { return _storage ? (_storage.getItem(key) || fallback) : fallback; } catch(e) { return fallback; } }
+  function safeSet(key, val) { try { if (_storage) _storage.setItem(key, val); } catch(e) {} }
+  function safeRemove(key) { try { if (_storage) _storage.removeItem(key); } catch(e) {} }
+
   wixSeo.title = 'إتمام الحجز | 5ATTH خته';
 
   // Must be logged in
@@ -20,7 +28,7 @@ $w.onReady(async function () {
   }
 
   const userId = wixUsers.currentUser.id;
-  const offerJson = wixWindow.storage.local.getItem('selectedOffer');
+  const offerJson = safeGet('selectedOffer', null);
 
   if (!offerJson) {
     wixLocation.to('/');

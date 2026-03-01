@@ -8,6 +8,14 @@ import wixWindow from 'wix-window';
 import wixData from 'wix-data';
 
 $w.onReady(async function () {
+
+  /* Safe storage helper */
+  var _storage = null;
+  try { _storage = wixWindow.storage.local; } catch(e) {}
+  function safeGet(key, fallback) { try { return _storage ? (_storage.getItem(key) || fallback) : fallback; } catch(e) { return fallback; } }
+  function safeSet(key, val) { try { if (_storage) _storage.setItem(key, val); } catch(e) {} }
+  function safeRemove(key) { try { if (_storage) _storage.removeItem(key); } catch(e) {} }
+
  const offerId = wixLocation.path[1]; // /offer/{id}
 
  if (!offerId) {
@@ -90,7 +98,7 @@ $w.onReady(async function () {
  } else {
  $w('#bookNowBtn').label = 'احجز الآن';
  $w('#bookNowBtn').onClick(() => {
- wixWindow.storage.local.setItem('selectedOffer', JSON.stringify(offer));
+ safeSet('selectedOffer', JSON.stringify(offer));
  wixLocation.to('/checkout');
  });
  }

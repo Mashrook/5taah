@@ -31,6 +31,14 @@ var destinations = [
 var activeCountry = 'all';
 
 $w.onReady(async function () {
+
+  /* Safe storage helper */
+  var _storage = null;
+  try { _storage = wixWindow.storage.local; } catch(e) {}
+  function safeGet(key, fallback) { try { return _storage ? (_storage.getItem(key) || fallback) : fallback; } catch(e) { return fallback; } }
+  function safeSet(key, val) { try { if (_storage) _storage.setItem(key, val); } catch(e) {} }
+  function safeRemove(key) { try { if (_storage) _storage.removeItem(key); } catch(e) {} }
+
  wixSeo.title = 'الوجهات السياحية | 5ATTH خته';
  wixSeo.description = 'اكتشف أجمل الوجهات السياحية حول العالم مع عروض حصرية من خته';
 
@@ -96,7 +104,7 @@ function renderDestinations(list) {
  try { $i('#destPrice').style.color = '#C9A227'; } catch (e) {}
  try {
  $i('#destExploreBtn').onClick(function () {
- wixWindow.storage.local.setItem('selectedDestination', d.name);
+ safeSet('selectedDestination', d.name);
  wixLocation.to('/flights');
  });
  } catch (e) {}

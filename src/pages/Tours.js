@@ -31,6 +31,14 @@ var tours = [
 var activeCategory = 'all';
 
 $w.onReady(async function () {
+
+  /* Safe storage helper */
+  var _storage = null;
+  try { _storage = wixWindow.storage.local; } catch(e) {}
+  function safeGet(key, fallback) { try { return _storage ? (_storage.getItem(key) || fallback) : fallback; } catch(e) { return fallback; } }
+  function safeSet(key, val) { try { if (_storage) _storage.setItem(key, val); } catch(e) {} }
+  function safeRemove(key) { try { if (_storage) _storage.removeItem(key); } catch(e) {} }
+
  wixSeo.title = 'جولات وتجارب سياحية | 5ATTH خته';
  wixSeo.description = 'اكتشف أفضل الجولات والتجارب السياحية في السعودية والعالم العربي';
 
@@ -115,7 +123,7 @@ function renderTours(list) {
  try { $i('#tourGroupSize').text = d.groupSize; } catch (e) {}
  try {
  $i('#tourBookBtn').onClick(function () {
- wixWindow.storage.local.setItem('selectedTour', JSON.stringify(d));
+ safeSet('selectedTour', JSON.stringify(d));
  wixLocation.to('/checkout');
  });
  } catch (e) {}

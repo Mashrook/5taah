@@ -18,6 +18,14 @@ var TENANT = 'default';
 var currentOffers = [];
 
 $w.onReady(async function () {
+
+  /* Safe storage helper */
+  var _storage = null;
+  try { _storage = wixWindow.storage.local; } catch(e) {}
+  function safeGet(key, fallback) { try { return _storage ? (_storage.getItem(key) || fallback) : fallback; } catch(e) { return fallback; } }
+  function safeSet(key, val) { try { if (_storage) _storage.setItem(key, val); } catch(e) {} }
+  function safeRemove(key) { try { if (_storage) _storage.removeItem(key); } catch(e) {} }
+
  wixSeo.title = 'حجز طيران | 5ATTH خته';
  wixSeo.description = 'ابحث واحجز أفضل رحلات الطيران بأسعار تنافسية - مقارنة بين عدة مزودين';
 
@@ -34,10 +42,10 @@ $w.onReady(async function () {
  setText('#cabinLabel', 'درجة السفر');
  setLabel('#searchFlightsBtn', 'بحث عن رحلات');
 
- var currency = wixWindow.storage.local.getItem('selectedCurrency') || 'SAR';
+ var currency = safeGet('selectedCurrency', 'SAR');
 
  /* ——— Pre-fill from stored params ——————————————————— */
- var storedParams = wixWindow.storage.local.getItem('searchParams');
+ var storedParams = safeGet('searchParams', null);
  if (storedParams) {
  try {
  var params = JSON.parse(storedParams);
@@ -47,7 +55,7 @@ $w.onReady(async function () {
  try { el('#flightReturn').value = params.returnDate || ''; } catch (e) {}
  try { el('#flightAdults').value = String(params.adults || 1); } catch (e) {}
  try { el('#flightCabin').value = params.cabin || 'ECONOMY'; } catch (e) {}
- wixWindow.storage.local.removeItem('searchParams');
+ safeRemove('searchParams');
  await doSearch(params);
  } catch (e) {}
  }
@@ -184,7 +192,7 @@ function renderOffers(offers) {
  try {
  $i('#flightBookBtn').onClick(function () {
  var offer = currentOffers.find(function (x) { return x.providerOfferId === d._id; });
- wixWindow.storage.local.setItem('selectedOffer', JSON.stringify(offer));
+ safeSet('selectedOffer', JSON.stringify(offer));
  wixLocation.to('/checkout');
  });
  } catch (e) {}

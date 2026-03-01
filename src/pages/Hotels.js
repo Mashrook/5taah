@@ -18,6 +18,14 @@ var TENANT = 'default';
 var currentOffers = [];
 
 $w.onReady(async function () {
+
+  /* Safe storage helper */
+  var _storage = null;
+  try { _storage = wixWindow.storage.local; } catch(e) {}
+  function safeGet(key, fallback) { try { return _storage ? (_storage.getItem(key) || fallback) : fallback; } catch(e) { return fallback; } }
+  function safeSet(key, val) { try { if (_storage) _storage.setItem(key, val); } catch(e) {} }
+  function safeRemove(key) { try { if (_storage) _storage.removeItem(key); } catch(e) {} }
+
  wixSeo.title = 'حجز فنادق | 5ATTH خته';
  wixSeo.description = 'ابحث واحجز أفضل الفنادق بأسعار تنافسية في جميع أنحاء العالم';
 
@@ -29,10 +37,10 @@ $w.onReady(async function () {
  setText('#guestsLabel', 'عدد الضيوف');
  setLabel('#searchHotelsBtn', 'بحث عن فنادق');
 
- var currency = wixWindow.storage.local.getItem('selectedCurrency') || 'SAR';
+ var currency = safeGet('selectedCurrency', 'SAR');
 
  /* ——— Pre-fill ——————————————————— */
- var stored = wixWindow.storage.local.getItem('searchParams');
+ var stored = safeGet('searchParams', null);
  if (stored) {
  try {
  var p = JSON.parse(stored);
@@ -40,7 +48,7 @@ $w.onReady(async function () {
  try { el('#hotelCheckIn').value = p.checkInDate || ''; } catch (e) {}
  try { el('#hotelCheckOut').value = p.checkOutDate || ''; } catch (e) {}
  try { el('#hotelGuests').value = String(p.adults || 2); } catch (e) {}
- wixWindow.storage.local.removeItem('searchParams');
+ safeRemove('searchParams');
  await doSearch(p);
  } catch (e) {}
  }
@@ -151,7 +159,7 @@ function renderHotels(offers) {
  try {
  $i('#hotelBookBtn').onClick(function () {
  var offer = currentOffers.find(function (x) { return x.providerOfferId === d._id; });
- wixWindow.storage.local.setItem('selectedOffer', JSON.stringify(offer));
+ safeSet('selectedOffer', JSON.stringify(offer));
  wixLocation.to('/checkout');
  });
  } catch (e) {}

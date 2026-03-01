@@ -224,16 +224,21 @@ $w.onReady(function () {
   /* =========================================================
    *  6) Country / Currency Selector
    * ========================================================= */
-  var savedCountry = wixWindow.storage.local.getItem('selectedCountry') || 'SA';
-  var currencies = { SA: 'SAR', AE: 'AED', KW: 'KWD', QA: 'QAR', BH: 'BHD' };
   try {
+    var storage = (wixWindow && wixWindow.storage) ? wixWindow.storage.local : null;
+    var savedCountry = storage ? (storage.getItem('selectedCountry') || 'SA') : 'SA';
+    var currencies = { SA: 'SAR', AE: 'AED', KW: 'KWD', QA: 'QAR', BH: 'BHD' };
     var cs = $w('#countrySelector');
     if (cs) {
       cs.value = savedCountry;
       cs.onChange(function (e) {
-        wixWindow.storage.local.setItem('selectedCountry', e.target.value);
-        wixWindow.storage.local.setItem('selectedCurrency', currencies[e.target.value] || 'SAR');
-        wixLocation.to(wixLocation.url);
+        try {
+          if (storage) {
+            storage.setItem('selectedCountry', e.target.value);
+            storage.setItem('selectedCurrency', currencies[e.target.value] || 'SAR');
+          }
+          wixLocation.to(wixLocation.url);
+        } catch (err) {}
       });
     }
   } catch (e) {}

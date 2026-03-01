@@ -2,7 +2,6 @@
  * 5ATTH | خته – Home Page
  * Comprehensive Arabic translation - no emojis
  */
-import wixWindow from 'wix-window';
 import wixLocation from 'wix-location';
 
 $w.onReady(function () {

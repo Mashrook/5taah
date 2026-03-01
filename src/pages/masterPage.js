@@ -237,7 +237,6 @@ $w.onReady(function () {
       });
     }
   } catch (e) {}
-});
 
   /* =========================================================
    *  7) Footer text (by ID if exists)

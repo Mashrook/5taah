@@ -1,0 +1,299 @@
+/**
+ * 5ATTH | خته — Integration Registry (JSW)
+ * Central manager for all provider integrations
+ * 
+ * Provides:
+ * - getActiveProvider(serviceType)
+ * - getEndpoint(providerName, environment)
+ * - getCredential(providerName, keyName)
+ * - rotateCredential(providerName, keyName, newSecretRef)
+ * - testConnection(providerName)
+ * - enableProvider(providerName)
+ * - disableProvider(providerName)
+ */
+import { secrets } from 'wix-secrets-backend';
+import wixData from 'wix-data';
+import { fetch } from 'wix-fetch';
+
+import * as amadeus from './providers/amadeus.adapter';
+import * as sabre from './providers/sabre.adapter';
+import * as travelport from './providers/travelport.adapter';
+import * as skyscanner from './providers/skyscanner.adapter';
+import * as skiplagged from './providers/skiplagged.adapter';
+import * as swoodoo from './providers/swoodoo.adapter';
+
+const adapterMap = { amadeus, sabre, travelport, skyscanner, skiplagged, swoodoo };
+
+// ─────────────────────────────────────────────────────────
+// getActiveProvider — returns the highest-priority active provider
+// sorted by priority, respecting FeatureFlags
+// ─────────────────────────────────────────────────────────
+export async function getActiveProvider(tenantId, serviceType) {
+  // Get all enabled endpoints for this service type
+  const providers = await wixData.query('Providers')
+    .eq('serviceType', serviceType)
+    .find();
+
+  const providerNames = providers.items.map(p => p.name);
+
+  const endpoints = await wixData.query('ProviderEndpoints')
+    .eq('tenantId', tenantId)
+    .eq('enabled', true)
+    .hasSome('providerName', providerNames)
+    .ascending('priority')
+    .find();
+
+  if (!endpoints.items.length) return null;
+
+  // Filter by feature flags (skiplagged, swoodoo)
+  const featureFlagProviders = ['skiplagged', 'swoodoo'];
+  const flags = await wixData.query('FeatureFlags')
+    .eq('tenantId', tenantId)
+    .find();
+  const enabledFlags = new Set(flags.items.filter(f => f.enabled).map(f => f.featureKey));
+
+  const filtered = endpoints.items.filter(ep => {
+    if (featureFlagProviders.includes(ep.providerName)) {
+      return enabledFlags.has(`provider_${ep.providerName}`);
+    }
+    return true;
+  });
+
+  if (!filtered.length) return null;
+
+  return {
+    providerName: filtered[0].providerName,
+    endpoint: filtered[0],
+    adapter: adapterMap[filtered[0].providerName] || null,
+    fallbackProviders: filtered.slice(1).map(ep => ({
+      providerName: ep.providerName,
+      endpoint: ep,
+      adapter: adapterMap[ep.providerName] || null,
+    })),
+  };
+}
+
+// ─────────────────────────────────────────────────────────
+// getEndpoint — returns endpoint config (baseUrl, fallbackUrl)
+// ─────────────────────────────────────────────────────────
+export async function getEndpoint(tenantId, providerName, environment = 'production') {
+  const results = await wixData.query('ProviderEndpoints')
+    .eq('tenantId', tenantId)
+    .eq('providerName', providerName)
+    .eq('environment', environment)
+    .find();
+
+  if (!results.items.length) {
+    throw new Error(`No endpoint found for ${providerName} (${environment})`);
+  }
+
+  return results.items[0];
+}
+
+// ─────────────────────────────────────────────────────────
+// getCredential — fetches credential, resolves secret if needed
+// ─────────────────────────────────────────────────────────
+export async function getCredential(tenantId, providerName, keyName) {
+  const results = await wixData.query('ProviderCredentials')
+    .eq('tenantId', tenantId)
+    .eq('providerName', providerName)
+    .eq('keyName', keyName)
+    .eq('isActive', true)
+    .find();
+
+  if (!results.items.length) {
+    throw new Error(`Credential "${keyName}" not found for ${providerName}`);
+  }
+
+  const cred = results.items[0];
+
+  // If it's a secret, resolve from Wix Secrets Manager
+  if (cred.isSecret && cred.secretRefName) {
+    try {
+      const secretValue = await secrets.getSecret(cred.secretRefName);
+      return { ...cred, resolvedValue: secretValue };
+    } catch (e) {
+      throw new Error(`Failed to resolve secret "${cred.secretRefName}": ${e.message}`);
+    }
+  }
+
+  // Otherwise, return plain value
+  return { ...cred, resolvedValue: cred.plainValue };
+}
+
+// ─────────────────────────────────────────────────────────
+// rotateCredential — replaces secret ref & logs audit
+// ─────────────────────────────────────────────────────────
+export async function rotateCredential(tenantId, providerName, keyName, newSecretRef, actorUserId) {
+  const results = await wixData.query('ProviderCredentials')
+    .eq('tenantId', tenantId)
+    .eq('providerName', providerName)
+    .eq('keyName', keyName)
+    .find();
+
+  if (!results.items.length) {
+    throw new Error(`Credential "${keyName}" not found`);
+  }
+
+  const cred = results.items[0];
+  const oldRef = cred.secretRefName;
+
+  await wixData.update('ProviderCredentials', {
+    ...cred,
+    secretRefName: newSecretRef,
+    rotatedAt: new Date(),
+  });
+
+  // Audit log
+  await wixData.insert('ProviderAuditLogs', {
+    tenantId,
+    providerName,
+    actorUserId: actorUserId || 'system',
+    actionType: 'CREDENTIAL_ROTATED',
+    oldValueJson: JSON.stringify({ keyName, secretRefName: oldRef }),
+    newValueJson: JSON.stringify({ keyName, secretRefName: newSecretRef }),
+    createdAt: new Date(),
+  });
+
+  return { success: true };
+}
+
+// ─────────────────────────────────────────────────────────
+// testConnection — tests provider connectivity
+// ─────────────────────────────────────────────────────────
+export async function testConnection(tenantId, providerName) {
+  const adapter = adapterMap[providerName];
+  if (!adapter || typeof adapter.testConnection !== 'function') {
+    return { ok: false, error: `No test method for provider "${providerName}"` };
+  }
+
+  try {
+    const endpoint = await getEndpoint(tenantId, providerName);
+
+    // Collect credentials
+    const creds = await wixData.query('ProviderCredentials')
+      .eq('tenantId', tenantId)
+      .eq('providerName', providerName)
+      .eq('isActive', true)
+      .find();
+
+    const credentials = {};
+    for (const c of creds.items) {
+      if (c.isSecret && c.secretRefName) {
+        credentials[c.keyName] = await secrets.getSecret(c.secretRefName);
+      } else {
+        credentials[c.keyName] = c.plainValue;
+      }
+    }
+
+    const result = await adapter.testConnection(endpoint, credentials);
+    
+    // Audit
+    await wixData.insert('ProviderAuditLogs', {
+      tenantId,
+      providerName,
+      actorUserId: 'system',
+      actionType: 'CONNECTION_TESTED',
+      newValueJson: JSON.stringify({ ok: result.ok, latencyMs: result.latencyMs }),
+      createdAt: new Date(),
+    });
+
+    return result;
+  } catch (e) {
+    return { ok: false, error: e.message };
+  }
+}
+
+// ─────────────────────────────────────────────────────────
+// enableProvider / disableProvider
+// ─────────────────────────────────────────────────────────
+export async function enableProvider(tenantId, providerName, actorUserId) {
+  return _setProviderEnabled(tenantId, providerName, true, actorUserId);
+}
+
+export async function disableProvider(tenantId, providerName, actorUserId) {
+  return _setProviderEnabled(tenantId, providerName, false, actorUserId);
+}
+
+async function _setProviderEnabled(tenantId, providerName, enabled, actorUserId) {
+  const endpoints = await wixData.query('ProviderEndpoints')
+    .eq('tenantId', tenantId)
+    .eq('providerName', providerName)
+    .find();
+
+  for (const ep of endpoints.items) {
+    await wixData.update('ProviderEndpoints', {
+      ...ep,
+      enabled,
+      updatedAt: new Date(),
+    });
+  }
+
+  await wixData.insert('ProviderAuditLogs', {
+    tenantId,
+    providerName,
+    actorUserId: actorUserId || 'system',
+    actionType: enabled ? 'PROVIDER_ENABLED' : 'PROVIDER_DISABLED',
+    newValueJson: JSON.stringify({ enabled }),
+    createdAt: new Date(),
+  });
+
+  return { success: true, providerName, enabled };
+}
+
+// ─────────────────────────────────────────────────────────
+// searchWithFallback — tries primary then fallbacks
+// ─────────────────────────────────────────────────────────
+export async function searchWithFallback(tenantId, serviceType, searchFn) {
+  const primary = await getActiveProvider(tenantId, serviceType);
+  if (!primary) throw new Error(`No active provider for ${serviceType}`);
+
+  const allProviders = [primary, ...(primary.fallbackProviders || [])];
+
+  for (const provider of allProviders) {
+    if (!provider.adapter) continue;
+    try {
+      const result = await searchFn(provider.adapter, provider.endpoint, provider.providerName);
+      return result;
+    } catch (e) {
+      console.warn(`Provider ${provider.providerName} failed: ${e.message}`);
+      // Log failure
+      await wixData.insert('ProviderAuditLogs', {
+        tenantId,
+        providerName: provider.providerName,
+        actorUserId: 'system',
+        actionType: 'SEARCH_FALLBACK',
+        newValueJson: JSON.stringify({ error: e.message }),
+        createdAt: new Date(),
+      });
+      continue;
+    }
+  }
+
+  throw new Error(`All providers failed for ${serviceType}`);
+}
+
+// ─────────────────────────────────────────────────────────
+// getAllProviders — list all providers with status
+// ─────────────────────────────────────────────────────────
+export async function getAllProviders(tenantId) {
+  const providers = await wixData.query('Providers').find();
+  const endpoints = await wixData.query('ProviderEndpoints')
+    .eq('tenantId', tenantId)
+    .find();
+
+  return providers.items.map(p => {
+    const ep = endpoints.items.find(e => e.providerName === p.name);
+    return {
+      name: p.name,
+      serviceType: p.serviceType,
+      category: p.category,
+      description: p.description,
+      enabled: ep?.enabled || false,
+      priority: ep?.priority || 999,
+      environment: ep?.environment || 'production',
+      baseUrl: ep?.baseUrl || '',
+      fallbackUrl: ep?.fallbackUrl || '',
+    };
+  });
+}

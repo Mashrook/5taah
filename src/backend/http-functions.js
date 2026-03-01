@@ -1,11 +1,36 @@
 /**
- * 5ATTH | خته — Moyasar Webhook Handler (HTTP Function)
- * POST /_functions/moyasar/webhook
+ * 5ATTH | خته — HTTP Functions
+ *
+ * POST /_functions/moyasar-webhook
+ * POST /_functions/provider-test
+ * GET  /_functions/public-config
+ * POST /_functions/search
+ * POST /_functions/create-booking
  */
-import { ok, badRequest, serverError } from 'wix-http-functions';
+import { ok, badRequest, serverError, forbidden } from 'wix-http-functions';
 import wixData from 'wix-data';
 import { sendNotification } from './notificationService.web';
+import { testConnection, getActiveProvider, searchWithFallback, getCredential } from './integrationRegistry.jsw';
+import { checkPermission } from './rbacService.web';
+import { applyMarkup } from './pricingService.web';
 
+// ════════════════════════════════════════════════════════
+// Rate limiter (in-memory, per-instance)
+// ════════════════════════════════════════════════════════
+const rateLimitMap = {};
+function checkRateLimit(ip, maxPerMinute = 30) {
+  const now = Date.now();
+  if (!rateLimitMap[ip]) rateLimitMap[ip] = [];
+  rateLimitMap[ip] = rateLimitMap[ip].filter(t => now - t < 60000);
+  if (rateLimitMap[ip].length >= maxPerMinute) return false;
+  rateLimitMap[ip].push(now);
+  return true;
+}
+
+
+// ════════════════════════════════════════════════════════
+// POST /_functions/moyasar-webhook
+// ════════════════════════════════════════════════════════
 export async function post_moyasarWebhook(request) {
   try {
     const body = await request.body.json();
@@ -113,6 +138,283 @@ export async function post_moyasarWebhook(request) {
     return ok({ body: JSON.stringify({ message: 'Webhook processed', status }) });
   } catch (err) {
     console.error('Moyasar webhook error:', err);
+    return serverError({ body: JSON.stringify({ error: err.message }) });
+  }
+}
+
+// ════════════════════════════════════════════════════════
+// POST /_functions/provider-test
+// Tests a provider connection (admin only)
+// Body: { tenantId, providerName, userId }
+// ════════════════════════════════════════════════════════
+export async function post_providerTest(request) {
+  try {
+    const body = await request.body.json();
+    const { tenantId, providerName, userId } = body;
+
+    if (!tenantId || !providerName || !userId) {
+      return badRequest({ body: JSON.stringify({ error: 'tenantId, providerName, userId required' }) });
+    }
+
+    // RBAC check
+    const allowed = await checkPermission(tenantId, userId, 'integrations_edit');
+    if (!allowed) {
+      return forbidden({ body: JSON.stringify({ error: 'Access denied' }) });
+    }
+
+    const result = await testConnection(tenantId, providerName);
+
+    return ok({
+      body: JSON.stringify(result),
+      headers: { 'Content-Type': 'application/json' },
+    });
+  } catch (err) {
+    return serverError({ body: JSON.stringify({ error: err.message }) });
+  }
+}
+
+// ════════════════════════════════════════════════════════
+// GET /_functions/public-config
+// Returns non-sensitive site configuration
+// Query: ?tenantId=default
+// ════════════════════════════════════════════════════════
+export async function get_publicConfig(request) {
+  try {
+    const tenantId = request.query?.tenantId || 'default';
+
+    // Get tenant info (non-sensitive)
+    const tenants = await wixData.query('Tenants')
+      .eq('slug', tenantId)
+      .find();
+
+    const tenant = tenants.items[0];
+    if (!tenant) {
+      return badRequest({ body: JSON.stringify({ error: 'Tenant not found' }) });
+    }
+
+    // Get feature flags
+    const flags = await wixData.query('FeatureFlags')
+      .eq('tenantId', tenant._id)
+      .find();
+
+    const features = {};
+    flags.items.forEach(f => { features[f.featureKey] = f.enabled; });
+
+    // Get active providers (names only, no secrets)
+    const endpoints = await wixData.query('ProviderEndpoints')
+      .eq('tenantId', tenant._id)
+      .eq('enabled', true)
+      .find();
+
+    const activeProviders = [...new Set(endpoints.items.map(e => e.providerName))];
+
+    const config = {
+      tenantName: tenant.name,
+      countryDefault: tenant.countryDefault,
+      currencyDefault: tenant.currencyDefault,
+      themeJson: tenant.themeJson,
+      features,
+      activeProviders,
+      supportedCountries: ['SA', 'AE', 'KW', 'QA', 'BH'],
+      supportedCurrencies: ['SAR', 'AED', 'KWD', 'QAR', 'BHD'],
+    };
+
+    return ok({
+      body: JSON.stringify(config),
+      headers: {
+        'Content-Type': 'application/json',
+        'Cache-Control': 'public, max-age=300',
+      },
+    });
+  } catch (err) {
+    return serverError({ body: JSON.stringify({ error: err.message }) });
+  }
+}
+
+// ════════════════════════════════════════════════════════
+// POST /_functions/search
+// Unified search endpoint (flights/hotels/cars/tours)
+// Body: { tenantId, productType, params, currency }
+// ════════════════════════════════════════════════════════
+export async function post_search(request) {
+  try {
+    const ip = request.headers?.['x-forwarded-for'] || 'unknown';
+    if (!checkRateLimit(ip, 30)) {
+      return ok({
+        status: 429,
+        body: JSON.stringify({ error: 'Rate limit exceeded. Try again in 1 minute.' }),
+      });
+    }
+
+    const body = await request.body.json();
+    const { tenantId, productType, params, currency } = body;
+
+    if (!tenantId || !productType || !params) {
+      return badRequest({ body: JSON.stringify({ error: 'tenantId, productType, params required' }) });
+    }
+
+    // Create search session
+    const session = await wixData.insert('SearchSessions', {
+      tenantId,
+      productType,
+      paramsJson: JSON.stringify(params),
+      providerStrategy: 'priority_fallback',
+      createdAt: new Date(),
+      expiresAt: new Date(Date.now() + 30 * 60 * 1000),
+    });
+
+    // Search via integration registry with fallback
+    const results = await searchWithFallback(tenantId, productType, async (adapter, endpoint, providerName) => {
+      // Resolve credentials
+      const creds = await wixData.query('ProviderCredentials')
+        .eq('tenantId', tenantId)
+        .eq('providerName', providerName)
+        .eq('isActive', true)
+        .find();
+
+      const credentials = {};
+      for (const c of creds.items) {
+        if (c.isSecret && c.secretRefName) {
+          const { secrets: secretsMod } = await import('wix-secrets-backend');
+          credentials[c.keyName] = await secretsMod.getSecret(c.secretRefName);
+        } else {
+          credentials[c.keyName] = c.plainValue;
+        }
+      }
+
+      // Call the appropriate search method
+      let searchResults;
+      if (productType === 'flights' && typeof adapter.searchFlights === 'function') {
+        searchResults = await adapter.searchFlights(endpoint, credentials, params);
+      } else if (productType === 'hotels' && typeof adapter.searchHotels === 'function') {
+        searchResults = await adapter.searchHotels(endpoint, credentials, params);
+      } else if (productType === 'activities' && typeof adapter.searchActivities === 'function') {
+        searchResults = await adapter.searchActivities(endpoint, credentials, params);
+      } else {
+        throw new Error(`${providerName} does not support ${productType}`);
+      }
+
+      return { providerName, offers: searchResults };
+    });
+
+    // Apply markup to each offer
+    const offersWithMarkup = [];
+    for (const offer of (results.offers || [])) {
+      const marked = await applyMarkup(tenantId, offer.totalAmount || offer.baseAmount, {
+        productType,
+        providerName: results.providerName,
+        currency: currency || 'SAR',
+      });
+      offersWithMarkup.push({
+        ...offer,
+        baseAmount: offer.baseAmount || offer.totalAmount,
+        markupAmount: marked.markupAmount || 0,
+        totalAmount: marked.finalPrice || offer.totalAmount,
+      });
+    }
+
+    // Store offers
+    for (const offer of offersWithMarkup) {
+      await wixData.insert('Offers', {
+        tenantId,
+        searchSessionId: session._id,
+        providerName: results.providerName,
+        providerOfferId: offer.providerOfferId || '',
+        productType,
+        totalAmount: offer.totalAmount,
+        currency: currency || 'SAR',
+        baseAmount: offer.baseAmount,
+        taxesAmount: offer.taxesAmount || 0,
+        markupAmount: offer.markupAmount || 0,
+        refundable: offer.refundable || false,
+        baggageSummaryJson: JSON.stringify(offer.baggage || {}),
+        deepLinkUrl: offer.deepLinkUrl || '',
+        createdAt: new Date(),
+      });
+    }
+
+    return ok({
+      body: JSON.stringify({
+        sessionId: session._id,
+        provider: results.providerName,
+        count: offersWithMarkup.length,
+        offers: offersWithMarkup,
+      }),
+      headers: { 'Content-Type': 'application/json' },
+    });
+  } catch (err) {
+    return serverError({ body: JSON.stringify({ error: err.message }) });
+  }
+}
+
+// ════════════════════════════════════════════════════════
+// POST /_functions/create-booking
+// Creates a booking from a selected offer
+// Body: { tenantId, userId, offerId, travelers, contact }
+// ════════════════════════════════════════════════════════
+export async function post_createBooking(request) {
+  try {
+    const body = await request.body.json();
+    const { tenantId, userId, offerId, travelers, contact } = body;
+
+    if (!tenantId || !userId || !offerId) {
+      return badRequest({ body: JSON.stringify({ error: 'tenantId, userId, offerId required' }) });
+    }
+
+    // Fetch the offer
+    const offer = await wixData.get('Offers', offerId);
+    if (!offer) {
+      return badRequest({ body: JSON.stringify({ error: 'Offer not found or expired' }) });
+    }
+
+    // Verify offer session hasn't expired
+    const session = await wixData.get('SearchSessions', offer.searchSessionId);
+    if (session && new Date(session.expiresAt) < new Date()) {
+      return badRequest({ body: JSON.stringify({ error: 'Search session expired. Please search again.' }) });
+    }
+
+    // Create booking
+    const booking = await wixData.insert('Bookings', {
+      tenantId,
+      userId,
+      productType: offer.productType,
+      providerName: offer.providerName,
+      status: 'pending_payment',
+      selectedOfferId: offerId,
+      travelersJson: JSON.stringify(travelers || []),
+      contactJson: JSON.stringify(contact || {}),
+      pricingJson: JSON.stringify({
+        baseAmount: offer.baseAmount,
+        taxesAmount: offer.taxesAmount,
+        markupAmount: offer.markupAmount,
+        totalAmount: offer.totalAmount,
+        currency: offer.currency,
+      }),
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    });
+
+    // Create invoice
+    const invoice = await wixData.insert('Invoices', {
+      tenantId,
+      bookingId: booking._id,
+      amount: offer.totalAmount,
+      currency: offer.currency,
+      status: 'pending',
+      createdAt: new Date(),
+    });
+
+    return ok({
+      body: JSON.stringify({
+        bookingId: booking._id,
+        invoiceId: invoice._id,
+        amount: offer.totalAmount,
+        currency: offer.currency,
+        status: booking.status,
+      }),
+      headers: { 'Content-Type': 'application/json' },
+    });
+  } catch (err) {
     return serverError({ body: JSON.stringify({ error: err.message }) });
   }
 }

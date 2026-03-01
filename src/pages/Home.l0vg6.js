@@ -14,7 +14,7 @@ $w.onReady(function () {
     'Join us on a journey to discover exclusive travel': 'منصتك الذكية لحجز رحلات الطيران والفنادق',
     'deals across the Gulf region, tailored to your wanderlust': 'والسيارات بأفضل الأسعار في الخليج',
     'deals across the Gulf region': 'بأفضل الأسعار في الخليج',
-    'tailored to your wanderlust': '',
+    'tailored to your wanderlust': 'حسب رغباتك',
 
     /* ----- Blog post titles (Wix Blog app content) ----- */
     'The Importance of Sustainable Living in Today\'s World': 'أهمية السياحة المستدامة في عالمنا اليوم',
@@ -125,8 +125,8 @@ $w.onReady(function () {
     /* ----- Footer ----- */
     'All rights reserved': 'جميع الحقوق محفوظة',
     'Copyright': '5ATTH خته',
-    'Powered and Secured by Wix': '',
-    'Powered and secured by Wix': '',
+    'Powered and Secured by Wix': '5ATTH خته',
+    'Powered and secured by Wix': '5ATTH خته',
     'Privacy Policy': 'سياسة الخصوصية',
     'Terms of Use': 'شروط الاستخدام',
     'Terms & Conditions': 'الشروط والأحكام',
@@ -138,8 +138,8 @@ $w.onReady(function () {
     'info@mysite.com': 'info@5atth.com',
     '500 Terry Francine Street': 'الرياض، المملكة العربية السعودية',
     '500 Terry Francine Street,': 'الرياض، المملكة العربية السعودية',
-    '6th Floor, San Francisco': '',
-    'CA 94158': '',
+    '6th Floor, San Francisco': 'المنطقة الشرقية',
+    'CA 94158': 'المملكة العربية السعودية',
   };
 
   var sortedKeys = Object.keys(textMap).sort(function (a, b) { return b.length - a.length; });
@@ -176,13 +176,8 @@ $w.onReady(function () {
           if (!original) return;
           if (/[\u0600-\u06FF]/.test(original) && !/[A-Za-z]{3,}/.test(original)) return;
           sortedKeys.forEach(function (eng) {
-            if (original.indexOf(eng) !== -1) {
-              if (textMap[eng] === '') {
-                t.text = ' ';
-                try { t.collapse(); } catch (e) {}
-              } else {
-                t.text = textMap[eng];
-              }
+            if (original.indexOf(eng) !== -1 && textMap[eng]) {
+              t.text = textMap[eng];
             }
           });
         } catch (e) {}

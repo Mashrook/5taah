@@ -1,16 +1,15 @@
 /**
  * 5ATTH | خته – Master Page (Global Site Code)
- * Comprehensive Arabic translation on every page
- * Uses delayed sweeps to catch async Wix app widgets (Blog, Pricing Plans, etc.)
+ * Arabic translation for every page - preserves template structure
  */
 import wixWindow from 'wix-window';
 import wixLocation from 'wix-location';
 
 $w.onReady(function () {
 
-  /* ==========  FULL TRANSLATION MAP  ========== */
+  /* ==========  TRANSLATION MAP  ========== */
   var map = {
-    /* ----- Blog post titles (from Wix Blog app) ----- */
+    /* ----- Blog ----- */
     'The Importance of Sustainable Living in Today\'s World': 'أهمية السياحة المستدامة في عالمنا اليوم',
     'The Art of Crafting Engaging Blog Posts': 'فن التخطيط لرحلة سفر مميزة',
     'Sustainable living is no longer just a trend; it has become a necessity': 'السياحة المستدامة لم تعد مجرد توجه بل أصبحت ضرورة',
@@ -24,7 +23,9 @@ $w.onReady(function () {
     'the concept of sustainable living has gained significant traction': 'مفهوم السفر المستدام اكتسب زخما كبيرا',
     'More than just a trend': 'أكثر من مجرد توجه',
     'sustainable living is a lifestyle choice': 'السفر المستدام هو خيار حياة',
+    'that aims to reduce an individual\'s or': 'يهدف إلى تقليل البصمة البيئية',
     'In a world where content is abundant': 'في عالم مليء بالخيارات',
+    'capturing your audience\'s attention and keeping them engaged is crucial': 'جذب انتباه المسافرين والحفاظ على تجربتهم أمر بالغ الأهمية',
     'Creating engaging blog posts': 'التخطيط لرحلة سفر مميزة',
     'keeping them engaged is crucial': 'الحفاظ على تجربة ممتعة أمر ضروري',
     'This post will guide you through the essential elements': 'سنرشدك في هذا المقال عبر العناصر الأساسية',
@@ -42,6 +43,7 @@ $w.onReady(function () {
     'Omar appreciated the variety of options': 'أعجب بتنوع الخيارات المتاحة',
     'available on 5TAAH for his family trip to Qatar': 'في خته لرحلته العائلية إلى قطر',
     'for his family trip to Qatar': 'لرحلته العائلية إلى قطر',
+    'What Our Travelers Say': 'آراء المسافرين',
     'Fatima Ali': 'فاطمة علي',
     'Omar Khouri': 'عمر الخوري',
     'Ali Hassan': 'علي حسن',
@@ -49,16 +51,17 @@ $w.onReady(function () {
     'Ibrahem': 'إبراهيم',
     'Ibrahim': 'إبراهيم',
 
-    /* ----- Hero & Sections ----- */
+    /* ----- Hero ----- */
     'Travel in Style': 'سافر بأسلوبك مع خته',
     'Join us on a journey to discover exclusive travel deals across the Gulf region, tailored to your wanderlust': 'منصتك الذكية لحجز رحلات الطيران والفنادق والسيارات بأفضل الأسعار في الخليج',
     'Join us on a journey to discover exclusive travel': 'منصتك الذكية لحجز رحلات الطيران والفنادق',
     'deals across the Gulf region, tailored to your wanderlust': 'والسيارات بأفضل الأسعار في الخليج',
     'deals across the Gulf region': 'بأفضل الأسعار في الخليج',
-    'tailored to your wanderlust': '',
+    'tailored to your wanderlust': 'حسب رغباتك',
+
+    /* ----- Section titles ----- */
     'Travel Insights': 'مقالات السفر',
     'Deals': 'العروض والباقات',
-    'What Our Travelers Say': 'آراء المسافرين',
     'Our Offerings': 'خدماتنا',
     'Our Services': 'خدماتنا',
     'Follow Us': 'تابعنا',
@@ -69,7 +72,7 @@ $w.onReady(function () {
     'Courses': 'الجولات السياحية',
     'Sustainability': 'السياحة المستدامة',
 
-    /* ----- Deals / Pricing Plans ----- */
+    /* ----- Deals / Plans ----- */
     'UAE Adventure': 'مغامرة الإمارات',
     'Saudi Tour': 'جولة سعودية',
     'Bahrain Exploration': 'استكشاف البحرين',
@@ -78,7 +81,7 @@ $w.onReady(function () {
     'Kuwait City': 'مدينة الكويت',
     'Oman Discovery': 'اكتشاف عُمان',
 
-    /* ----- Offerings / Services ----- */
+    /* ----- Offerings ----- */
     'Exclusive Packages': 'باقات حصرية',
     'Our exclusive travel packages provide incredible value for your adventures, making it easier to explore the Gulf\'s top destinations': 'باقات سفر حصرية بقيمة استثنائية تسهل عليك استكشاف أفضل الوجهات في الخليج',
     'Our exclusive travel packages provide incredible value for your adventures': 'باقات سفر حصرية بقيمة استثنائية لمغامراتك',
@@ -90,7 +93,6 @@ $w.onReady(function () {
     'to ensure you find exactly what you wish for in your travels': 'لنضمن لك العثور على ما تبحث عنه',
     'User-Friendly Platform': 'منصة سهلة الاستخدام',
     'User-Friendly': 'سهلة الاستخدام',
-    'Platform': 'منصة',
     'Customer Support': 'دعم العملاء',
     'Best Deals': 'أفضل العروض',
     'Secure Payments': 'دفع آمن',
@@ -103,14 +105,14 @@ $w.onReady(function () {
     'Home': 'الرئيسية',
     'Welcome': 'مرحبا بك',
     'Blog Feed': 'المدونة',
-    'Blog': 'مدونة السفر',
+    'Blog': 'المدونة',
     'More': 'المزيد',
     'About': 'من نحن',
     'About Us': 'من نحن',
     'Contact': 'تواصل معنا',
     'Contact Us': 'تواصل معنا',
 
-    /* ----- General actions ----- */
+    /* ----- Actions ----- */
     'Get Started': 'ابدأ الآن',
     'Learn More': 'اكتشف المزيد',
     'Read More': 'اقرأ المزيد',
@@ -133,7 +135,7 @@ $w.onReady(function () {
     'Explore': 'استكشف',
     'Go to Homepage': 'العودة للرئيسية',
 
-    /* ----- Booking / Plans pages ----- */
+    /* ----- Pages ----- */
     'Book Online': 'احجز الآن',
     'Plans & Pricing': 'العروض والباقات',
     'Plan Customization': 'تخصيص الباقة',
@@ -149,23 +151,21 @@ $w.onReady(function () {
     /* ----- Footer ----- */
     'All rights reserved': 'جميع الحقوق محفوظة',
     'Copyright': '5ATTH خته',
-    'Powered and Secured by Wix': '',
-    'Powered and secured by Wix': '',
     'Privacy Policy': 'سياسة الخصوصية',
     'Terms of Use': 'شروط الاستخدام',
     'Terms & Conditions': 'الشروط والأحكام',
     'Accessibility': 'إمكانية الوصول',
     'Accessibility Statement': 'بيان إمكانية الوصول',
     'Refund Policy': 'سياسة الاسترداد',
-
-    /* ----- Footer contact ----- */
     '123-456-7890': '+968 50 000 0000',
     'info@mysite.com': 'info@5atth.com',
     '500 Terry Francine Street': 'الرياض، المملكة العربية السعودية',
     '500 Terry Francine Street,': 'الرياض، المملكة العربية السعودية',
-    '6th Floor, San Francisco': '',
-    'CA 94158': '',
-    'San Francisco': '',
+    '6th Floor, San Francisco': 'المنطقة الشرقية',
+    'CA 94158': 'المملكة العربية السعودية',
+    'San Francisco': 'الرياض',
+    'Powered and Secured by Wix': '5ATTH خته',
+    'Powered and secured by Wix': '5ATTH خته',
   };
 
   var btnMap = {
@@ -187,27 +187,45 @@ $w.onReady(function () {
     'Go to Homepage': 'العودة للرئيسية',
   };
 
+  /* ----- Menu label translation map ----- */
+  var menuLabelMap = {
+    'Home': 'الرئيسية',
+    'Blog': 'المدونة',
+    'Blog Feed': 'المدونة',
+    'Plans & Pricing': 'العروض والباقات',
+    'Book Online': 'احجز الآن',
+    'Service Page': 'الخدمات',
+    'About': 'من نحن',
+    'About Us': 'من نحن',
+    'Contact': 'تواصل معنا',
+    'Contact Us': 'تواصل معنا',
+    'More': 'المزيد',
+    'Cart Page': 'السلة',
+    'My Bookings': 'حجوزاتي',
+    'My Orders': 'طلباتي',
+    'Account Settings': 'الإعدادات',
+    'Profile': 'الملف الشخصي',
+    'Privacy Policy': 'سياسة الخصوصية',
+    'Terms & Conditions': 'الشروط والأحكام',
+    'Accessibility Statement': 'إمكانية الوصول',
+    'Refund Policy': 'سياسة الاسترداد',
+  };
+
   var sortedKeys = Object.keys(map).sort(function (a, b) { return b.length - a.length; });
   var sortedBtnKeys = Object.keys(btnMap).sort(function (a, b) { return b.length - a.length; });
 
-  /* ========== translateAll: single sweep of all elements ========== */
+  /* ========== translateAll ========== */
   function translateAll() {
-    /* 1) Text elements */
+    /* 1) Text — NEVER collapse, NEVER hide */
     try {
       $w('Text').forEach(function (t) {
         try {
           var original = t.text || '';
-          if (!original) return;
-          /* Skip if already Arabic (contains Arabic chars and no Latin letters) */
+          if (!original || original.length < 2) return;
           if (/[\u0600-\u06FF]/.test(original) && !/[A-Za-z]{3,}/.test(original)) return;
           sortedKeys.forEach(function (eng) {
-            if (original.indexOf(eng) !== -1) {
-              if (map[eng] === '') {
-                t.text = ' ';
-                try { t.collapse(); } catch (e) {}
-              } else {
-                t.text = map[eng];
-              }
+            if (original.indexOf(eng) !== -1 && map[eng]) {
+              t.text = map[eng];
             }
           });
         } catch (e) {}
@@ -229,7 +247,7 @@ $w.onReady(function () {
       });
     } catch (e) {}
 
-    /* 3) Repeaters (Blog, Pricing Plans, Testimonials, etc.) */
+    /* 3) Repeaters */
     try {
       $w('Repeater').forEach(function (rep) {
         try {
@@ -238,7 +256,7 @@ $w.onReady(function () {
               $i('Text').forEach(function (t) {
                 try {
                   var txt = t.text || '';
-                  if (!txt) return;
+                  if (!txt || txt.length < 2) return;
                   if (/[\u0600-\u06FF]/.test(txt) && !/[A-Za-z]{3,}/.test(txt)) return;
                   sortedKeys.forEach(function (eng) {
                     if (txt.indexOf(eng) !== -1 && map[eng]) {
@@ -270,32 +288,37 @@ $w.onReady(function () {
   try { $w('Header').forEach(function (h) { try { h.style.backgroundColor = '#0E0E12'; } catch (e) {} }); } catch (e) {}
   try { $w('Footer').forEach(function (f) { try { f.style.backgroundColor = '#0E0E12'; } catch (e) {} }); } catch (e) {}
 
-  /* ========== Run translation immediately ========== */
+  /* ========== Run immediately + delayed sweeps ========== */
   translateAll();
-
-  /* ========== Delayed sweeps to catch async Wix app widgets ========== */
   setTimeout(translateAll, 800);
   setTimeout(translateAll, 2000);
   setTimeout(translateAll, 4000);
   setTimeout(translateAll, 7000);
 
   /* =========================================================
-   *  Navigation Menu — links to EXISTING pages only
+   *  Menu: TRANSLATE labels only, KEEP original template links
    * ========================================================= */
   try {
     $w('Menu').forEach(function (menu) {
       try {
-        menu.menuItems = [
-          { label: 'الرئيسية', link: '/' },
-          { label: 'العروض', link: '/plans-pricing' },
-          { label: 'الحجز', link: '/book-online' },
-          { label: 'المدونة', link: '/blog' },
-        ];
+        var items = menu.menuItems;
+        if (items && items.length > 0) {
+          function translateMenuItem(item) {
+            if (item.label && menuLabelMap[item.label]) {
+              item.label = menuLabelMap[item.label];
+            }
+            if (item.items && item.items.length > 0) {
+              item.items.forEach(translateMenuItem);
+            }
+          }
+          items.forEach(translateMenuItem);
+          menu.menuItems = items;
+        }
       } catch (e) {}
     });
   } catch (e) {}
 
-  /* ========== Country / Currency Selector ========== */
+  /* ========== Country / Currency ========== */
   try {
     var storage = (wixWindow && wixWindow.storage) ? wixWindow.storage.local : null;
     var savedCountry = storage ? (storage.getItem('selectedCountry') || 'SA') : 'SA';

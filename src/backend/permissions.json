@@ -1,16 +1,169 @@
 {
   "web-methods": {
-    "*": {
+    "searchService.web.js": {
       "*": {
-        "siteOwner": {
-          "invoke": true
-        },
-        "siteMember": {
-          "invoke": true
-        },
-        "anonymous": {
-          "invoke": true
-        }
+        "siteOwner": { "invoke": true },
+        "siteMember": { "invoke": true },
+        "anonymous": { "invoke": true }
+      }
+    },
+    "bookingService.web.js": {
+      "createBooking": {
+        "siteOwner": { "invoke": true },
+        "siteMember": { "invoke": true },
+        "anonymous": { "invoke": false }
+      },
+      "confirmBooking": {
+        "siteOwner": { "invoke": true },
+        "siteMember": { "invoke": true },
+        "anonymous": { "invoke": false }
+      },
+      "cancelBooking": {
+        "siteOwner": { "invoke": true },
+        "siteMember": { "invoke": true },
+        "anonymous": { "invoke": false }
+      },
+      "getUserBookings": {
+        "siteOwner": { "invoke": true },
+        "siteMember": { "invoke": true },
+        "anonymous": { "invoke": false }
+      },
+      "getBookingDetails": {
+        "siteOwner": { "invoke": true },
+        "siteMember": { "invoke": true },
+        "anonymous": { "invoke": false }
+      }
+    },
+    "paymentMoyasar.web.js": {
+      "getPublishableKey": {
+        "siteOwner": { "invoke": true },
+        "siteMember": { "invoke": true },
+        "anonymous": { "invoke": true }
+      },
+      "createInvoice": {
+        "siteOwner": { "invoke": true },
+        "siteMember": { "invoke": true },
+        "anonymous": { "invoke": false }
+      },
+      "fetchPayment": {
+        "siteOwner": { "invoke": true },
+        "siteMember": { "invoke": true },
+        "anonymous": { "invoke": false }
+      },
+      "refundPayment": {
+        "siteOwner": { "invoke": true },
+        "siteMember": { "invoke": false },
+        "anonymous": { "invoke": false }
+      }
+    },
+    "notificationService.web.js": {
+      "sendNotification": {
+        "siteOwner": { "invoke": true },
+        "siteMember": { "invoke": false },
+        "anonymous": { "invoke": false }
+      }
+    },
+    "pricingService.web.js": {
+      "applyMarkup": {
+        "siteOwner": { "invoke": true },
+        "siteMember": { "invoke": true },
+        "anonymous": { "invoke": true }
+      },
+      "getMarkupRules": {
+        "siteOwner": { "invoke": true },
+        "siteMember": { "invoke": false },
+        "anonymous": { "invoke": false }
+      },
+      "saveMarkupRule": {
+        "siteOwner": { "invoke": true },
+        "siteMember": { "invoke": false },
+        "anonymous": { "invoke": false }
+      },
+      "deleteMarkupRule": {
+        "siteOwner": { "invoke": true },
+        "siteMember": { "invoke": false },
+        "anonymous": { "invoke": false }
+      }
+    },
+    "rbacService.web.js": {
+      "checkPermission": {
+        "siteOwner": { "invoke": true },
+        "siteMember": { "invoke": true },
+        "anonymous": { "invoke": false }
+      },
+      "getUserPermissions": {
+        "siteOwner": { "invoke": true },
+        "siteMember": { "invoke": true },
+        "anonymous": { "invoke": false }
+      },
+      "getRoles": {
+        "siteOwner": { "invoke": true },
+        "siteMember": { "invoke": false },
+        "anonymous": { "invoke": false }
+      },
+      "saveRole": {
+        "siteOwner": { "invoke": true },
+        "siteMember": { "invoke": false },
+        "anonymous": { "invoke": false }
+      }
+    },
+    "integrationsAdmin.web.js": {
+      "*": {
+        "siteOwner": { "invoke": true },
+        "siteMember": { "invoke": false },
+        "anonymous": { "invoke": false }
+      }
+    },
+    "cmsService.web.js": {
+      "getSectionContent": {
+        "siteOwner": { "invoke": true },
+        "siteMember": { "invoke": true },
+        "anonymous": { "invoke": true }
+      },
+      "getArticles": {
+        "siteOwner": { "invoke": true },
+        "siteMember": { "invoke": true },
+        "anonymous": { "invoke": true }
+      },
+      "getArticleBySlug": {
+        "siteOwner": { "invoke": true },
+        "siteMember": { "invoke": true },
+        "anonymous": { "invoke": true }
+      },
+      "getCuratedOffers": {
+        "siteOwner": { "invoke": true },
+        "siteMember": { "invoke": true },
+        "anonymous": { "invoke": true }
+      },
+      "submitLead": {
+        "siteOwner": { "invoke": true },
+        "siteMember": { "invoke": true },
+        "anonymous": { "invoke": true }
+      },
+      "getFeatureFlags": {
+        "siteOwner": { "invoke": true },
+        "siteMember": { "invoke": true },
+        "anonymous": { "invoke": true }
+      },
+      "savePage": {
+        "siteOwner": { "invoke": true },
+        "siteMember": { "invoke": false },
+        "anonymous": { "invoke": false }
+      },
+      "saveArticle": {
+        "siteOwner": { "invoke": true },
+        "siteMember": { "invoke": false },
+        "anonymous": { "invoke": false }
+      },
+      "saveCuratedOffer": {
+        "siteOwner": { "invoke": true },
+        "siteMember": { "invoke": false },
+        "anonymous": { "invoke": false }
+      },
+      "toggleFeatureFlag": {
+        "siteOwner": { "invoke": true },
+        "siteMember": { "invoke": false },
+        "anonymous": { "invoke": false }
       }
     }
   }

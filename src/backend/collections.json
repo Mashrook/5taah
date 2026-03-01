@@ -1,0 +1,307 @@
+{
+  "collections": [
+    {
+      "id": "tenants",
+      "fields": {
+        "name": { "type": "text" },
+        "slug": { "type": "text" },
+        "status": { "type": "text" },
+        "countryDefault": { "type": "text" },
+        "currencyDefault": { "type": "text" },
+        "themeJson": { "type": "text" },
+        "logoMediaId": { "type": "image" },
+        "createdAt": { "type": "datetime" }
+      }
+    },
+    {
+      "id": "tenant_members",
+      "fields": {
+        "tenantId": { "type": "reference", "referencedCollection": "tenants" },
+        "userId": { "type": "text" },
+        "role": { "type": "text" },
+        "createdAt": { "type": "datetime" }
+      }
+    },
+    {
+      "id": "feature_flags",
+      "fields": {
+        "tenantId": { "type": "reference", "referencedCollection": "tenants" },
+        "featureKey": { "type": "text" },
+        "enabled": { "type": "boolean" }
+      }
+    },
+    {
+      "id": "providers",
+      "fields": {
+        "name": { "type": "text" },
+        "serviceType": { "type": "text" },
+        "category": { "type": "text" },
+        "description": { "type": "text" },
+        "createdAt": { "type": "datetime" }
+      }
+    },
+    {
+      "id": "provider_endpoints",
+      "fields": {
+        "tenantId": { "type": "reference", "referencedCollection": "tenants" },
+        "providerName": { "type": "text" },
+        "environment": { "type": "text" },
+        "baseUrl": { "type": "url" },
+        "fallbackUrl": { "type": "url" },
+        "enabled": { "type": "boolean" },
+        "priority": { "type": "number" },
+        "updatedAt": { "type": "datetime" }
+      }
+    },
+    {
+      "id": "provider_credentials",
+      "fields": {
+        "tenantId": { "type": "reference", "referencedCollection": "tenants" },
+        "providerName": { "type": "text" },
+        "keyName": { "type": "text" },
+        "isSecret": { "type": "boolean" },
+        "secretRefName": { "type": "text" },
+        "plainValue": { "type": "text" },
+        "isActive": { "type": "boolean" },
+        "rotatedAt": { "type": "datetime" },
+        "createdAt": { "type": "datetime" }
+      }
+    },
+    {
+      "id": "provider_audit_logs",
+      "fields": {
+        "tenantId": { "type": "reference", "referencedCollection": "tenants" },
+        "providerName": { "type": "text" },
+        "actorUserId": { "type": "text" },
+        "actionType": { "type": "text" },
+        "oldValueJson": { "type": "text" },
+        "newValueJson": { "type": "text" },
+        "ipAddress": { "type": "text" },
+        "userAgent": { "type": "text" },
+        "createdAt": { "type": "datetime" }
+      }
+    },
+    {
+      "id": "search_sessions",
+      "fields": {
+        "tenantId": { "type": "reference", "referencedCollection": "tenants" },
+        "userId": { "type": "text" },
+        "productType": { "type": "text" },
+        "paramsJson": { "type": "text" },
+        "providerStrategy": { "type": "text" },
+        "createdAt": { "type": "datetime" },
+        "expiresAt": { "type": "datetime" }
+      }
+    },
+    {
+      "id": "offers",
+      "fields": {
+        "searchSessionId": { "type": "reference", "referencedCollection": "search_sessions" },
+        "tenantId": { "type": "reference", "referencedCollection": "tenants" },
+        "providerName": { "type": "text" },
+        "providerOfferId": { "type": "text" },
+        "productType": { "type": "text" },
+        "totalAmount": { "type": "number" },
+        "currency": { "type": "text" },
+        "baseAmount": { "type": "number" },
+        "taxesAmount": { "type": "number" },
+        "markupAmount": { "type": "number" },
+        "refundable": { "type": "boolean" },
+        "baggageSummaryJson": { "type": "text" },
+        "scoreJson": { "type": "text" },
+        "deepLinkUrl": { "type": "url" },
+        "createdAt": { "type": "datetime" }
+      }
+    },
+    {
+      "id": "itineraries",
+      "fields": {
+        "offerId": { "type": "reference", "referencedCollection": "offers" },
+        "direction": { "type": "text" },
+        "durationMinutes": { "type": "number" },
+        "stopsCount": { "type": "number" }
+      }
+    },
+    {
+      "id": "segments",
+      "fields": {
+        "itineraryId": { "type": "reference", "referencedCollection": "itineraries" },
+        "fromIata": { "type": "text" },
+        "toIata": { "type": "text" },
+        "departAt": { "type": "datetime" },
+        "arriveAt": { "type": "datetime" },
+        "marketingCarrier": { "type": "text" },
+        "operatingCarrier": { "type": "text" },
+        "flightNumber": { "type": "text" },
+        "cabin": { "type": "text" },
+        "fareClass": { "type": "text" },
+        "baggageJson": { "type": "text" }
+      }
+    },
+    {
+      "id": "hotels_offers",
+      "fields": {
+        "offerId": { "type": "reference", "referencedCollection": "offers" },
+        "providerHotelId": { "type": "text" },
+        "roomJson": { "type": "text" },
+        "boardType": { "type": "text" },
+        "cancellationPolicyJson": { "type": "text" }
+      }
+    },
+    {
+      "id": "cars_offers",
+      "fields": {
+        "offerId": { "type": "reference", "referencedCollection": "offers" },
+        "supplier": { "type": "text" },
+        "vehicleJson": { "type": "text" },
+        "depositPolicyJson": { "type": "text" }
+      }
+    },
+    {
+      "id": "tours_offers",
+      "fields": {
+        "offerId": { "type": "reference", "referencedCollection": "offers" },
+        "activityJson": { "type": "text" },
+        "meetingPoint": { "type": "text" },
+        "duration": { "type": "text" },
+        "inclusionsJson": { "type": "text" }
+      }
+    },
+    {
+      "id": "bookings",
+      "fields": {
+        "tenantId": { "type": "reference", "referencedCollection": "tenants" },
+        "userId": { "type": "text" },
+        "productType": { "type": "text" },
+        "providerName": { "type": "text" },
+        "status": { "type": "text" },
+        "selectedOfferId": { "type": "reference", "referencedCollection": "offers" },
+        "providerOrderId": { "type": "text" },
+        "travelersJson": { "type": "text" },
+        "contactJson": { "type": "text" },
+        "pricingJson": { "type": "text" },
+        "createdAt": { "type": "datetime" },
+        "updatedAt": { "type": "datetime" }
+      }
+    },
+    {
+      "id": "invoices",
+      "fields": {
+        "tenantId": { "type": "reference", "referencedCollection": "tenants" },
+        "bookingId": { "type": "reference", "referencedCollection": "bookings" },
+        "amount": { "type": "number" },
+        "currency": { "type": "text" },
+        "status": { "type": "text" },
+        "createdAt": { "type": "datetime" },
+        "updatedAt": { "type": "datetime" }
+      }
+    },
+    {
+      "id": "payments",
+      "fields": {
+        "invoiceId": { "type": "reference", "referencedCollection": "invoices" },
+        "providerName": { "type": "text" },
+        "providerPaymentId": { "type": "text" },
+        "status": { "type": "text" },
+        "paidAt": { "type": "datetime" },
+        "rawPayloadJson": { "type": "text" }
+      }
+    },
+    {
+      "id": "notifications_log",
+      "fields": {
+        "tenantId": { "type": "reference", "referencedCollection": "tenants" },
+        "userId": { "type": "text" },
+        "channel": { "type": "text" },
+        "templateKey": { "type": "text" },
+        "payloadJson": { "type": "text" },
+        "status": { "type": "text" },
+        "createdAt": { "type": "datetime" }
+      }
+    },
+    {
+      "id": "cms_pages",
+      "fields": {
+        "tenantId": { "type": "reference", "referencedCollection": "tenants" },
+        "sectionKey": { "type": "text" },
+        "slug": { "type": "text" },
+        "title": { "type": "text" },
+        "contentRichText": { "type": "richtext" },
+        "heroMediaId": { "type": "image" },
+        "seoJson": { "type": "text" },
+        "status": { "type": "text" },
+        "updatedAt": { "type": "datetime" }
+      }
+    },
+    {
+      "id": "articles",
+      "fields": {
+        "tenantId": { "type": "reference", "referencedCollection": "tenants" },
+        "slug": { "type": "text" },
+        "title": { "type": "text" },
+        "content": { "type": "richtext" },
+        "tagsJson": { "type": "text" },
+        "seasonKey": { "type": "text" },
+        "seoJson": { "type": "text" },
+        "publishedAt": { "type": "datetime" }
+      }
+    },
+    {
+      "id": "curated_offers",
+      "fields": {
+        "tenantId": { "type": "reference", "referencedCollection": "tenants" },
+        "title": { "type": "text" },
+        "segmentKey": { "type": "text" },
+        "heroMediaId": { "type": "image" },
+        "ctaLabel": { "type": "text" },
+        "ctaTargetJson": { "type": "text" },
+        "activeFrom": { "type": "datetime" },
+        "activeTo": { "type": "datetime" },
+        "priority": { "type": "number" },
+        "status": { "type": "text" }
+      }
+    },
+    {
+      "id": "leads",
+      "fields": {
+        "tenantId": { "type": "reference", "referencedCollection": "tenants" },
+        "segmentKey": { "type": "text" },
+        "name": { "type": "text" },
+        "phone": { "type": "text" },
+        "budgetRange": { "type": "text" },
+        "destinationPreference": { "type": "text" },
+        "travelersCount": { "type": "number" },
+        "source": { "type": "text" },
+        "createdAt": { "type": "datetime" }
+      }
+    },
+    {
+      "id": "markup_rules",
+      "fields": {
+        "tenantId": { "type": "reference", "referencedCollection": "tenants" },
+        "scopeJson": { "type": "text" },
+        "ruleType": { "type": "text" },
+        "value": { "type": "number" },
+        "enabled": { "type": "boolean" },
+        "priority": { "type": "number" }
+      }
+    },
+    {
+      "id": "roles",
+      "fields": {
+        "name": { "type": "text" },
+        "description": { "type": "text" },
+        "tenantId": { "type": "reference", "referencedCollection": "tenants" },
+        "createdAt": { "type": "datetime" }
+      }
+    },
+    {
+      "id": "role_permissions",
+      "fields": {
+        "roleId": { "type": "reference", "referencedCollection": "roles" },
+        "permissionKey": { "type": "text" },
+        "createdAt": { "type": "datetime" }
+      }
+    }
+  ]
+}

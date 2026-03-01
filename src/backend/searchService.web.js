@@ -56,13 +56,15 @@ async function storeOffers(sessionId, tenantId, providerName, offers) {
   }));
 
   const inserted = [];
-  for (const item of items) {
+  for (let idx = 0; idx < items.length; idx++) {
+    const item = items[idx];
+    const originalOffer = offers[idx];
     const result = await wixData.insert('offers', item);
     inserted.push(result);
 
     // Store itineraries
-    if (offer.itineraries) {
-      for (const itin of offer.itineraries) {
+    if (originalOffer.itineraries) {
+      for (const itin of originalOffer.itineraries) {
         const itinRecord = await wixData.insert('itineraries', {
           offerId: result._id,
           direction: itin.direction,
@@ -82,18 +84,18 @@ async function storeOffers(sessionId, tenantId, providerName, offers) {
     }
 
     // Store hotel data
-    if (offer.hotelData) {
+    if (originalOffer.hotelData) {
       await wixData.insert('hotels_offers', {
         offerId: result._id,
-        ...offer.hotelData,
+        ...originalOffer.hotelData,
       });
     }
 
     // Store tour data
-    if (offer.tourData) {
+    if (originalOffer.tourData) {
       await wixData.insert('tours_offers', {
         offerId: result._id,
-        ...offer.tourData,
+        ...originalOffer.tourData,
       });
     }
   }

@@ -77,10 +77,17 @@ export async function getActiveProvider(tenantId, serviceType) {
 // getEndpoint — returns endpoint config (baseUrl, fallbackUrl)
 // ─────────────────────────────────────────────────────────
 export async function getEndpoint(tenantId, providerName, environment = 'production') {
-  const results = await wixData.query('ProviderEndpoints')
-    .eq('tenantId', tenantId)
+  let q = wixData.query('ProviderEndpoints')
     .eq('providerName', providerName)
-    .eq('environment', environment)
+    .eq('environment', environment);
+
+  // If tenantId is provided, filter by it; otherwise get any matching endpoint
+  if (tenantId) {
+    q = q.eq('tenantId', tenantId);
+  }
+
+  const results = await q.eq('enabled', true)
+    .descending('priority')
     .find();
 
   if (!results.items.length) {
@@ -94,12 +101,17 @@ export async function getEndpoint(tenantId, providerName, environment = 'product
 // getCredential — fetches credential, resolves secret if needed
 // ─────────────────────────────────────────────────────────
 export async function getCredential(tenantId, providerName, keyName) {
-  const results = await wixData.query('ProviderCredentials')
-    .eq('tenantId', tenantId)
+  let q = wixData.query('ProviderCredentials')
     .eq('providerName', providerName)
     .eq('keyName', keyName)
-    .eq('isActive', true)
-    .find();
+    .eq('isActive', true);
+
+  // If tenantId is provided, filter by it; otherwise get any matching credential
+  if (tenantId) {
+    q = q.eq('tenantId', tenantId);
+  }
+
+  const results = await q.find();
 
   if (!results.items.length) {
     throw new Error(`Credential "${keyName}" not found for ${providerName}`);

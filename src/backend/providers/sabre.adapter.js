@@ -160,3 +160,85 @@ export async function testConnection(endpoint, credentials) {
     return { success: false, message: err.message };
   }
 }
+
+// ─── Raw Search (for Unified Search Pipeline) ──────────────
+// Returns raw Sabre JSON without normalization, used by
+// backend/search/unifiedSearch.adapter.js → normalize.js
+import { getEndpoint, getCredential } from '../integrationRegistry.jsw';
+
+export async function searchFlightsRaw(params, { env }) {
+  const epRecord = await getEndpoint(null, "sabre", env || "production");
+  const baseUrl = (epRecord.baseUrl || epRecord).replace(/\/$/, "");
+
+  const credClientId = await getCredential(null, "sabre", "client_id");
+  const credClientSecret = await getCredential(null, "sabre", "client_secret");
+  const clientId = credClientId.resolvedValue || credClientId;
+  const clientSecret = credClientSecret.resolvedValue || credClientSecret;
+
+  const token = await getSabreTokenDirect(baseUrl, clientId, clientSecret);
+
+  const body = {
+    OTA_AirLowFareSearchRQ: {
+      OriginDestinationInformation: [
+        {
+          DepartureDateTime: params.departDate,
+          OriginLocation: { LocationCode: params.origin },
+          DestinationLocation: { LocationCode: params.destination },
+        },
+      ],
+      TravelerInfoSummary: {
+        AirTravelerAvail: [{
+          PassengerTypeQuantity: [{ Code: 'ADT', Quantity: params.adults || 1 }],
+        }],
+      },
+      TPA_Extensions: {
+        IntelliSellTransaction: { RequestType: { Name: '50ITINS' } },
+      },
+    },
+  };
+
+  if (params.returnDate) {
+    body.OTA_AirLowFareSearchRQ.OriginDestinationInformation.push({
+      DepartureDateTime: params.returnDate,
+      OriginLocation: { LocationCode: params.destination },
+      DestinationLocation: { LocationCode: params.origin },
+    });
+  }
+
+  const res = await fetch(`${baseUrl}/v4/offers/shop`, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(body),
+  });
+
+  if (!res.ok) {
+    const txt = await res.text();
+    throw new Error(`Sabre raw search failed: ${res.status} ${txt}`);
+  }
+  return await res.json(); // raw Sabre response
+}
+
+async function getSabreTokenDirect(baseUrl, clientId, clientSecret) {
+  const encoded = typeof Buffer !== 'undefined'
+    ? Buffer.from(`${clientId}:${clientSecret}`).toString('base64')
+    : btoa(`${clientId}:${clientSecret}`);
+
+  const res = await fetch(`${baseUrl}/v2/auth/token`, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Basic ${encoded}`,
+      'Content-Type': 'application/x-www-form-urlencoded',
+    },
+    body: 'grant_type=client_credentials',
+  });
+
+  if (!res.ok) {
+    const txt = await res.text();
+    throw new Error(`Sabre token (raw) failed: ${res.status} ${txt}`);
+  }
+  const json = await res.json();
+  return json.access_token;
+}

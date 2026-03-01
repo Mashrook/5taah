@@ -289,3 +289,103 @@ export async function testConnection(endpoint, credentials) {
     return { success: false, message: err.message };
   }
 }
+
+// ─── Raw Search (for Unified Search Pipeline) ──────────────
+// Returns raw Amadeus JSON without normalization, used by
+// backend/search/unifiedSearch.adapter.js → normalize.js
+import { getEndpoint, getCredential } from '../integrationRegistry.jsw';
+
+export async function searchFlightsRaw(params, { env }) {
+  // Resolve endpoint + credentials from Integration Registry
+  const epRecord = await getEndpoint(null, "amadeus", env || "production");
+  const baseUrl = (epRecord.baseUrl || epRecord).replace(/\/$/, "");
+
+  const credClientId = await getCredential(null, "amadeus", "client_id");
+  const credClientSecret = await getCredential(null, "amadeus", "client_secret");
+  const clientId = credClientId.resolvedValue || credClientId;
+  const clientSecret = credClientSecret.resolvedValue || credClientSecret;
+
+  const token = await getAmadeusTokenDirect(baseUrl, clientId, clientSecret);
+
+  const searchBody = {
+    currencyCode: params.currency || 'SAR',
+    originDestinations: [
+      {
+        id: '1',
+        originLocationCode: params.origin,
+        destinationLocationCode: params.destination,
+        departureDateTimeRange: { date: params.departDate },
+      },
+    ],
+    travelers: Array.from({ length: params.adults || 1 }, (_, i) => ({
+      id: String(i + 1),
+      travelerType: 'ADULT',
+    })),
+    sources: ['GDS'],
+    searchCriteria: {
+      maxFlightOffers: 50,
+    },
+  };
+
+  if (params.cabin) {
+    searchBody.searchCriteria.flightFilters = {
+      cabinRestrictions: [{
+        cabin: mapCabin(params.cabin),
+        coverage: 'MOST_SEGMENTS',
+        originDestinationIds: ['1'],
+      }],
+    };
+  }
+
+  if (params.returnDate) {
+    searchBody.originDestinations.push({
+      id: '2',
+      originLocationCode: params.destination,
+      destinationLocationCode: params.origin,
+      departureDateTimeRange: { date: params.returnDate },
+    });
+    if (searchBody.searchCriteria.flightFilters?.cabinRestrictions?.[0]) {
+      searchBody.searchCriteria.flightFilters.cabinRestrictions[0].originDestinationIds.push('2');
+    }
+  }
+
+  const res = await fetch(`${baseUrl}/v2/shopping/flight-offers`, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(searchBody),
+  });
+
+  if (!res.ok) {
+    const txt = await res.text();
+    throw new Error(`Amadeus raw search failed: ${res.status} ${txt}`);
+  }
+  return await res.json(); // raw Amadeus response
+}
+
+async function getAmadeusTokenDirect(baseUrl, clientId, clientSecret) {
+  const tokenUrl = `${baseUrl}/v1/security/oauth2/token`;
+  const body = `grant_type=client_credentials&client_id=${encodeURIComponent(clientId)}&client_secret=${encodeURIComponent(clientSecret)}`;
+
+  const res = await fetch(tokenUrl, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body,
+  });
+
+  if (!res.ok) {
+    const txt = await res.text();
+    throw new Error(`Amadeus token (raw) failed: ${res.status} ${txt}`);
+  }
+  const json = await res.json();
+  return json.access_token;
+}
+
+function mapCabin(cabin) {
+  if (!cabin) return "ECONOMY";
+  const c = String(cabin).toUpperCase();
+  if (c === "PREMIUM") return "PREMIUM_ECONOMY";
+  return c;
+}

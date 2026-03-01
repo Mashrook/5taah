@@ -13,6 +13,7 @@ import { sendNotification } from './notificationService.web';
 import { testConnection, getActiveProvider, searchWithFallback, getCredential } from './integrationRegistry.jsw';
 import { checkPermission } from './rbacService.web';
 import { applyMarkup } from './pricingService.web';
+import { searchFlightsUnified } from './search/unifiedSearch.adapter.js';
 
 // ════════════════════════════════════════════════════════
 // Rate limiter (in-memory, per-instance)
@@ -249,11 +250,54 @@ export async function post_search(request) {
     const body = await request.body.json();
     const { tenantId, productType, params, currency } = body;
 
-    if (!tenantId || !productType || !params) {
-      return badRequest({ body: JSON.stringify({ error: 'tenantId, productType, params required' }) });
+    if (!productType || !params) {
+      return badRequest({ body: JSON.stringify({ error: 'productType, params required' }) });
     }
 
-    // Create search session
+    // ── Flights: use the new Unified Search Pipeline ──
+    if (productType === 'flights' || productType === 'flight') {
+      const result = await searchFlightsUnified(params, {
+        environment: params.environment || 'production',
+        providerTimeoutMs: 12000,
+        strategy: 'multi',
+      });
+
+      // Apply markup to each ranked offer
+      const offersWithMarkup = [];
+      for (const offer of result.offers) {
+        try {
+          const marked = await applyMarkup(tenantId, offer.totalAmount, {
+            productType: 'flights',
+            providerName: offer.providerName,
+            currency: currency || offer.currency || 'SAR',
+          });
+          offersWithMarkup.push({
+            ...offer,
+            markupAmount: marked.markupAmount || 0,
+            totalAmount: marked.finalPrice || offer.totalAmount,
+          });
+        } catch (_) {
+          // If markup fails, return original price
+          offersWithMarkup.push(offer);
+        }
+      }
+
+      return ok({
+        body: JSON.stringify({
+          sessionId: result.sessionId,
+          totalResults: offersWithMarkup.length,
+          providers: result.providers,
+          offers: offersWithMarkup,
+        }),
+        headers: { 'Content-Type': 'application/json' },
+      });
+    }
+
+    // ── Other product types: legacy fallback path ──
+    if (!tenantId) {
+      return badRequest({ body: JSON.stringify({ error: 'tenantId required for non-flight search' }) });
+    }
+
     const session = await wixData.insert('SearchSessions', {
       tenantId,
       productType,
@@ -263,9 +307,7 @@ export async function post_search(request) {
       expiresAt: new Date(Date.now() + 30 * 60 * 1000),
     });
 
-    // Search via integration registry with fallback
     const results = await searchWithFallback(tenantId, productType, async (adapter, endpoint, providerName) => {
-      // Resolve credentials
       const creds = await wixData.query('ProviderCredentials')
         .eq('tenantId', tenantId)
         .eq('providerName', providerName)
@@ -282,11 +324,8 @@ export async function post_search(request) {
         }
       }
 
-      // Call the appropriate search method
       let searchResults;
-      if (productType === 'flights' && typeof adapter.searchFlights === 'function') {
-        searchResults = await adapter.searchFlights(endpoint, credentials, params);
-      } else if (productType === 'hotels' && typeof adapter.searchHotels === 'function') {
+      if (productType === 'hotels' && typeof adapter.searchHotels === 'function') {
         searchResults = await adapter.searchHotels(endpoint, credentials, params);
       } else if (productType === 'activities' && typeof adapter.searchActivities === 'function') {
         searchResults = await adapter.searchActivities(endpoint, credentials, params);
@@ -297,7 +336,6 @@ export async function post_search(request) {
       return { providerName, offers: searchResults };
     });
 
-    // Apply markup to each offer
     const offersWithMarkup = [];
     for (const offer of (results.offers || [])) {
       const marked = await applyMarkup(tenantId, offer.totalAmount || offer.baseAmount, {
@@ -313,7 +351,6 @@ export async function post_search(request) {
       });
     }
 
-    // Store offers
     for (const offer of offersWithMarkup) {
       await wixData.insert('Offers', {
         tenantId,

@@ -1,6 +1,55 @@
-# dependencies
-node_modules/
-.vscode/
-.idea/
-.wix/
-jsconfig.json
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+node_modules
+dist
+dist-ssr
+*.local
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Ignore Android build and asset files
+android/app/build/
+android/build/
+android/.gradle/
+android/.idea/
+*.iml
+*.apk
+*.lock
+
+# Xcode user state (ignore user-specific, keep project structure)
+*.xcuserstate
+*.xcworkspace/xcuserdata/
+*.xcodeproj/xcuserdata/
+
+.env
+
+# Build artifacts
+build/
+*.p12
+*.p8
+*.ipa
+AuthKey*.p8
+
+# Swift build
+.build/
+.swiftpm/
+
+# Stale lock files
+bun.lockb
+

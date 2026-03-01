@@ -1,0 +1,91 @@
+{
+  "typeAcquisition": {
+    "enable": true
+  },
+  "references": [
+    {
+      "path": ".wix\\types\\axfi1\\jsconfig.json"
+    },
+    {
+      "path": ".wix\\types\\ckx7t\\jsconfig.json"
+    },
+    {
+      "path": ".wix\\types\\eqnuy\\jsconfig.json"
+    },
+    {
+      "path": ".wix\\types\\fys6m\\jsconfig.json"
+    },
+    {
+      "path": ".wix\\types\\hwy3n\\jsconfig.json"
+    },
+    {
+      "path": ".wix\\types\\jk43d\\jsconfig.json"
+    },
+    {
+      "path": ".wix\\types\\jtys9\\jsconfig.json"
+    },
+    {
+      "path": ".wix\\types\\k5w7d\\jsconfig.json"
+    },
+    {
+      "path": ".wix\\types\\k9v1i\\jsconfig.json"
+    },
+    {
+      "path": ".wix\\types\\kgvh7\\jsconfig.json"
+    },
+    {
+      "path": ".wix\\types\\l0vg6\\jsconfig.json"
+    },
+    {
+      "path": ".wix\\types\\mnhy1\\jsconfig.json"
+    },
+    {
+      "path": ".wix\\types\\n41f7\\jsconfig.json"
+    },
+    {
+      "path": ".wix\\types\\qlhpn\\jsconfig.json"
+    },
+    {
+      "path": ".wix\\types\\rljqx\\jsconfig.json"
+    },
+    {
+      "path": ".wix\\types\\swayo\\jsconfig.json"
+    },
+    {
+      "path": ".wix\\types\\szuwm\\jsconfig.json"
+    },
+    {
+      "path": ".wix\\types\\t8o9b\\jsconfig.json"
+    },
+    {
+      "path": ".wix\\types\\tdk8t\\jsconfig.json"
+    },
+    {
+      "path": ".wix\\types\\u0per\\jsconfig.json"
+    },
+    {
+      "path": ".wix\\types\\u5sg2\\jsconfig.json"
+    },
+    {
+      "path": ".wix\\types\\vhm86\\jsconfig.json"
+    },
+    {
+      "path": ".wix\\types\\xa814\\jsconfig.json"
+    },
+    {
+      "path": ".wix\\types\\ylkdf\\jsconfig.json"
+    },
+    {
+      "path": ".wix\\types\\h9z8t\\jsconfig.json"
+    },
+    {
+      "path": ".wix\\types\\masterPage\\jsconfig.json"
+    },
+    {
+      "path": ".wix\\types\\backend\\jsconfig.json"
+    },
+    {
+      "path": ".wix\\types\\public\\jsconfig.json"
+    }
+  ]
+}

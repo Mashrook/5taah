@@ -1,209 +1,214 @@
 /**
- * 5ATTH | خته — Flights Search & Results Page
+ * 5ATTH | خته – Flights Search Engine ✈️
+ * محرك بحث رحلات الطيران
  */
 import wixWindow from 'wix-window';
 import wixLocation from 'wix-location';
 import wixSeo from 'wix-seo';
-import { searchFlights, getOfferDetails } from 'backend/searchService.web';
+import { searchFlights } from 'backend/searchService.web';
 
-const TENANT_ID = 'default';
-let currentOffers = [];
+function el(id) { try { return $w(id); } catch (e) { return null; } }
+function setText(id, txt) { try { var e = el(id); if (e) e.text = txt; } catch (e) {} }
+function setLabel(id, txt) { try { var e = el(id); if (e) e.label = txt; } catch (e) {} }
+function show(id) { try { var e = el(id); if (e) e.expand(); } catch (e) {} }
+function hide(id) { try { var e = el(id); if (e) e.collapse(); } catch (e) {} }
+function btn(id, fn) { try { var e = el(id); if (e) e.onClick(fn); } catch (e) {} }
+
+var TENANT = 'default';
+var currentOffers = [];
 
 $w.onReady(async function () {
   wixSeo.title = 'حجز طيران | 5ATTH خته';
   wixSeo.description = 'ابحث واحجز أفضل رحلات الطيران بأسعار تنافسية - مقارنة بين عدة مزودين';
 
-  const currency = wixWindow.storage.local.getItem('selectedCurrency') || 'SAR';
+  /* ——— Page Title ——————————————————— */
+  setText('#pageTitle', '✈️ حجز رحلات الطيران');
+  setText('#pageSubtitle', 'ابحث وقارن بين مئات الرحلات من أفضل شركات الطيران');
 
-  // ─── Pre-fill from stored params ───────────────────────
-  const storedParams = wixWindow.storage.local.getItem('searchParams');
+  /* ——— Labels ——————————————————— */
+  setText('#fromLabel', 'مدينة المغادرة');
+  setText('#toLabel', 'مدينة الوصول');
+  setText('#departLabel', 'تاريخ المغادرة');
+  setText('#returnLabel', 'تاريخ العودة');
+  setText('#adultsLabel', 'عدد المسافرين');
+  setText('#cabinLabel', 'درجة السفر');
+  setLabel('#searchFlightsBtn', '🔍 بحث عن رحلات');
+
+  var currency = wixWindow.storage.local.getItem('selectedCurrency') || 'SAR';
+
+  /* ——— Pre-fill from stored params ——————————————————— */
+  var storedParams = wixWindow.storage.local.getItem('searchParams');
   if (storedParams) {
     try {
-      const params = JSON.parse(storedParams);
-      if ($w('#flightFrom')) $w('#flightFrom').value = params.origin || '';
-      if ($w('#flightTo')) $w('#flightTo').value = params.destination || '';
-      if ($w('#flightDepart')) $w('#flightDepart').value = params.departDate || '';
-      if ($w('#flightReturn')) $w('#flightReturn').value = params.returnDate || '';
-      if ($w('#flightAdults')) $w('#flightAdults').value = String(params.adults || 1);
-      if ($w('#flightCabin')) $w('#flightCabin').value = params.cabin || 'ECONOMY';
-
-      // Auto-search
-      await handleFlightSearch(params);
+      var params = JSON.parse(storedParams);
+      try { el('#flightFrom').value = params.origin || ''; } catch (e) {}
+      try { el('#flightTo').value = params.destination || ''; } catch (e) {}
+      try { el('#flightDepart').value = params.departDate || ''; } catch (e) {}
+      try { el('#flightReturn').value = params.returnDate || ''; } catch (e) {}
+      try { el('#flightAdults').value = String(params.adults || 1); } catch (e) {}
+      try { el('#flightCabin').value = params.cabin || 'ECONOMY'; } catch (e) {}
+      wixWindow.storage.local.removeItem('searchParams');
+      await doSearch(params);
     } catch (e) {}
-    wixWindow.storage.local.removeItem('searchParams');
   }
 
-  // ─── City Autocomplete (Debounced) ─────────────────────
-  ['#flightFrom', '#flightTo'].forEach(selector => {
-    if ($w(selector)) {
-      let debounceTimer;
-      $w(selector).onInput((e) => {
-        clearTimeout(debounceTimer);
-        debounceTimer = setTimeout(() => {
-          // IATA autocomplete would be fetched from backend
-          // For now, basic input
-        }, 300);
-      });
+  /* ——— Search Button ——————————————————— */
+  btn('#searchFlightsBtn', async function () {
+    var p = {
+      origin: (el('#flightFrom') || {}).value || '',
+      destination: (el('#flightTo') || {}).value || '',
+      departDate: (el('#flightDepart') || {}).value || '',
+      returnDate: (el('#flightReturn') || {}).value || '',
+      adults: parseInt((el('#flightAdults') || {}).value) || 1,
+      cabin: (el('#flightCabin') || {}).value || 'ECONOMY',
+      currency: currency,
+    };
+    if (!p.origin || !p.destination || !p.departDate) {
+      setText('#searchError', 'يرجى تعبئة المدينة وتاريخ المغادرة على الأقل');
+      return;
     }
+    await doSearch(p);
   });
 
-  // ─── Search Button ────────────────────────────────────
-  if ($w('#searchFlightsBtn')) {
-    $w('#searchFlightsBtn').onClick(async () => {
-      const params = {
-        origin: $w('#flightFrom')?.value || '',
-        destination: $w('#flightTo')?.value || '',
-        departDate: $w('#flightDepart')?.value || '',
-        returnDate: $w('#flightReturn')?.value || '',
-        adults: parseInt($w('#flightAdults')?.value) || 1,
-        cabin: $w('#flightCabin')?.value || 'ECONOMY',
-        currency,
-      };
+  /* ——— Sort ——————————————————— */
+  try {
+    var sort = el('#sortOptions');
+    if (sort) {
+      sort.options = [
+        { label: 'الأقل سعراً', value: 'price_asc' },
+        { label: 'الأعلى سعراً', value: 'price_desc' },
+        { label: 'أقصر مدة', value: 'duration' },
+        { label: 'الأفضل قيمة', value: 'best_value' },
+      ];
+      sort.onChange(function (e) { sortOffers(e.target.value); });
+    }
+  } catch (e) {}
 
-      if (!params.origin || !params.destination || !params.departDate) {
-        if ($w('#searchError')) $w('#searchError').text = 'يرجى تعبئة جميع الحقول المطلوبة';
-        return;
-      }
+  /* ——— Stops Filter ——————————————————— */
+  try {
+    var sf = el('#stopsFilter');
+    if (sf) {
+      sf.options = [
+        { label: 'الكل', value: 'all' },
+        { label: 'مباشر فقط', value: 'direct' },
+        { label: 'توقف واحد', value: '1' },
+      ];
+      sf.onChange(function () { filterOffers(); });
+    }
+  } catch (e) {}
 
-      await handleFlightSearch(params);
-    });
-  }
-
-  // ─── Sort ──────────────────────────────────────────────
-  if ($w('#sortOptions')) {
-    $w('#sortOptions').options = [
-      { label: 'الأقل سعراً', value: 'price_asc' },
-      { label: 'الأعلى سعراً', value: 'price_desc' },
-      { label: 'أقصر مدة', value: 'duration' },
-      { label: 'الأفضل قيمة', value: 'best_value' },
-    ];
-
-    $w('#sortOptions').onChange((e) => {
-      sortOffers(e.target.value);
-    });
-  }
-
-  // ─── Filters ──────────────────────────────────────────
-  if ($w('#stopsFilter')) {
-    $w('#stopsFilter').onChange((e) => {
-      filterOffers();
-    });
-  }
+  /* ——— Popular Routes ——————————————————— */
+  var routes = [
+    { _id: 'r1', from: 'الرياض', to: 'دبي', price: 'من ٣٩٩ ر.س', code_from: 'RUH', code_to: 'DXB' },
+    { _id: 'r2', from: 'جدة', to: 'القاهرة', price: 'من ٥٩٩ ر.س', code_from: 'JED', code_to: 'CAI' },
+    { _id: 'r3', from: 'الرياض', to: 'إسطنبول', price: 'من ٩٩٩ ر.س', code_from: 'RUH', code_to: 'IST' },
+    { _id: 'r4', from: 'الدمام', to: 'البحرين', price: 'من ٢٩٩ ر.س', code_from: 'DMM', code_to: 'BAH' },
+    { _id: 'r5', from: 'جدة', to: 'لندن', price: 'من ٢,٤٩٩ ر.س', code_from: 'JED', code_to: 'LHR' },
+    { _id: 'r6', from: 'الرياض', to: 'كوالالمبور', price: 'من ١,٧٩٩ ر.س', code_from: 'RUH', code_to: 'KUL' },
+  ];
+  try {
+    var rep = el('#popularRoutesRepeater');
+    if (rep) {
+      rep.data = routes;
+      rep.onItemReady(function ($i, d) {
+        try { $i('#routeFrom').text = d.from; } catch (e) {}
+        try { $i('#routeTo').text = d.to; } catch (e) {}
+        try { $i('#routePrice').text = d.price; } catch (e) {}
+        try { $i('#routePrice').style.color = '#C9A227'; } catch (e) {}
+        try {
+          $i('#routeCard').onClick(function () {
+            try { el('#flightFrom').value = d.code_from; } catch (e) {}
+            try { el('#flightTo').value = d.code_to; } catch (e) {}
+          });
+        } catch (e) {}
+      });
+    }
+  } catch (e) {}
 });
 
-async function handleFlightSearch(params) {
-  // Show skeleton loading
-  if ($w('#loadingSection')) $w('#loadingSection').expand();
-  if ($w('#resultsSection')) $w('#resultsSection').collapse();
-  if ($w('#searchError')) $w('#searchError').text = '';
+/* ===== Search Logic ===== */
+async function doSearch(params) {
+  show('#loadingSection');
+  hide('#resultsSection');
+  setText('#searchError', '');
 
   try {
-    const result = await searchFlights(TENANT_ID, params);
-    currentOffers = result.offers;
-
-    if ($w('#resultsCount')) {
-      $w('#resultsCount').text = `${result.count} رحلة متاحة`;
-    }
-    if ($w('#providerBadge') && result.provider) {
-      $w('#providerBadge').text = result.provider;
-    }
-
+    var result = await searchFlights(TENANT, params);
+    currentOffers = result.offers || [];
+    setText('#resultsCount', currentOffers.length + ' رحلة متاحة');
+    if (result.provider) setText('#providerBadge', result.provider);
     renderOffers(currentOffers);
   } catch (e) {
-    if ($w('#searchError')) $w('#searchError').text = 'حدث خطأ في البحث، يرجى المحاولة مرة أخرى';
+    setText('#searchError', 'حدث خطأ في البحث، يرجى المحاولة مرة أخرى');
     console.log('Flight search error:', e);
   }
 
-  if ($w('#loadingSection')) $w('#loadingSection').collapse();
-  if ($w('#resultsSection')) $w('#resultsSection').expand();
+  hide('#loadingSection');
+  show('#resultsSection');
 }
 
 function renderOffers(offers) {
-  if (!$w('#flightsRepeater')) return;
+  try {
+    var rep = el('#flightsRepeater');
+    if (!rep) return;
 
-  $w('#flightsRepeater').data = offers.slice(0, 50).map(o => ({
-    _id: o.providerOfferId || String(Math.random()),
-    airline: o.itineraries?.[0]?.segments?.[0]?.marketingCarrier || '✈️',
-    route: `${o.itineraries?.[0]?.segments?.[0]?.fromIata || ''} → ${o.itineraries?.[0]?.segments?.[o.itineraries[0].segments.length - 1]?.toIata || ''}`,
-    departTime: formatTime(o.itineraries?.[0]?.segments?.[0]?.departAt),
-    arriveTime: formatTime(o.itineraries?.[0]?.segments?.[o.itineraries[0].segments.length - 1]?.arriveAt),
-    duration: `${Math.floor((o.itineraries?.[0]?.durationMinutes || 0) / 60)}س ${(o.itineraries?.[0]?.durationMinutes || 0) % 60}د`,
-    stops: o.itineraries?.[0]?.stopsCount === 0 ? 'مباشر' : `${o.itineraries[0].stopsCount} توقف`,
-    price: `${o.totalAmount} ${o.currency}`,
-    refundable: o.refundable ? 'قابل للاسترداد' : 'غير قابل للاسترداد',
-    totalAmount: o.totalAmount,
-  }));
-
-  $w('#flightsRepeater').onItemReady(($item, itemData) => {
-    $item('#flightAirline').text = itemData.airline;
-    $item('#flightRoute').text = itemData.route;
-    $item('#flightDepart').text = itemData.departTime;
-    $item('#flightArrive').text = itemData.arriveTime;
-    $item('#flightDuration').text = itemData.duration;
-    $item('#flightStops').text = itemData.stops;
-    $item('#flightPrice').text = itemData.price;
-    $item('#flightRefund').text = itemData.refundable;
-
-    // Gold accent
-    try { $item('#flightPrice').style.color = '#C9A227'; } catch (e) {}
-
-    // Card hover
-    $item('#flightCard').onMouseIn(() => {
-      try { $item('#flightCard').style.borderColor = '#C9A227'; } catch (e) {}
-    });
-    $item('#flightCard').onMouseOut(() => {
-      try { $item('#flightCard').style.borderColor = '#2A2A35'; } catch (e) {}
+    rep.data = offers.slice(0, 50).map(function (o) {
+      var seg0 = (o.itineraries && o.itineraries[0] && o.itineraries[0].segments && o.itineraries[0].segments[0]) || {};
+      var lastSeg = (o.itineraries && o.itineraries[0] && o.itineraries[0].segments) ? o.itineraries[0].segments[o.itineraries[0].segments.length - 1] : {};
+      var itin = (o.itineraries && o.itineraries[0]) || {};
+      var dur = itin.durationMinutes || 0;
+      return {
+        _id: o.providerOfferId || String(Math.random()),
+        airline: seg0.marketingCarrier || '✈️',
+        route: (seg0.fromIata || '') + ' → ' + (lastSeg.toIata || ''),
+        departTime: fmtTime(seg0.departAt),
+        arriveTime: fmtTime(lastSeg.arriveAt),
+        duration: Math.floor(dur / 60) + 'س ' + (dur % 60) + 'د',
+        stops: itin.stopsCount === 0 ? 'مباشر' : itin.stopsCount + ' توقف',
+        price: o.totalAmount + ' ' + o.currency,
+        refundable: o.refundable ? 'قابل للاسترداد' : 'غير قابل للاسترداد',
+        totalAmount: o.totalAmount,
+      };
     });
 
-    // Book button
-    $item('#flightBookBtn').onClick(() => {
-      const offer = currentOffers.find(o => o.providerOfferId === itemData._id);
-      wixWindow.storage.local.setItem('selectedOffer', JSON.stringify(offer));
-      wixLocation.to('/checkout');
+    rep.onItemReady(function ($i, d) {
+      try { $i('#flightAirline').text = d.airline; } catch (e) {}
+      try { $i('#flightRoute').text = d.route; } catch (e) {}
+      try { $i('#flightDepartTime').text = d.departTime; } catch (e) {}
+      try { $i('#flightArriveTime').text = d.arriveTime; } catch (e) {}
+      try { $i('#flightDuration').text = d.duration; } catch (e) {}
+      try { $i('#flightStops').text = d.stops; } catch (e) {}
+      try { $i('#flightPrice').text = d.price; } catch (e) {}
+      try { $i('#flightRefund').text = d.refundable; } catch (e) {}
+      try { $i('#flightPrice').style.color = '#C9A227'; } catch (e) {}
+      try {
+        $i('#flightBookBtn').onClick(function () {
+          var offer = currentOffers.find(function (x) { return x.providerOfferId === d._id; });
+          wixWindow.storage.local.setItem('selectedOffer', JSON.stringify(offer));
+          wixLocation.to('/checkout');
+        });
+      } catch (e) {}
     });
-  });
+  } catch (e) {}
 }
 
-function sortOffers(sortType) {
-  let sorted = [...currentOffers];
-  switch (sortType) {
-    case 'price_asc':
-      sorted.sort((a, b) => a.totalAmount - b.totalAmount);
-      break;
-    case 'price_desc':
-      sorted.sort((a, b) => b.totalAmount - a.totalAmount);
-      break;
-    case 'duration':
-      sorted.sort((a, b) => (a.itineraries?.[0]?.durationMinutes || 999) - (b.itineraries?.[0]?.durationMinutes || 999));
-      break;
-    case 'best_value':
-      sorted.sort((a, b) => {
-        const scoreA = a.totalAmount / Math.max(1, a.itineraries?.[0]?.durationMinutes || 1);
-        const scoreB = b.totalAmount / Math.max(1, b.itineraries?.[0]?.durationMinutes || 1);
-        return scoreA - scoreB;
-      });
-      break;
-  }
+function sortOffers(type) {
+  var sorted = currentOffers.slice();
+  if (type === 'price_asc') sorted.sort(function (a, b) { return a.totalAmount - b.totalAmount; });
+  else if (type === 'price_desc') sorted.sort(function (a, b) { return b.totalAmount - a.totalAmount; });
+  else if (type === 'duration') sorted.sort(function (a, b) { return ((a.itineraries && a.itineraries[0] && a.itineraries[0].durationMinutes) || 999) - ((b.itineraries && b.itineraries[0] && b.itineraries[0].durationMinutes) || 999); });
   renderOffers(sorted);
 }
 
 function filterOffers() {
-  let filtered = [...currentOffers];
-  const stops = $w('#stopsFilter')?.value;
-  if (stops === 'direct') {
-    filtered = filtered.filter(o => o.itineraries?.[0]?.stopsCount === 0);
-  } else if (stops === '1') {
-    filtered = filtered.filter(o => o.itineraries?.[0]?.stopsCount <= 1);
-  }
+  var stops = (el('#stopsFilter') || {}).value;
+  var filtered = currentOffers.slice();
+  if (stops === 'direct') filtered = filtered.filter(function (o) { return o.itineraries && o.itineraries[0] && o.itineraries[0].stopsCount === 0; });
+  else if (stops === '1') filtered = filtered.filter(function (o) { return o.itineraries && o.itineraries[0] && o.itineraries[0].stopsCount <= 1; });
   renderOffers(filtered);
 }
 
-function formatTime(isoString) {
-  if (!isoString) return '--:--';
-  try {
-    const date = new Date(isoString);
-    return date.toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit' });
-  } catch (e) {
-    return '--:--';
-  }
+function fmtTime(iso) {
+  if (!iso) return '--:--';
+  try { return new Date(iso).toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit' }); } catch (e) { return '--:--'; }
 }

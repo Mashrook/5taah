@@ -1,99 +1,181 @@
 /**
- * 5ATTH | خته — Cars Search Page
+ * 5ATTH | خته – Cars Rental Search 🚗
+ * محرك بحث تأجير السيارات
  */
+import wixWindow from 'wix-window';
+import wixLocation from 'wix-location';
 import wixSeo from 'wix-seo';
 import { searchActivities } from 'backend/searchService.web';
 
-const TENANT_ID = 'default';
+function el(id) { try { return $w(id); } catch (e) { return null; } }
+function setText(id, txt) { try { var e = el(id); if (e) e.text = txt; } catch (e) {} }
+function setLabel(id, txt) { try { var e = el(id); if (e) e.label = txt; } catch (e) {} }
+function show(id) { try { var e = el(id); if (e) e.expand(); } catch (e) {} }
+function hide(id) { try { var e = el(id); if (e) e.collapse(); } catch (e) {} }
+function btn(id, fn) { try { var e = el(id); if (e) e.onClick(fn); } catch (e) {} }
 
-$w.onReady(function () {
+var TENANT = 'default';
+
+$w.onReady(async function () {
   wixSeo.title = 'تأجير سيارات | 5ATTH خته';
+  wixSeo.description = 'استأجر سيارتك بأفضل الأسعار في السعودية والخليج والعالم';
 
-  // ─── Search Handler ────────────────────────────────────
-  if ($w('#carSearchBtn')) {
-    $w('#carSearchBtn').onClick(async () => {
-      const pickupCity = $w('#pickupCity')?.value;
-      const pickupDate = $w('#pickupDate')?.value;
-      const returnDate = $w('#returnDate')?.value;
+  setText('#pageTitle', '🚗 تأجير السيارات');
+  setText('#pageSubtitle', 'استأجر سيارتك من أفضل شركات التأجير بأسعار تنافسية');
+  setText('#pickupLabel', 'مدينة الاستلام');
+  setText('#pickupDateLabel', 'تاريخ الاستلام');
+  setText('#returnDateLabel', 'تاريخ الإرجاع');
+  setText('#driverAgeLabel', 'عمر السائق');
+  setLabel('#searchCarsBtn', '🔍 بحث عن سيارات');
 
-      if (!pickupCity || !pickupDate || !returnDate) {
-        if ($w('#carsError')) $w('#carsError').text = 'يرجى تعبئة جميع الحقول';
-        return;
-      }
+  var currency = wixWindow.storage.local.getItem('selectedCurrency') || 'SAR';
 
-      if ($w('#carsLoading')) $w('#carsLoading').expand();
-      if ($w('#carsError')) $w('#carsError').text = '';
-
-      try {
-        // Using searchActivities as a generic search — could be extended
-        const results = await searchActivities(TENANT_ID, pickupCity, pickupDate, returnDate, 1, 'SAR');
-        renderCarResults(results.offers || []);
-      } catch (e) {
-        if ($w('#carsError')) $w('#carsError').text = `خطأ: ${e.message}`;
-      }
-
-      if ($w('#carsLoading')) $w('#carsLoading').collapse();
-    });
+  /* ——— Pre-fill from storage ——————————————————— */
+  var stored = wixWindow.storage.local.getItem('searchParams');
+  if (stored) {
+    try {
+      var p = JSON.parse(stored);
+      try { el('#pickupCity').value = p.cityCode || ''; } catch (e) {}
+      try { el('#pickupDate').value = p.startDate || ''; } catch (e) {}
+      try { el('#returnDate').value = p.endDate || ''; } catch (e) {}
+      wixWindow.storage.local.removeItem('searchParams');
+      await doSearch(p);
+    } catch (e) {}
   }
 
-  function renderCarResults(offers) {
-    if (!$w('#carsRepeater')) return;
-
-    if (offers.length === 0) {
-      if ($w('#noResults')) $w('#noResults').expand();
-      $w('#carsRepeater').data = [];
+  /* ——— Search ——————————————————— */
+  btn('#searchCarsBtn', async function () {
+    var p = {
+      cityCode: (el('#pickupCity') || {}).value || '',
+      startDate: (el('#pickupDate') || {}).value || '',
+      endDate: (el('#returnDate') || {}).value || '',
+      currency: currency,
+      activityType: 'car_rental',
+    };
+    if (!p.cityCode || !p.startDate) {
+      setText('#searchError', 'يرجى تعبئة المدينة وتاريخ الاستلام');
       return;
     }
-    if ($w('#noResults')) $w('#noResults').collapse();
+    await doSearch(p);
+  });
 
-    $w('#carsRepeater').data = offers.map((o, i) => ({
-      _id: String(i),
-      ...o,
-    }));
+  /* ——— Sort ——————————————————— */
+  try {
+    var sort = el('#carSort');
+    if (sort) {
+      sort.options = [
+        { label: 'الأقل سعراً', value: 'price_asc' },
+        { label: 'الأعلى سعراً', value: 'price_desc' },
+        { label: 'الأفضل تقييماً', value: 'rating' },
+      ];
+      sort.onChange(function () { sortCars(sort.value); });
+    }
+  } catch (e) {}
 
-    $w('#carsRepeater').onItemReady(($item, data) => {
-      if ($item('#carName')) $item('#carName').text = data.providerOfferId || 'سيارة';
-      if ($item('#carPrice')) {
-        $item('#carPrice').text = `${data.totalAmount} ${data.currency}`;
-        try { $item('#carPrice').style.color = '#C9A227'; } catch (e) {}
-      }
-      if ($item('#carProvider')) $item('#carProvider').text = data.source || '';
-
-      if ($item('#carBookBtn')) {
-        $item('#carBookBtn').onClick(() => {
-          import('wix-window').then(wixWindow => {
-            wixWindow.storage.local.setItem('selectedOffer', JSON.stringify(data));
-          });
-          import('wix-location').then(wixLocation => {
-            wixLocation.to('/checkout');
-          });
-        });
-      }
-    });
-  }
-
-  // ─── Popular Cities ────────────────────────────────────
-  const popularCities = [
-    { name: 'الرياض', code: 'RUH' },
-    { name: 'جدة', code: 'JED' },
-    { name: 'الدمام', code: 'DMM' },
-    { name: 'دبي', code: 'DXB' },
-    { name: 'الكويت', code: 'KWI' },
+  /* ——— Car Types ——————————————————— */
+  var types = [
+    { _id: 't1', name: 'اقتصادية', icon: '🚙', desc: 'سيارات صغيرة موفرة للوقود', price: 'من ٩٩ ر.س/يوم' },
+    { _id: 't2', name: 'عائلية', icon: '🚐', desc: 'سيارات واسعة للعائلات', price: 'من ١٤٩ ر.س/يوم' },
+    { _id: 't3', name: 'فاخرة', icon: '🏎️', desc: 'سيارات فاخرة وسبورت', price: 'من ٤٩٩ ر.س/يوم' },
+    { _id: 't4', name: 'دفع رباعي', icon: '🚙', desc: 'سيارات SUV للطرق الوعرة', price: 'من ١٩٩ ر.س/يوم' },
+    { _id: 't5', name: 'حافلة صغيرة', icon: '🚌', desc: 'لمجموعات ٧-١٥ شخص', price: 'من ٢٩٩ ر.س/يوم' },
   ];
+  try {
+    var rep = el('#carTypesRepeater');
+    if (rep) {
+      rep.data = types;
+      rep.onItemReady(function ($i, d) {
+        try { $i('#typeName').text = d.icon + ' ' + d.name; } catch (e) {}
+        try { $i('#typeDesc').text = d.desc; } catch (e) {}
+        try { $i('#typePrice').text = d.price; } catch (e) {}
+        try { $i('#typePrice').style.color = '#C9A227'; } catch (e) {}
+      });
+    }
+  } catch (e) {}
 
-  if ($w('#popularCarsRepeater')) {
-    $w('#popularCarsRepeater').data = popularCities.map((c, i) => ({
-      _id: String(i),
-      ...c,
-    }));
-
-    $w('#popularCarsRepeater').onItemReady(($item, data) => {
-      if ($item('#cityName')) $item('#cityName').text = data.name;
-      if ($item('#cityBtn')) {
-        $item('#cityBtn').onClick(() => {
-          if ($w('#pickupCity')) $w('#pickupCity').value = data.code;
-        });
-      }
-    });
-  }
+  /* ——— Popular Cities ——————————————————— */
+  var cities = [
+    { _id: 'pc1', name: '🇸🇦 الرياض', code: 'RUH' },
+    { _id: 'pc2', name: '🇸🇦 جدة', code: 'JED' },
+    { _id: 'pc3', name: '🇸🇦 الدمام', code: 'DMM' },
+    { _id: 'pc4', name: '🇦🇪 دبي', code: 'DXB' },
+    { _id: 'pc5', name: '🇰🇼 الكويت', code: 'KWI' },
+  ];
+  try {
+    var pRep = el('#popularPickupRepeater');
+    if (pRep) {
+      pRep.data = cities;
+      pRep.onItemReady(function ($i, d) {
+        try { $i('#pickupCityName').text = d.name; } catch (e) {}
+        try {
+          $i('#pickupCityCard').onClick(function () {
+            try { el('#pickupCity').value = d.code; } catch (e) {}
+          });
+        } catch (e) {}
+      });
+    }
+  } catch (e) {}
 });
+
+var currentOffers = [];
+
+async function doSearch(params) {
+  show('#loadingSection');
+  hide('#resultsSection');
+  setText('#searchError', '');
+
+  try {
+    var result = await searchActivities(TENANT, params);
+    currentOffers = result.offers || [];
+    setText('#resultsCount', currentOffers.length + ' سيارة متاحة');
+    renderCars(currentOffers);
+  } catch (e) {
+    setText('#searchError', 'حدث خطأ في البحث. جاري المحاولة مرة أخرى...');
+  }
+
+  hide('#loadingSection');
+  show('#resultsSection');
+}
+
+function renderCars(offers) {
+  try {
+    var rep = el('#carsRepeater');
+    if (!rep) return;
+
+    rep.data = offers.map(function (o) {
+      var name = o.activityName || 'سيارة';
+      return {
+        _id: o.providerOfferId || String(Math.random()),
+        name: name,
+        type: o.activityType || 'car_rental',
+        price: o.totalAmount + ' ' + o.currency,
+        pricePerDay: Math.round(o.totalAmount / Math.max(1, o.durationDays || 1)) + ' ' + o.currency + '/يوم',
+        features: o.features || '',
+        totalAmount: o.totalAmount,
+      };
+    });
+
+    rep.onItemReady(function ($i, d) {
+      try { $i('#carName').text = d.name; } catch (e) {}
+      try { $i('#carType').text = d.type; } catch (e) {}
+      try { $i('#carPrice').text = d.price; } catch (e) {}
+      try { $i('#carPricePerDay').text = d.pricePerDay; } catch (e) {}
+      try { $i('#carFeatures').text = d.features; } catch (e) {}
+      try { $i('#carPrice').style.color = '#C9A227'; } catch (e) {}
+      try {
+        $i('#carBookBtn').onClick(function () {
+          var offer = currentOffers.find(function (x) { return x.providerOfferId === d._id; });
+          wixWindow.storage.local.setItem('selectedOffer', JSON.stringify(offer));
+          wixLocation.to('/checkout');
+        });
+      } catch (e) {}
+    });
+  } catch (e) {}
+}
+
+function sortCars(type) {
+  var sorted = currentOffers.slice();
+  if (type === 'price_asc') sorted.sort(function (a, b) { return a.totalAmount - b.totalAmount; });
+  else if (type === 'price_desc') sorted.sort(function (a, b) { return b.totalAmount - a.totalAmount; });
+  renderCars(sorted);
+}

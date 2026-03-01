@@ -1,34 +1,43 @@
 /**
- * 5ATTH | خته — Master Page (Global Site Code)
- * Dark Mode Premium GCC Travel Platform
- * Runs on every page load
+ * 5ATTH | خته – Master Page (Global Site Code)
+ * Runs on every page load – RTL, dark theme, navigation
  */
 import wixWindow from 'wix-window';
 import wixLocation from 'wix-location';
-import { getFeatureFlags } from 'backend/cmsService.web';
 
-const TENANT_ID = 'default';
+function el(id) { try { return $w(id); } catch (e) { return null; } }
+function setText(id, txt) { try { var e = el(id); if (e) e.text = txt; } catch (e) {} }
+function setLabel(id, txt) { try { var e = el(id); if (e) e.label = txt; } catch (e) {} }
+function btn(id, fn) { try { var e = el(id); if (e) e.onClick(fn); } catch (e) {} }
 
-$w.onReady(async function () {
-  // ─── RTL + Dark Theme ──────────────────────────────────
-  applyDarkTheme();
+$w.onReady(function () {
+  /* ——— Dark Theme ——————————————————— */
+  var darkSections = ['#headerStrip', '#footerStrip', '#mainContainer', '#header1', '#footer1'];
+  darkSections.forEach(function (s) {
+    try { if (el(s)) el(s).style.backgroundColor = '#0E0E12'; } catch (e) {}
+  });
 
-  // ─── Country/Currency Selector ─────────────────────────
-  const savedCountry = wixWindow.storage.local.getItem('selectedCountry') || 'SA';
-  const currencies = { SA: 'SAR', AE: 'AED', KW: 'KWD', QA: 'QAR', BH: 'BHD' };
+  /* ——— Country / Currency ——————————————————— */
+  var savedCountry = wixWindow.storage.local.getItem('selectedCountry') || 'SA';
+  var currencies = { SA: 'SAR', AE: 'AED', KW: 'KWD', QA: 'QAR', BH: 'BHD' };
+  try {
+    var cs = el('#countrySelector');
+    if (cs) {
+      cs.value = savedCountry;
+      cs.onChange(function (e) {
+        wixWindow.storage.local.setItem('selectedCountry', e.target.value);
+        wixWindow.storage.local.setItem('selectedCurrency', currencies[e.target.value] || 'SAR');
+        wixLocation.to(wixLocation.url);
+      });
+    }
+  } catch (e) {}
 
-  if ($w('#countrySelector')) {
-    $w('#countrySelector').value = savedCountry;
-    $w('#countrySelector').onChange((e) => {
-      wixWindow.storage.local.setItem('selectedCountry', e.target.value);
-      wixWindow.storage.local.setItem('selectedCurrency', currencies[e.target.value] || 'SAR');
-      wixLocation.to(wixLocation.url);
-    });
-  }
-
-  // ─── Navigation ────────────────────────────────────────
-  const navLinks = [
+  /* ——— Navigation Links ——————————————————— */
+  var navLinks = [
     { id: '#navHome', url: '/' },
+    { id: '#navFlights', url: '/flights' },
+    { id: '#navHotels', url: '/hotels' },
+    { id: '#navCars', url: '/cars' },
     { id: '#navOffers', url: '/offers' },
     { id: '#navSeasons', url: '/seasons' },
     { id: '#navTours', url: '/tours' },
@@ -36,42 +45,18 @@ $w.onReady(async function () {
     { id: '#navStudyAbroad', url: '/study-abroad' },
     { id: '#navSaudiTourism', url: '/saudi-tourism' },
     { id: '#navArticles', url: '/articles' },
-    { id: '#navFlights', url: '/flights' },
-    { id: '#navHotels', url: '/hotels' },
-    { id: '#navCars', url: '/cars' },
+    { id: '#navNews', url: '/news' },
   ];
-  navLinks.forEach(link => {
-    if ($w(link.id)) {
-      $w(link.id).onClick(() => wixLocation.to(link.url));
-    }
+  navLinks.forEach(function (link) {
+    btn(link.id, function () { wixLocation.to(link.url); });
   });
 
-  // ─── Feature Flags ─────────────────────────────────────
-  try {
-    const flags = await getFeatureFlags(TENANT_ID);
-    if ($w('#laborImportSection') && !flags['labor_import']) {
-      $w('#laborImportSection').collapse();
-    }
-  } catch (e) {
-    console.log('Feature flags not loaded');
-  }
+  /* ——— WhatsApp CTA ——————————————————— */
+  btn('#whatsappBtn', function () {
+    wixWindow.openUrl('https://wa.me/966500000000?text=أريد استشارة سفر من خته');
+  });
 
-  // ─── WhatsApp + Consultation CTAs ─────────────────────
-  if ($w('#whatsappBtn')) {
-    $w('#whatsappBtn').onClick(() => {
-      wixWindow.openUrl('https://wa.me/966XXXXXXXXX?text=أريد استشارة سفر');
-    });
-  }
-  if ($w('#consultBtn')) {
-    $w('#consultBtn').onClick(() => {
-      wixWindow.openLightbox('ConsultationForm');
-    });
-  }
+  /* ——— Footer Text ——————————————————— */
+  setText('#footerText', '© 2026 5ATTH | خته - جميع الحقوق محفوظة');
+  setText('#footerDesc', 'منصتك الذكية لحجز السفر في الخليج');
 });
-
-function applyDarkTheme() {
-  const darkElements = ['#headerStrip', '#footerStrip', '#mainContainer'];
-  darkElements.forEach(selector => {
-    try { if ($w(selector)) $w(selector).style.backgroundColor = '#0E0E12'; } catch (e) {}
-  });
-}

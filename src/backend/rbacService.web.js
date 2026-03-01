@@ -117,6 +117,33 @@ export const getRoles = webMethod(
   }
 );
 
+// ─── DB-backed Rate Limiting ──────────────────────────
+export const enforceRateLimit = webMethod(
+  Permissions.Anyone,
+  async (ip, action, maxPerMinute = 20) => {
+    const windowMs = 60 * 1000;
+    const since = new Date(Date.now() - windowMs);
+
+    const results = await wixData.query('RateLimits')
+      .eq('ip', ip)
+      .eq('action', action)
+      .ge('createdAt', since)
+      .find();
+
+    if (results.items.length >= maxPerMinute) {
+      throw new Error('Rate limit exceeded');
+    }
+
+    await wixData.insert('RateLimits', {
+      ip,
+      action,
+      createdAt: new Date(),
+    });
+
+    return { allowed: true, remaining: maxPerMinute - results.items.length - 1 };
+  }
+);
+
 export const saveRole = webMethod(
   Permissions.SiteMember,
   async (userId, tenantId, roleData) => {

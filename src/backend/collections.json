@@ -204,6 +204,15 @@
       }
     },
     {
+      "id": "RateLimits",
+      "displayName": "Rate Limits",
+      "fields": {
+        "ip": { "type": "text" },
+        "action": { "type": "text" },
+        "createdAt": { "type": "datetime" }
+      }
+    },
+    {
       "id": "Leads",
       "displayName": "Leads",
       "fields": {

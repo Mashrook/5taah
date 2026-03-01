@@ -16,7 +16,7 @@ import { applyMarkup } from './pricingService.web';
 import { searchFlightsUnified } from './search/unifiedSearch.adapter.js';
 
 // ════════════════════════════════════════════════════════
-// Rate limiter (in-memory, per-instance)
+// Rate limiter (in-memory, per-instance — fast first layer)
 // ════════════════════════════════════════════════════════
 const rateLimitMap = {};
 function checkRateLimit(ip, maxPerMinute = 30) {
@@ -26,6 +26,72 @@ function checkRateLimit(ip, maxPerMinute = 30) {
   if (rateLimitMap[ip].length >= maxPerMinute) return false;
   rateLimitMap[ip].push(now);
   return true;
+}
+
+// DB-backed rate limiter (persistent across instances)
+async function enforceRateLimit(ip, action, maxPerMinute = 20) {
+  const since = new Date(Date.now() - 60 * 1000);
+  const results = await wixData.query('RateLimits')
+    .eq('ip', ip)
+    .eq('action', action)
+    .ge('createdAt', since)
+    .find();
+
+  if (results.items.length >= maxPerMinute) {
+    throw new Error('Rate limit exceeded');
+  }
+
+  await wixData.insert('RateLimits', {
+    ip,
+    action,
+    createdAt: new Date(),
+  });
+}
+
+// ════════════════════════════════════════════════════════
+// Search Cache Helpers (10-minute window)
+// ════════════════════════════════════════════════════════
+async function findCachedSearch(productType, params) {
+  const now = new Date();
+  const results = await wixData.query('SearchSessions')
+    .eq('productType', productType)
+    .eq('paramsJson', JSON.stringify(params))
+    .ge('expiresAt', now)
+    .limit(1)
+    .find();
+
+  if (!results.items.length) return null;
+
+  const session = results.items[0];
+  const offers = await wixData.query('Offers')
+    .eq('searchSessionId', session._id)
+    .limit(100)
+    .find();
+
+  if (!offers.items.length) return null;
+
+  return {
+    sessionId: session._id,
+    offers: offers.items,
+  };
+}
+
+async function saveSearchCache(productType, params, sessionId, offers) {
+  const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
+
+  // Update the session with the paramsJson so it can be matched later
+  try {
+    const existing = await wixData.get('SearchSessions', sessionId);
+    if (existing) {
+      await wixData.update('SearchSessions', {
+        ...existing,
+        paramsJson: JSON.stringify(params),
+        expiresAt,
+      });
+    }
+  } catch (_) {
+    // Session was already created by the unified search pipeline
+  }
 }
 
 
@@ -234,12 +300,14 @@ export async function get_publicConfig(request) {
 
 // ════════════════════════════════════════════════════════
 // POST /_functions/search
-// Unified search endpoint (flights/hotels/cars/tours)
-// Body: { tenantId, productType, params, currency }
+// Unified search endpoint with caching + DB rate limiting
+// Body: { productType, params, tenantId?, currency? }
 // ════════════════════════════════════════════════════════
 export async function post_search(request) {
   try {
     const ip = request.headers?.['x-forwarded-for'] || 'unknown';
+
+    // Fast in-memory rate limit (first layer)
     if (!checkRateLimit(ip, 30)) {
       return ok({
         status: 429,
@@ -248,14 +316,48 @@ export async function post_search(request) {
     }
 
     const body = await request.body.json();
-    const { tenantId, productType, params, currency } = body;
 
-    if (!productType || !params) {
+    if (!body || !body.productType || !body.params) {
       return badRequest({ body: JSON.stringify({ error: 'productType, params required' }) });
     }
 
-    // ── Flights: use the new Unified Search Pipeline ──
+    const { productType, params, tenantId, currency } = body;
+
+    // Validate required search params
+    if (productType === 'flight' || productType === 'flights') {
+      const { origin, destination, departDate } = params;
+      if (!origin || !destination || !departDate) {
+        return badRequest({ body: JSON.stringify({ error: 'Missing required: origin, destination, departDate' }) });
+      }
+    }
+
+    // DB-persisted rate limit (second layer, across all instances)
+    try {
+      await enforceRateLimit(ip, 'search', 20);
+    } catch (rlErr) {
+      return ok({
+        status: 429,
+        body: JSON.stringify({ error: rlErr.message }),
+      });
+    }
+
+    // ── Flights: Unified Search Pipeline with cache ──
     if (productType === 'flights' || productType === 'flight') {
+      // Check cache first (10-minute window)
+      const cached = await findCachedSearch('flight', params);
+      if (cached) {
+        return ok({
+          body: JSON.stringify({
+            source: 'cache',
+            sessionId: cached.sessionId,
+            totalResults: cached.offers.length,
+            offers: cached.offers,
+          }),
+          headers: { 'Content-Type': 'application/json' },
+        });
+      }
+
+      // Live search (parallel Amadeus + Sabre)
       const result = await searchFlightsUnified(params, {
         environment: params.environment || 'production',
         providerTimeoutMs: 12000,
@@ -263,27 +365,32 @@ export async function post_search(request) {
       });
 
       // Apply markup to each ranked offer
-      const offersWithMarkup = [];
-      for (const offer of result.offers) {
-        try {
-          const marked = await applyMarkup(tenantId, offer.totalAmount, {
-            productType: 'flights',
-            providerName: offer.providerName,
-            currency: currency || offer.currency || 'SAR',
-          });
-          offersWithMarkup.push({
-            ...offer,
-            markupAmount: marked.markupAmount || 0,
-            totalAmount: marked.finalPrice || offer.totalAmount,
-          });
-        } catch (_) {
-          // If markup fails, return original price
-          offersWithMarkup.push(offer);
-        }
-      }
+      const offersWithMarkup = await Promise.all(
+        result.offers.map(async (offer) => {
+          try {
+            const marked = await applyMarkup(tenantId, offer.totalAmount, {
+              productType: 'flight',
+              providerName: offer.providerName,
+              currency: currency || offer.currency || 'SAR',
+              routeKey: offer.routeKey,
+            });
+            return {
+              ...offer,
+              markupAmount: marked.markup || marked.markupAmount || 0,
+              totalAmount: marked.total || marked.finalPrice || offer.totalAmount,
+            };
+          } catch (_) {
+            return offer;
+          }
+        })
+      );
+
+      // Save cache so identical searches return instantly
+      await saveSearchCache('flight', params, result.sessionId, offersWithMarkup);
 
       return ok({
         body: JSON.stringify({
+          source: 'live',
           sessionId: result.sessionId,
           totalResults: offersWithMarkup.length,
           providers: result.providers,

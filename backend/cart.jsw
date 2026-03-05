@@ -1,0 +1,93 @@
+// backend/cart.jsw
+// إدارة سلة المشتريات
+
+import wixData from 'wix-data';
+import wixUsers from 'wix-users-backend';
+
+// إضافة عنصر للسلة
+export async function addToCart(item) {
+    let userId;
+
+    try {
+        userId = wixUsers.currentUser.id;
+    } catch (e) {
+        userId = "guest";
+    }
+
+    return wixData.insert("Cart", {
+        itemId: item.itemId,
+        type: item.type,
+        title: item.title,
+        price: Number(item.price),
+        details: item.details || "",
+        userId: userId,
+        createdAt: new Date()
+    });
+}
+
+// جلب محتويات السلة
+export async function getCart() {
+    let userId;
+
+    try {
+        userId = wixUsers.currentUser.id;
+    } catch (e) {
+        userId = "guest";
+    }
+
+    return wixData.query("Cart")
+        .eq("userId", userId)
+        .find();
+}
+
+// حذف عنصر من السلة
+export async function removeFromCart(itemId) {
+    return wixData.remove("Cart", itemId);
+}
+
+// مسح السلة بالكامل
+export async function clearCart() {
+    let userId;
+
+    try {
+        userId = wixUsers.currentUser.id;
+    } catch (e) {
+        userId = "guest";
+    }
+
+    const items = await wixData.query("Cart")
+        .eq("userId", userId)
+        .find();
+
+    const deletions = items.items.map(item =>
+        wixData.remove("Cart", item._id)
+    );
+
+    return Promise.all(deletions);
+}
+
+// إنشاء طلب جديد
+export async function createOrder(orderData) {
+    let userId;
+
+    try {
+        userId = wixUsers.currentUser.id;
+    } catch (e) {
+        userId = "guest";
+    }
+
+    return wixData.insert("Orders", {
+        items: JSON.stringify(orderData.items),
+        total: Number(orderData.total),
+        status: "pending",
+        userId: userId,
+        createdAt: new Date()
+    });
+}
+
+// تحديث كمية عنصر في السلة
+export async function updateCartItem(itemId, quantity) {
+    return wixData.update("Cart", itemId, {
+        quantity: quantity
+    });
+}

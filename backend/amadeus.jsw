@@ -76,3 +76,89 @@ export async function searchFlights(origin, dest, date) {
     throw error;
   }
 }
+/**
+ * Hotels search
+ * cityCode مثال: RUH, JED, DXB (IATA city code)
+ * انتبه: بعض واجهات Amadeus تتطلب cityCode وليس اسم المدينة النصي.
+ */
+export async function searchHotels(cityCode) {
+  try {
+    const token = await getAccessToken();
+
+    const params = new URLSearchParams({
+      cityCode: cityCode,
+      radius: '20',
+      radiusUnit: 'KM',
+      adults: '1',
+      currency: 'USD'
+    });
+
+    const response = await fetch(
+      `${AMADEUS_BASE_URL}/v1/reference-data/locations/hotels/by-city?${params.toString()}`,
+      {
+        method: 'get',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          Accept: 'application/json'
+        }
+      }
+    );
+
+    if (!response.ok) {
+      const text = await response.text();
+      throw new Error(`Amadeus hotels error: ${response.status} - ${text}`);
+    }
+
+    const json = await response.json();
+
+    // الكود الأمامي يتوقع data.data.map(...)
+    return {
+      data: json.data || []
+    };
+  } catch (error) {
+    console.error('searchHotels error', error);
+    throw error;
+  }
+}
+/**
+ * Tours / Activities search
+ * lat, lon كنقاط إحداثيات لمكان الوجهة
+ */
+export async function searchTours(lat, lon) {
+  try {
+    const token = await getAccessToken();
+
+    const params = new URLSearchParams({
+      latitude: String(lat),
+      longitude: String(lon),
+      radius: '20',
+      radiusUnit: 'KM',
+      currencyCode: 'USD'
+    });
+
+    const response = await fetch(
+      `${AMADEUS_BASE_URL}/v1/shopping/activities?${params.toString()}`,
+      {
+        method: 'get',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          Accept: 'application/json'
+        }
+      }
+    );
+
+    if (!response.ok) {
+      const text = await response.text();
+      throw new Error(`Amadeus tours error: ${response.status} - ${text}`);
+    }
+
+    const json = await response.json();
+
+    return {
+      data: json.data || []
+    };
+  } catch (error) {
+    console.error('searchTours error', error);
+    throw error;
+  }
+}

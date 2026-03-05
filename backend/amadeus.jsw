@@ -1,164 +1,150 @@
 // backend/amadeus.jsw
+// API اتصال بـ Amadeus
 
-import { ok, notFound, serverError } from 'wix-http-functions';
-import wixSecretsBackend from 'wix-secrets-backend';
-import { fetch } from 'wix-fetch';
+const AMADEUS_BASE_URL = "https://test.api.amadeus.com";
+const API_KEY = "7W5MzlS607pHr3JqnSYqQP8tJjUgMzj2";
+const API_SECRET = "7nlYxguGaMgnDMe5";
 
-const AMADEUS_BASE_URL = 'https://test.api.amadeus.com';
+let accessToken = null;
+let tokenExpiry = null;
 
+// الحصول على Access Token
 async function getAccessToken() {
-  const clientId = await wixSecretsBackend.getSecret('AMADEUS_API_KEY');
-  const clientSecret = await wixSecretsBackend.getSecret('AMADEUS_API_SECRET');
-
-  const body = `grant_type=client_credentials&client_id=${encodeURIComponent(
-    clientId
-  )}&client_secret=${encodeURIComponent(clientSecret)}`;
-
-  const response = await fetch(`${AMADEUS_BASE_URL}/v1/security/oauth2/token`, {
-    method: 'post',
-    headers: {
-      'Content-Type': 'application/x-www-form-urlencoded'
-    },
-    body
-  });
-
-  if (!response.ok) {
-    const text = await response.text();
-    throw new Error(`Amadeus token error: ${response.status} - ${text}`);
-  }
-
-  const json = await response.json();
-  return json.access_token;
-}
-
-/**
- * Flights search
- * origin, dest in IATA codes (e.g. RUH, DXB)
- * date in format YYYY-MM-DD
- */
-export async function searchFlights(origin, dest, date) {
-  try {
-    const token = await getAccessToken();
-
-    const params = new URLSearchParams({
-      originLocationCode: origin,
-      destinationLocationCode: dest,
-      departureDate: date,
-      adults: '1',
-      currencyCode: 'USD',
-      max: '20'
-    });
-
-    const response = await fetch(
-      `${AMADEUS_BASE_URL}/v2/shopping/flight-offers?${params.toString()}`,
-      {
-        method: 'get',
-        headers: {
-          Authorization: `Bearer ${token}`,
-          Accept: 'application/json'
-        }
-      }
-    );
-
-    if (!response.ok) {
-      const text = await response.text();
-      throw new Error(`Amadeus flights error: ${response.status} - ${text}`);
+    if (accessToken && tokenExpiry && new Date() < tokenExpiry) {
+        return accessToken;
     }
 
-    const json = await response.json();
-
-    // الكود في الواجهة يتوقع كائن فيه data
-    return {
-      data: json.data || []
-    };
-  } catch (error) {
-    console.error('searchFlights error', error);
-    throw error;
-  }
-}
-/**
- * Hotels search
- * cityCode مثال: RUH, JED, DXB (IATA city code)
- * انتبه: بعض واجهات Amadeus تتطلب cityCode وليس اسم المدينة النصي.
- */
-export async function searchHotels(cityCode) {
-  try {
-    const token = await getAccessToken();
-
-    const params = new URLSearchParams({
-      cityCode: cityCode,
-      radius: '20',
-      radiusUnit: 'KM',
-      adults: '1',
-      currency: 'USD'
+    const response = await fetch(`${AMADEUS_BASE_URL}/v1/security/oauth2/token`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/x-www-form-urlencoded"
+        },
+        body: `grant_type=client_credentials&client_id=${API_KEY}&client_secret=${API_SECRET}`
     });
 
-    const response = await fetch(
-      `${AMADEUS_BASE_URL}/v1/reference-data/locations/hotels/by-city?${params.toString()}`,
-      {
-        method: 'get',
-        headers: {
-          Authorization: `Bearer ${token}`,
-          Accept: 'application/json'
-        }
-      }
-    );
+    const data = await response.json();
 
-    if (!response.ok) {
-      const text = await response.text();
-      throw new Error(`Amadeus hotels error: ${response.status} - ${text}`);
+    if (data.error) {
+        throw new Error("خطأ في الحصول على التوكن: " + data.error_description);
     }
 
-    const json = await response.json();
+    accessToken = data.access_token;
+    tokenExpiry = new Date(new Date().getTime() + (data.expires_in * 1000));
 
-    // الكود الأمامي يتوقع data.data.map(...)
-    return {
-      data: json.data || []
-    };
-  } catch (error) {
-    console.error('searchHotels error', error);
-    throw error;
-  }
+    return accessToken;
 }
-/**
- * Tours / Activities search
- * lat, lon كنقاط إحداثيات لمكان الوجهة
- */
-export async function searchTours(lat, lon) {
-  try {
+
+// البحث عن الرحلات الجوية
+export async function searchFlights(origin, destination, date, adults = 1, travelClass = "ECONOMY") {
     const token = await getAccessToken();
 
-    const params = new URLSearchParams({
-      latitude: String(lat),
-      longitude: String(lon),
-      radius: '20',
-      radiusUnit: 'KM',
-      currencyCode: 'USD'
+    const url = `${AMADEUS_BASE_URL}/v2/shopping/flight-offers?` +
+        `originLocationCode=${origin}&` +
+        `destinationLocationCode=${destination}&` +
+        `departureDate=${date}&` +
+        `adults=${adults}&` +
+        `travelClass=${travelClass}&` +
+        `currency=USD&` +
+        `max=20`;
+
+    const response = await fetch(url, {
+        headers: {
+            "Authorization": `Bearer ${token}`
+        }
     });
 
-    const response = await fetch(
-      `${AMADEUS_BASE_URL}/v1/shopping/activities?${params.toString()}`,
-      {
-        method: 'get',
-        headers: {
-          Authorization: `Bearer ${token}`,
-          Accept: 'application/json'
-        }
-      }
-    );
+    return response.json();
+}
 
-    if (!response.ok) {
-      const text = await response.text();
-      throw new Error(`Amadeus tours error: ${response.status} - ${text}`);
+// البحث عن الفنادق
+export async function searchHotels(cityCode, checkIn, checkOut, guests = 1) {
+    const token = await getAccessToken();
+
+    // الحصول على إحداثيات المدينة
+    const geoUrl = `${AMADEUS_BASE_URL}/v1/reference-data/locations?` +
+        `cityCode=${cityCode}&subType=CITY,AIRPORT`;
+
+    const geoResponse = await fetch(geoUrl, {
+        headers: { "Authorization": `Bearer ${token}` }
+    });
+
+    const geoData = await geoResponse.json();
+
+    if (!geoData.data || geoData.data.length === 0) {
+        return { data: [] };
     }
 
-    const json = await response.json();
+    const latitude = geoData.data[0].geoCode.latitude;
+    const longitude = geoData.data[0].geoCode.longitude;
 
-    return {
-      data: json.data || []
-    };
-  } catch (error) {
-    console.error('searchTours error', error);
-    throw error;
-  }
+    // البحث عن الفنادق
+    const hotelsUrl = `${AMADEUS_BASE_URL}/v2/shopping/hotel-offers?` +
+        `latitude=${latitude}&` +
+        `longitude=${longitude}&` +
+        `checkInDate=${checkIn}&` +
+        `checkOutDate=${checkOut}&` +
+        `adults=${guests}&` +
+        `radius=50&` +
+        `currency=USD&` +
+        `roomQuantity=1`;
+
+    const hotelsResponse = await fetch(hotelsUrl, {
+        headers: { "Authorization": `Bearer ${token}` }
+    });
+
+    return hotelsResponse.json();
+}
+
+// البحث عن السيارات
+export async function searchCars(pickupLocation, pickupDate, dropoffDate) {
+    const token = await getAccessToken();
+
+    const url = `${AMADEUS_BASE_URL}/v1/shopping/car-rental-offers?` +
+        `pickupDateTime=${pickupDate}T10:00:00&` +
+        `dropoffDateTime=${dropoffDate}T10:00:00&` +
+        `pickupLocationCode=${pickupLocation}&` +
+        `dropoffLocationCode=${pickupLocation}&` +
+        `currency=USD`;
+
+    const response = await fetch(url, {
+        headers: {
+            "Authorization": `Bearer ${token}`
+        }
+    });
+
+    return response.json();
+}
+
+// البحث عن الأنشطة والجولات
+export async function searchTours(latitude, longitude, date) {
+    const token = await getAccessToken();
+
+    const url = `${AMADEUS_BASE_URL}/v1/shopping/activities?` +
+        `latitude=${latitude}&` +
+        `longitude=${longitude}&` +
+        `radius=50&` +
+        `date=${date}`;
+
+    const response = await fetch(url, {
+        headers: {
+            "Authorization": `Bearer ${token}`
+        }
+    });
+
+    return response.json();
+}
+
+// البحث عن الوجهات الشائعة
+export async function getTopDestinations() {
+    const token = await getAccessToken();
+
+    const url = `${AMADEUS_BASE_URL}/v1/reference-data/recommended-locations`;
+
+    const response = await fetch(url, {
+        headers: {
+            "Authorization": `Bearer ${token}`
+        }
+    });
+
+    return response.json();
 }

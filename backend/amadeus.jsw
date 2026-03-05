@@ -1,0 +1,78 @@
+// backend/amadeus.jsw
+
+import { ok, notFound, serverError } from 'wix-http-functions';
+import wixSecretsBackend from 'wix-secrets-backend';
+import { fetch } from 'wix-fetch';
+
+const AMADEUS_BASE_URL = 'https://test.api.amadeus.com';
+
+async function getAccessToken() {
+  const clientId = await wixSecretsBackend.getSecret('AMADEUS_API_KEY');
+  const clientSecret = await wixSecretsBackend.getSecret('AMADEUS_API_SECRET');
+
+  const body = `grant_type=client_credentials&client_id=${encodeURIComponent(
+    clientId
+  )}&client_secret=${encodeURIComponent(clientSecret)}`;
+
+  const response = await fetch(`${AMADEUS_BASE_URL}/v1/security/oauth2/token`, {
+    method: 'post',
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded'
+    },
+    body
+  });
+
+  if (!response.ok) {
+    const text = await response.text();
+    throw new Error(`Amadeus token error: ${response.status} - ${text}`);
+  }
+
+  const json = await response.json();
+  return json.access_token;
+}
+
+/**
+ * Flights search
+ * origin, dest in IATA codes (e.g. RUH, DXB)
+ * date in format YYYY-MM-DD
+ */
+export async function searchFlights(origin, dest, date) {
+  try {
+    const token = await getAccessToken();
+
+    const params = new URLSearchParams({
+      originLocationCode: origin,
+      destinationLocationCode: dest,
+      departureDate: date,
+      adults: '1',
+      currencyCode: 'USD',
+      max: '20'
+    });
+
+    const response = await fetch(
+      `${AMADEUS_BASE_URL}/v2/shopping/flight-offers?${params.toString()}`,
+      {
+        method: 'get',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          Accept: 'application/json'
+        }
+      }
+    );
+
+    if (!response.ok) {
+      const text = await response.text();
+      throw new Error(`Amadeus flights error: ${response.status} - ${text}`);
+    }
+
+    const json = await response.json();
+
+    // الكود في الواجهة يتوقع كائن فيه data
+    return {
+      data: json.data || []
+    };
+  } catch (error) {
+    console.error('searchFlights error', error);
+    throw error;
+  }
+}

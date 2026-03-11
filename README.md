@@ -1,4 +1,4 @@
-# تطبيق خته - Mashrook/Khattah
+# تطبيق خته - 5ATTH Travel
 
 تطبيق ويب لحجز الرحلات والفنادق والسيارات والجولات والخدمات السياحية.
 
@@ -35,13 +35,35 @@ npm run build
 
 ## متغيرات البيئة
 
-أنشئ ملف `.env`:
+الملف `.env` تم تحديثه:
 
-```env
-VITE_SUPABASE_URL=https://your-project.supabase.co
-VITE_SUPABASE_PUBLISHABLE_KEY=your-anon-key
-VITE_SUPABASE_PROJECT_ID=your-project-id
 ```
+VITE_SUPABASE_URL=https://yxojwultjidolgiwyktl.supabase.co
+VITE_SUPABASE_PUBLISHABLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+VITE_SUPABASE_PROJECT_ID=yxojwultjidolgiwyktl
+```
+
+## إعداد Supabase
+
+### 1. تشغيل SQL Schema
+
+اذهب إلى [Supabase SQL Editor](https://supabase.com/dashboard) لمشروعك وانسخ محتويات ملف:
+
+```
+supabase/schema.sql
+```
+
+واضغط "Run" لتنفيذ SQL.
+
+### 2. إعداد API Keys في الأدمن
+
+بعد تشغيل التطبيق، اذهب إلى لوحة الأدمن وأنشئ مفاتيح API:
+
+- **Amadeus**: 
+  - Client ID: `7W5MzlS607pHr3JqnSYqQP8tJjUgMzj2`
+  - Client Secret: `7nlYxguGaMgnDMe5`
+
+- **Moyasar**: أضف مفاتيح Moyasar
 
 ## النشر على Railway
 
@@ -56,9 +78,9 @@ VITE_SUPABASE_PROJECT_ID=your-project-id
 AMADEUS_CLIENT_ID=7W5MzlS607pHr3JqnSYqQP8tJjUgMzj2
 AMADEUS_CLIENT_SECRET=7nlYxguGaMgnDMe5
 
-VITE_SUPABASE_URL=https://frkdmxdfalohpmzlnsth.supabase.co
+VITE_SUPABASE_URL=https://yxojwultjidolgiwyktl.supabase.co
 VITE_SUPABASE_PUBLISHABLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
-VITE_SUPABASE_PROJECT_ID=frkdmxdfalohpmzlnsth
+VITE_SUPABASE_PROJECT_ID=yxojwultjidolgiwyktl
 ```
 
 ### 3. نشر Supabase Functions
@@ -71,7 +93,7 @@ npm install -g supabase
 supabase login
 
 # ربط المشروع
-supabase link --project-ref your-project-ref
+supabase link --project-ref yxojwultjidolgiwyktl
 
 # نشر الـ functions
 supabase functions deploy amadeus

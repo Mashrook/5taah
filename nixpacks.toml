@@ -1,0 +1,7 @@
+# Force Nixpacks builder - avoids Railpack's Docker BuildKit secret detection
+# for VITE_* variables which are public client-side configuration.
+[phases.build]
+cmds = ["npm run build"]
+
+[start]
+cmd = "npx serve -s dist -l tcp://0.0.0.0:$PORT"

@@ -162,7 +162,7 @@ function buildUrl(action: string, params: Record<string, string>) {
 }
 
 const defaultHeaders = {
-  apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+  apikey: import.meta.env.VITE_SUPABASE_ANON_KEY,
 };
 
 // ─── Flight API ───

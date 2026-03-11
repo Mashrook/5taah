@@ -9,7 +9,7 @@
     "build:dev": "vite build --mode development",
     "lint": "eslint .",
     "preview": "vite preview",
-    "start": "npx serve -s dist --listen tcp://0.0.0.0:${PORT:-8080}"
+    "start": "npx serve -s dist -l tcp://0.0.0.0:${PORT:-8080}"
   },
   "dependencies": {
     "@capacitor/cli": "^7.5.0",

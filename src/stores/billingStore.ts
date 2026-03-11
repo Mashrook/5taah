@@ -91,7 +91,7 @@ export const useBillingStore = create<BillingState>((set, get) => ({
 
       const res = await fetch(
         `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/billing-subscription?tenant_id=${tenantId}`,
-        { headers: { Authorization: `Bearer ${token}`, apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY } }
+        { headers: { Authorization: `Bearer ${token}`, apikey: import.meta.env.VITE_SUPABASE_ANON_KEY } }
       );
       const result = await res.json();
       set({
@@ -114,7 +114,7 @@ export const useBillingStore = create<BillingState>((set, get) => ({
     try {
       const res = await fetch(
         `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/billing-invoices?tenant_id=${tenantId}`,
-        { headers: { Authorization: `Bearer ${token}`, apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY } }
+        { headers: { Authorization: `Bearer ${token}`, apikey: import.meta.env.VITE_SUPABASE_ANON_KEY } }
       );
       const result = await res.json();
       set({ invoices: result.invoices || [] });

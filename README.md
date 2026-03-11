@@ -39,7 +39,7 @@ npm run build
 
 ```env
 VITE_SUPABASE_URL=https://your-project.supabase.co
-VITE_SUPABASE_PUBLISHABLE_KEY=your-anon-key
+VITE_SUPABASE_ANON_KEY=your-anon-key
 VITE_SUPABASE_PROJECT_ID=your-project-id
 ```
 
@@ -65,7 +65,7 @@ Railway سيكتشف إعدادات `railway.json` تلقائياً:
 
 ```
 VITE_SUPABASE_URL=https://your-project.supabase.co
-VITE_SUPABASE_PUBLISHABLE_KEY=your-supabase-anon-key
+VITE_SUPABASE_ANON_KEY=your-supabase-anon-key
 VITE_SUPABASE_PROJECT_ID=your-project-id
 ```
 

@@ -177,6 +177,9 @@ export default function TravelerForm({ onSubmit, onBack, title = "بيانات �
             placeholder="اختر تاريخ الميلاد"
             disabled={(d) => d > new Date(Date.now() - 18 * 365.25 * 24 * 3600 * 1000)}
             className={errors.dateOfBirth ? "border-destructive" : ""}
+            captionLayout="dropdown-buttons"
+            fromYear={1940}
+            toYear={new Date().getFullYear() - 18}
           />
           {errors.dateOfBirth && <p className="text-xs text-destructive mt-1">{errors.dateOfBirth}</p>}
         </div>

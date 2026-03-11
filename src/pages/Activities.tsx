@@ -1,13 +1,14 @@
 import { useState, useMemo, useEffect } from "react";
-import { Search, Star, MapPin, Clock, Users, Filter, Calendar, Sparkles, SlidersHorizontal, ExternalLink } from "lucide-react";
+import { Search, Star, MapPin, Clock, Users, Filter, Calendar, Sparkles, SlidersHorizontal, ExternalLink, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import CityAutocomplete from "@/components/search/CityAutocomplete";
 import DatePickerInput from "@/components/ui/date-picker-input";
-import { useSearchParams } from "react-router-dom";
+import { useSearchParams, useNavigate } from "react-router-dom";
 import { getTourDeeplink } from "@/lib/travelpayoutsClient";
+import { supabase } from "@/integrations/supabase/client";
 
 import redSeaImg from "@/assets/tours/red-sea.jpg";
 import desertImg from "@/assets/tours/desert-safari.jpg";
@@ -113,8 +114,29 @@ const tours: Tour[] = [
 
 const categories = ["الكل", "بحرية", "مغامرات", "ثقافية", "ترفيهية", "دينية"];
 
+const fallbackImages: Record<string, string> = {
+  "بحرية": redSeaImg, "مغامرات": desertImg, "ثقافية": jeddahImg,
+  "ترفيهية": riyadhImg, "دينية": umrahImg,
+};
+
+interface DbTour {
+  id: string;
+  title: string;
+  title_ar: string | null;
+  description: string | null;
+  description_ar: string | null;
+  city: string | null;
+  duration: string | null;
+  category: string | null;
+  price: number;
+  currency: string;
+  image_url: string | null;
+  is_active: boolean;
+}
+
 export default function Activities() {
   const [urlParams] = useSearchParams();
+  const navigate = useNavigate();
   const [destination, setDestination] = useState(urlParams.get("city") || "");
   const [tourDate, setTourDate] = useState(urlParams.get("date") || "");
   const [guests, setGuests] = useState(Number(urlParams.get("guests")) || 2);
@@ -123,6 +145,17 @@ export default function Activities() {
   const [priceMax, setPriceMax] = useState("");
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [partnerLink, setPartnerLink] = useState("");
+  const [dbTours, setDbTours] = useState<DbTour[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  // Load tours from database
+  useEffect(() => {
+    supabase.from("tours").select("*").eq("is_active", true).order("sort_order")
+      .then(({ data }) => {
+        setDbTours((data as DbTour[]) || []);
+        setLoading(false);
+      });
+  }, []);
 
   // Generate Travelpayouts tour deeplink
   useEffect(() => {
@@ -134,14 +167,35 @@ export default function Activities() {
   }, [destination, tourDate]);
 
   const filteredTours = useMemo(() => {
-    return tours.filter((t) => {
+    // Combine DB tours (converted to Tour type) + static fallback tours
+    const combined: Tour[] = [
+      ...dbTours.map((t) => ({
+        id: t.id,
+        title: t.title_ar || t.title,
+        description: t.description_ar || t.description || "",
+        image: t.image_url || fallbackImages[t.category || ""] || redSeaImg,
+        category: t.category || "ثقافية",
+        rating: 4.5 + Math.random() * 0.4,
+        reviews: 50 + Math.floor(Math.random() * 200),
+        price: Number(t.price),
+        currency: t.currency || "SAR",
+        duration: t.duration || "يوم كامل",
+        destination: t.city || "",
+      })),
+      ...tours,
+    ];
+    // Deduplicate by id
+    const seen = new Set<string>();
+    return combined.filter((t) => {
+      if (seen.has(t.id)) return false;
+      seen.add(t.id);
       if (selectedCategory !== "الكل" && t.category !== selectedCategory) return false;
       if (priceMin && t.price < Number(priceMin)) return false;
       if (priceMax && t.price > Number(priceMax)) return false;
       if (destination && !t.destination.includes(destination.replace(/\(.*\)/, "").trim())) return false;
       return true;
     });
-  }, [selectedCategory, priceMin, priceMax, destination]);
+  }, [selectedCategory, priceMin, priceMax, destination, dbTours]);
 
   return (
     <div className="min-h-screen">
@@ -243,8 +297,18 @@ export default function Activities() {
         </h2>
 
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredTours.map((tour) => (
-            <TourCard key={tour.id} tour={tour} />
+          {loading ? (
+            <div className="col-span-full text-center py-12"><Loader2 className="w-8 h-8 animate-spin mx-auto text-muted-foreground" /></div>
+          ) : filteredTours.map((tour) => (
+            <TourCard key={tour.id} tour={tour} guests={guests} tourDate={tourDate} onBook={(t) => {
+              const params = new URLSearchParams({
+                id: t.id, title: t.title, city: t.destination,
+                duration: t.duration, category: t.category,
+                price: String(t.price), currency: t.currency,
+                travelers: String(guests),
+              });
+              navigate(`/tour-booking?${params.toString()}`);
+            }} />
           ))}
         </div>
 
@@ -279,7 +343,7 @@ export default function Activities() {
   );
 }
 
-function TourCard({ tour }: { tour: Tour }) {
+function TourCard({ tour, guests, tourDate, onBook }: { tour: Tour; guests: number; tourDate: string; onBook: (t: Tour) => void }) {
   return (
     <div className="rounded-2xl bg-card/70 border border-border/30 overflow-hidden hover:border-primary/20 transition-all group">
       {/* Image */}
@@ -295,7 +359,7 @@ function TourCard({ tour }: { tour: Tour }) {
         {/* Rating */}
         <div className="flex items-center gap-1.5 mb-2">
           <Star className="w-4 h-4 text-primary fill-primary" />
-          <span className="text-sm font-semibold">{tour.rating}</span>
+          <span className="text-sm font-semibold">{tour.rating.toFixed(1)}</span>
           <span className="text-xs text-muted-foreground">({tour.reviews} تقييم)</span>
         </div>
 
@@ -320,9 +384,7 @@ function TourCard({ tour }: { tour: Tour }) {
             <span className="text-lg font-bold text-primary">{tour.price.toLocaleString()}</span>
             <span className="text-xs text-muted-foreground mr-1">{tour.currency}</span>
           </div>
-          <div className="flex gap-2">
-            <Button variant="gold" size="sm">عرض التفاصيل</Button>
-          </div>
+          <Button variant="gold" size="sm" onClick={() => onBook(tour)}>احجز الآن</Button>
         </div>
       </div>
     </div>

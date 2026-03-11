@@ -9,12 +9,17 @@ const footerLinks = {
     { href: "/hotels", label: "حجز الفنادق" },
     { href: "/cars", label: "تأجير السيارات" },
     { href: "/tours", label: "الجولات السياحية" },
+    { href: "/activities", label: "الأنشطة والجولات" },
     { href: "/transfers", label: "خدمة التنقلات" },
+    { href: "/study-abroad", label: "الدراسة بالخارج" },
   ],
   explore: [
     { href: "/offers", label: "العروض" },
     { href: "/destinations", label: "الوجهات" },
+    { href: "/festivals", label: "الفعاليات" },
+    { href: "/saudi-tourism", label: "سياحة السعودية" },
     { href: "/articles", label: "المقالات" },
+    { href: "/news", label: "الأخبار" },
   ],
   company: [
     { href: "/about", label: "من نحن" },

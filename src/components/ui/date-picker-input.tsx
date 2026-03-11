@@ -1,5 +1,6 @@
 import * as React from "react";
 import { format, parseISO } from "date-fns";
+import { ar } from "date-fns/locale";
 import { CalendarIcon } from "lucide-react";
 
 import { cn } from "@/lib/utils";
@@ -21,6 +22,10 @@ export interface DatePickerInputProps {
   disabled?: (date: Date) => boolean;
   className?: string;
   align?: React.ComponentProps<typeof PopoverContent>["align"];
+  /** Enable year/month dropdown navigation (useful for DOB). */
+  captionLayout?: "buttons" | "dropdown" | "dropdown-buttons";
+  fromYear?: number;
+  toYear?: number;
 }
 
 function DatePickerInput({
@@ -30,6 +35,9 @@ function DatePickerInput({
   disabled,
   className,
   align = "start",
+  captionLayout,
+  fromYear,
+  toYear,
 }: DatePickerInputProps) {
   const selected = React.useMemo(() => {
     if (!value) return undefined;
@@ -52,7 +60,7 @@ function DatePickerInput({
             className,
           )}
         >
-          <span className="truncate">{selected ? selected.toLocaleDateString("ar-SA", { year: "numeric", month: "long", day: "numeric" }) : placeholder}</span>
+          <span dir="rtl" className="truncate">{selected ? format(selected, "d MMMM yyyy", { locale: ar }) : placeholder}</span>
           <CalendarIcon className="h-4 w-4 opacity-70" />
         </Button>
       </PopoverTrigger>
@@ -63,7 +71,12 @@ function DatePickerInput({
           onSelect={(d) => onChange(d ? toYmdLocal(d) : "")}
           disabled={disabled}
           initialFocus
+          dir="rtl"
+          locale={ar}
           className={cn("p-3 pointer-events-auto")}
+          {...(captionLayout ? { captionLayout } : {})}
+          {...(fromYear !== undefined ? { fromYear } : {})}
+          {...(toYear !== undefined ? { toYear } : {})}
         />
       </PopoverContent>
     </Popover>

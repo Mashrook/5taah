@@ -36,8 +36,10 @@ export default function CarBooking() {
     : 1;
   const totalPrice = carPrice * days;
 
+  const travelersCount = parseInt(params.get("travelers") || "1", 10);
   const [step, setStep] = useState<BookingStep>("traveler");
-  const [traveler, setTraveler] = useState<TravelerData | null>(null);
+  const [travelers, setTravelers] = useState<(TravelerData | null)[]>(Array(travelersCount).fill(null));
+  const [currentTravelerIdx, setCurrentTravelerIdx] = useState(0);
   const [paymentSessionId, setPaymentSessionId] = useState<string | null>(null);
   const [paymentPreparing, setPaymentPreparing] = useState(false);
 
@@ -55,13 +57,20 @@ export default function CarBooking() {
   }
 
   const handleTravelerSubmit = (data: TravelerData) => {
-    setTraveler(data);
-    setStep("review");
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    const updated = [...travelers];
+    updated[currentTravelerIdx] = data;
+    setTravelers(updated);
+    if (currentTravelerIdx < travelersCount - 1) {
+      setCurrentTravelerIdx((i) => i + 1);
+    } else {
+      setStep("review");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
   };
 
   const handleGoToPayment = async () => {
-    if (!traveler) return;
+    const filledTravelers = travelers.filter(Boolean) as TravelerData[];
+    if (filledTravelers.length < travelersCount) return;
 
     if (!paymentSessionId) {
       setPaymentPreparing(true);
@@ -76,6 +85,7 @@ export default function CarBooking() {
             payment_provider: "moyasar",
             user_id: isAuthenticated && user ? user.id : null,
             tenant_id: tenant?.id || null,
+            travelers_count: travelersCount,
             details_json: {
               car_id: carId,
               car_name: carName,
@@ -85,7 +95,7 @@ export default function CarBooking() {
               return_date: returnDate,
               days,
               price_per_day: carPrice,
-              traveler,
+              travelers: filledTravelers,
             },
           } as Record<string, unknown>)
           .select("id")
@@ -94,7 +104,8 @@ export default function CarBooking() {
         if (error) throw error;
         setPaymentSessionId((data as { id: string }).id);
       } catch (err: unknown) {
-        toast({ title: "خطأ", description: err.message || "تعذر تجهيز الدفع", variant: "destructive" });
+        const message = err instanceof Error ? err.message : "تعذر تجهيز الدفع";
+        toast({ title: "خطأ", description: message, variant: "destructive" });
         return;
       } finally {
         setPaymentPreparing(false);
@@ -161,16 +172,24 @@ export default function CarBooking() {
 
           {/* Step 1: Traveler */}
           {step === "traveler" && (
-            <TravelerForm
-              onSubmit={handleTravelerSubmit}
-              onBack={() => navigate("/cars")}
-              title="بيانات المستأجر"
-              submitLabel="التالي — مراجعة الحجز"
-            />
+            <div>
+              {travelersCount > 1 && (
+                <p className="text-center text-sm text-muted-foreground mb-3">
+                  المسافر {currentTravelerIdx + 1} من {travelersCount}
+                </p>
+              )}
+              <TravelerForm
+                key={currentTravelerIdx}
+                onSubmit={handleTravelerSubmit}
+                onBack={() => currentTravelerIdx > 0 ? setCurrentTravelerIdx((i) => i - 1) : navigate("/cars")}
+                title={travelersCount > 1 ? `بيانات المسافر ${currentTravelerIdx + 1}` : "بيانات المستأجر"}
+                submitLabel={currentTravelerIdx < travelersCount - 1 ? "التالي — المسافر التالي" : "التالي — مراجعة الحجز"}
+              />
+            </div>
           )}
 
           {/* Step 2: Review */}
-          {step === "review" && traveler && (
+          {step === "review" && travelers.every(Boolean) && (
             <div className="space-y-5">
               <h2 className="text-2xl font-bold text-right mb-2">مراجعة الحجز</h2>
 
@@ -193,24 +212,28 @@ export default function CarBooking() {
                 </div>
               </div>
 
-              <div className="p-5 rounded-2xl bg-card border border-border">
-                <h3 className="font-bold mb-4 flex items-center gap-2 justify-end">بيانات المستأجر <Users className="w-4 h-4 text-primary" /></h3>
-                <div className="grid grid-cols-2 gap-3 text-sm">
-                  {[
-                    { label: "الاسم الكامل", value: `${traveler.firstName} ${traveler.lastName}` },
-                    { label: "نوع الوثيقة", value: traveler.idType === "national_id" ? "هوية وطنية" : "جواز سفر" },
-                    { label: "رقم الوثيقة", value: traveler.idNumber },
-                    { label: "تاريخ الميلاد", value: new Date(traveler.dateOfBirth).toLocaleDateString("ar-SA") },
-                    { label: "رقم الجوال", value: traveler.phone },
-                  ].map((f) => (
-                    <div key={f.label} className="bg-muted/30 rounded-xl p-3">
-                      <p className="text-xs text-muted-foreground mb-0.5">{f.label}</p>
-                      <p className="font-semibold text-foreground">{f.value}</p>
-                    </div>
-                  ))}
+              {(travelers.filter(Boolean) as TravelerData[]).map((t, idx) => (
+                <div key={idx} className="p-5 rounded-2xl bg-card border border-border">
+                  <h3 className="font-bold mb-4 flex items-center gap-2 justify-end">
+                    {travelersCount > 1 ? `بيانات المسافر ${idx + 1}` : "بيانات المستأجر"} <Users className="w-4 h-4 text-primary" />
+                  </h3>
+                  <div className="grid grid-cols-2 gap-3 text-sm">
+                    {[
+                      { label: "الاسم الكامل", value: `${t.firstName} ${t.lastName}` },
+                      { label: "نوع الوثيقة", value: t.idType === "national_id" ? "هوية وطنية" : "جواز سفر" },
+                      { label: "رقم الوثيقة", value: t.idNumber },
+                      { label: "تاريخ الميلاد", value: new Date(t.dateOfBirth).toLocaleDateString("ar", { year: "numeric", month: "long", day: "numeric" }) },
+                      { label: "رقم الجوال", value: t.phone },
+                    ].map((f) => (
+                      <div key={f.label} className="bg-muted/30 rounded-xl p-3">
+                        <p className="text-xs text-muted-foreground mb-0.5">{f.label}</p>
+                        <p className="font-semibold text-foreground">{f.value}</p>
+                      </div>
+                    ))}
+                  </div>
+                  <button onClick={() => { setCurrentTravelerIdx(idx); setStep("traveler"); }} className="mt-3 text-xs text-primary hover:underline">تعديل البيانات</button>
                 </div>
-                <button onClick={() => setStep("traveler")} className="mt-3 text-xs text-primary hover:underline">تعديل البيانات</button>
-              </div>
+              ))}
 
               <div className="p-5 rounded-2xl bg-primary/5 border border-primary/20">
                 <h3 className="font-bold mb-3 text-right">ملخص السعر</h3>

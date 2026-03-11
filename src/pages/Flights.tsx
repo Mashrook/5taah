@@ -189,7 +189,7 @@ export default function Flights() {
         departureDate: departParam,
         returnDate: tripType === "roundtrip" && retParam ? retParam : undefined,
         adults: passengers,
-        max: 15,
+        max: 250,
       })
         .then((result) => {
           const offers = result.data || [];
@@ -223,7 +223,7 @@ export default function Flights() {
       const result = await amadeusSearch({
         origin: originCode, destination: destCode, departureDate: departDate,
         returnDate: tripType === "roundtrip" && returnDate ? returnDate : undefined,
-        adults: passengers, max: 15,
+        adults: passengers, max: 250,
       });
       const offers = result.data || [];
       setSearchResults(offers);
@@ -668,9 +668,17 @@ export default function Flights() {
                 {/* Flight Summary Card */}
                 <div className="mb-5 p-4 rounded-2xl bg-primary/5 border border-primary/20">
                   <div className="flex items-center justify-between mb-3">
-                    <p className="text-2xl font-bold text-primary">
-                      {parseFloat(displayOffer.price.grandTotal).toLocaleString()} <span className="text-sm">{displayOffer.price.currency}</span>
-                    </p>
+                    <div>
+                      <p className="text-2xl font-bold text-primary">
+                        {parseFloat(displayOffer.price.grandTotal).toLocaleString()} <span className="text-sm">{displayOffer.price.currency}</span>
+                      </p>
+                      {selectedOffer && pricedOffer && parseFloat(pricedOffer.price.grandTotal) !== parseFloat(selectedOffer.price.grandTotal) && (
+                        <p className="text-xs text-muted-foreground mt-0.5">
+                          <span className="line-through">{parseFloat(selectedOffer.price.grandTotal).toLocaleString()}</span>
+                          {" "}تم تحديث السعر بعد التحقق
+                        </p>
+                      )}
+                    </div>
                     <div className="text-right">
                       <p className="font-bold text-lg">
                         {displayOffer.itineraries[0].segments[0].departure.iataCode}
@@ -678,7 +686,7 @@ export default function Flights() {
                         {(() => { const segs = displayOffer.itineraries[0].segments; return segs[segs.length - 1].arrival.iataCode; })()}
                       </p>
                       <p className="text-xs text-muted-foreground">
-                        {new Date(displayOffer.itineraries[0].segments[0].departure.at).toLocaleDateString("ar-SA", { weekday: "long", day: "numeric", month: "long" })}
+                        {new Date(displayOffer.itineraries[0].segments[0].departure.at).toLocaleDateString("ar", { weekday: "long", day: "numeric", month: "long" })}
                         {" • "}
                         {passengers} مسافر
                         {" • "}
@@ -743,7 +751,7 @@ export default function Flights() {
                           return s[s.length - 1].arrival.iataCode;
                         })(),
                       },
-                      { label: "تاريخ المغادرة", value: new Date(displayOffer.itineraries[0].segments[0].departure.at).toLocaleDateString("ar-SA") },
+                      { label: "تاريخ المغادرة", value: new Date(displayOffer.itineraries[0].segments[0].departure.at).toLocaleDateString("ar", { year: "numeric", month: "long", day: "numeric" }) },
                       { label: "شركة الطيران", value: getAirlineName(displayOffer.validatingAirlineCodes?.[0] || displayOffer.itineraries[0].segments[0].carrierCode) },
                       { label: "عدد المسافرين", value: `${passengers} مسافر` },
                       { label: "المدة", value: formatDuration(displayOffer.itineraries[0].duration) },
@@ -770,10 +778,10 @@ export default function Flights() {
                             { label: "الاسم الكامل", value: `${t.firstName} ${t.lastName}` },
                             { label: "نوع الوثيقة", value: t.idType === "national_id" ? "هوية وطنية" : "جواز سفر" },
                             { label: "رقم الوثيقة", value: t.idNumber },
-                            { label: "تاريخ الميلاد", value: new Date(t.dateOfBirth).toLocaleDateString("ar-SA") },
+                            { label: "تاريخ الميلاد", value: new Date(t.dateOfBirth).toLocaleDateString("ar", { year: "numeric", month: "long", day: "numeric" }) },
                             { label: "رقم الجوال", value: t.phone },
                             ...(t.idType === "passport" && t.passportExpiry
-                              ? [{ label: "انتهاء الجواز", value: new Date(t.passportExpiry).toLocaleDateString("ar-SA") }]
+                              ? [{ label: "انتهاء الجواز", value: new Date(t.passportExpiry).toLocaleDateString("ar", { year: "numeric", month: "long", day: "numeric" }) }]
                               : []),
                           ].map((f) => (
                             <div key={f.label} className="bg-muted/30 rounded-xl p-3">
@@ -799,6 +807,11 @@ export default function Flights() {
                 {/* Pricing */}
                 <div className="p-5 rounded-2xl bg-primary/5 border border-primary/20">
                   <h3 className="font-bold mb-3 text-right">ملخص السعر</h3>
+                  {selectedOffer && pricedOffer && parseFloat(pricedOffer.price.grandTotal) !== parseFloat(selectedOffer.price.grandTotal) && (
+                    <div className="mb-3 p-2.5 rounded-xl bg-amber-500/10 border border-amber-500/20 text-xs text-amber-700 dark:text-amber-400 text-right">
+                      تم تحديث السعر من {parseFloat(selectedOffer.price.grandTotal).toLocaleString()} إلى {parseFloat(pricedOffer.price.grandTotal).toLocaleString()} {pricedOffer.price.currency} بعد التحقق من شركة الطيران
+                    </div>
+                  )}
                   <div className="space-y-2 text-sm">
                     <div className="flex justify-between">
                       <span className="font-bold text-primary text-lg">

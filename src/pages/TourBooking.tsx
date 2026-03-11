@@ -224,7 +224,7 @@ export default function TourBooking() {
                           { label: "الاسم الكامل", value: `${t.firstName} ${t.lastName}` },
                           { label: "نوع الوثيقة", value: t.idType === "national_id" ? "هوية وطنية" : "جواز سفر" },
                           { label: "رقم الوثيقة", value: t.idNumber },
-                          { label: "تاريخ الميلاد", value: new Date(t.dateOfBirth).toLocaleDateString("ar-SA") },
+                          { label: "تاريخ الميلاد", value: new Date(t.dateOfBirth).toLocaleDateString("ar", { year: "numeric", month: "long", day: "numeric" }) },
                           { label: "رقم الجوال", value: t.phone },
                         ].map((f) => (
                           <div key={f.label} className="bg-muted/30 rounded-xl p-3">

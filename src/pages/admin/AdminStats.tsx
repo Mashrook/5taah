@@ -39,20 +39,23 @@ export default function AdminStats() {
   const [bookings, setBookings] = useState<BookingRecord[]>([]);
   const [users, setUsers] = useState(0);
   const [searchCount, setSearchCount] = useState(0);
+  const [apiSearchLogs, setApiSearchLogs] = useState<{ provider: string; search_type: string; results_count: number; response_time_ms: number; created_at: string }[]>([]);
 
   const fetchData = async () => {
     setLoading(true);
     try {
-      const [bookingsRes, profilesRes] = await Promise.all([
+      const [bookingsRes, profilesRes, searchLogsRes] = await Promise.all([
         supabase.from("bookings").select("*").order("created_at", { ascending: false }),
         supabase.from("profiles").select("id, created_at"),
+        supabase.from("api_search_logs").select("provider, search_type, results_count, response_time_ms, created_at").order("created_at", { ascending: false }).limit(500),
       ]);
       setBookings((bookingsRes.data as BookingRecord[]) || []);
       setUsers(profilesRes.data?.length || 0);
+      setApiSearchLogs((searchLogsRes.data as typeof apiSearchLogs) || []);
 
-      // Approximate search count from site settings or a dedicated counter
-      // For demo, estimate searches = bookings * 8 (typical funnel)
-      setSearchCount((bookingsRes.data?.length || 0) * 8);
+      // Search count from actual logs or estimate from bookings
+      const logCount = searchLogsRes.data?.length || 0;
+      setSearchCount(logCount > 0 ? logCount : (bookingsRes.data?.length || 0) * 8);
     } catch {
       toast({ title: "خطأ", description: "تعذر تحميل الإحصاءات", variant: "destructive" });
     }
@@ -111,6 +114,18 @@ export default function AdminStats() {
     const withAmadeusOrder = flightBookings.filter(b => b.details_json?.amadeus_order_id).length;
     const amadeusSuccessRate = flightBookings.length > 0 ? (withAmadeusOrder / flightBookings.length) * 100 : 0;
 
+    // API provider analytics from search logs
+    const amadeusSearches = apiSearchLogs.filter(l => l.provider === "amadeus");
+    const travelpayoutsSearches = apiSearchLogs.filter(l => l.provider === "travelpayouts");
+    const amadeusAvgTime = amadeusSearches.length > 0 ? amadeusSearches.reduce((s, l) => s + (l.response_time_ms || 0), 0) / amadeusSearches.length : 0;
+    const travelpayoutsAvgTime = travelpayoutsSearches.length > 0 ? travelpayoutsSearches.reduce((s, l) => s + (l.response_time_ms || 0), 0) / travelpayoutsSearches.length : 0;
+    const travelpayoutsSuccessCount = travelpayoutsSearches.filter(l => (l.results_count || 0) > 0).length;
+    const travelpayoutsSuccessRate = travelpayoutsSearches.length > 0 ? (travelpayoutsSuccessCount / travelpayoutsSearches.length) * 100 : 0;
+
+    // Search type breakdown
+    const searchByType: Record<string, number> = {};
+    apiSearchLogs.forEach(l => { searchByType[l.search_type || "unknown"] = (searchByType[l.search_type || "unknown"] || 0) + 1; });
+
     return {
       totalBookings: bookings.length,
       flightBookings: flightBookings.length,
@@ -127,8 +142,14 @@ export default function AdminStats() {
       byMonth,
       amadeusSuccessRate,
       withAmadeusOrder,
+      amadeusSearches: amadeusSearches.length,
+      travelpayoutsSearches: travelpayoutsSearches.length,
+      amadeusAvgTime,
+      travelpayoutsAvgTime,
+      travelpayoutsSuccessRate,
+      searchByType,
     };
-  }, [bookings, searchCount]);
+  }, [bookings, searchCount, apiSearchLogs]);
 
   const pieData = Object.entries(stats.byType).map(([name, value]) => ({ name, value }));
   const chartData = Object.entries(stats.byMonth).slice(-8).map(([month, d]) => ({ month, count: d.count, revenue: d.revenue }));
@@ -143,6 +164,8 @@ export default function AdminStats() {
     { label: "متوسط قيمة الحجز", value: `${stats.avgBookingValue.toLocaleString("ar-SA", { maximumFractionDigits: 0 })} ر.س`, icon: Target, color: "text-purple-400", bg: "bg-purple-500/10 border-purple-500/20" },
     { label: "نسبة التحويل", value: `${stats.conversionRate.toFixed(1)}%`, icon: Percent, color: "text-teal-400", bg: "bg-teal-500/10 border-teal-500/20", subtitle: "من البحث للحجز" },
     { label: "نجاح Amadeus API", value: `${stats.amadeusSuccessRate.toFixed(0)}%`, icon: CheckCircle2, color: "text-emerald-400", bg: "bg-emerald-500/10 border-emerald-500/20", subtitle: `${stats.withAmadeusOrder} حجز مؤكد` },
+    { label: "بحث Amadeus", value: stats.amadeusSearches.toLocaleString("ar-SA"), icon: Timer, color: "text-sky-400", bg: "bg-sky-500/10 border-sky-500/20", subtitle: `${stats.amadeusAvgTime.toFixed(0)}ms متوسط` },
+    { label: "بحث Travelpayouts", value: stats.travelpayoutsSearches.toLocaleString("ar-SA"), icon: Route, color: "text-pink-400", bg: "bg-pink-500/10 border-pink-500/20", subtitle: `نجاح ${stats.travelpayoutsSuccessRate.toFixed(0)}%` },
     { label: "حجوزات مدفوعة", value: stats.paidCount.toLocaleString("ar-SA"), icon: TrendingUp, color: "text-orange-400", bg: "bg-orange-500/10 border-orange-500/20" },
   ];
 
@@ -161,7 +184,7 @@ export default function AdminStats() {
           <h1 className="text-2xl font-bold flex items-center gap-3">
             <BarChart3 className="w-7 h-7 text-primary" /> الإحصاءات المتقدمة
           </h1>
-          <p className="text-muted-foreground text-sm mt-1">نظرة شاملة على أداء المنصة ومؤشرات Amadeus</p>
+          <p className="text-muted-foreground text-sm mt-1">نظرة شاملة على أداء المنصة ومؤشرات Amadeus و Travelpayouts</p>
         </div>
         <Button variant="outline" size="sm" onClick={fetchData}>
           <RefreshCw className="w-4 h-4 ml-2" /> تحديث
@@ -277,7 +300,8 @@ export default function AdminStats() {
       </div>
 
       {/* Status breakdown & service breakdown */}
-      <div className="grid lg:grid-cols-2 gap-6">
+      <div className="grid lg:grid-cols-2 gap-6 mb-6">
+
         {/* Status */}
         <div className="p-6 rounded-2xl bg-card border border-border/50">
           <h3 className="font-bold mb-4 text-sm">حالة الحجوزات</h3>
@@ -340,6 +364,66 @@ export default function AdminStats() {
               </div>
             </div>
           </div>
+        </div>
+      </div>
+
+      {/* API Provider Analytics */}
+      <div className="grid lg:grid-cols-2 gap-6">
+        {/* Amadeus vs Travelpayouts */}
+        <div className="p-6 rounded-2xl bg-card border border-border/50">
+          <h3 className="font-bold mb-4 text-sm flex items-center gap-2 justify-end">
+            مقارنة مزودي API <Target className="w-4 h-4 text-primary" />
+          </h3>
+          <div className="space-y-4">
+            <div>
+              <div className="flex justify-between text-sm mb-1">
+                <span className="font-bold text-emerald-500">{stats.amadeusSearches}</span>
+                <span className="text-muted-foreground">Amadeus</span>
+              </div>
+              <div className="h-2 rounded-full bg-muted overflow-hidden">
+                <div className="h-full rounded-full bg-emerald-500 transition-all" style={{ width: (stats.amadeusSearches + stats.travelpayoutsSearches) > 0 ? `${(stats.amadeusSearches / (stats.amadeusSearches + stats.travelpayoutsSearches)) * 100}%` : "0%" }} />
+              </div>
+              <p className="text-[10px] text-muted-foreground mt-0.5">متوسط الاستجابة: {stats.amadeusAvgTime.toFixed(0)}ms</p>
+            </div>
+            <div>
+              <div className="flex justify-between text-sm mb-1">
+                <span className="font-bold text-pink-500">{stats.travelpayoutsSearches}</span>
+                <span className="text-muted-foreground">Travelpayouts</span>
+              </div>
+              <div className="h-2 rounded-full bg-muted overflow-hidden">
+                <div className="h-full rounded-full bg-pink-500 transition-all" style={{ width: (stats.amadeusSearches + stats.travelpayoutsSearches) > 0 ? `${(stats.travelpayoutsSearches / (stats.amadeusSearches + stats.travelpayoutsSearches)) * 100}%` : "0%" }} />
+              </div>
+              <p className="text-[10px] text-muted-foreground mt-0.5">متوسط الاستجابة: {stats.travelpayoutsAvgTime.toFixed(0)}ms · نجاح: {stats.travelpayoutsSuccessRate.toFixed(0)}%</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Search type breakdown */}
+        <div className="p-6 rounded-2xl bg-card border border-border/50">
+          <h3 className="font-bold mb-4 text-sm flex items-center gap-2 justify-end">
+            عمليات البحث حسب النوع <BarChart3 className="w-4 h-4 text-primary" />
+          </h3>
+          {Object.keys(stats.searchByType).length === 0 ? (
+            <div className="flex items-center justify-center h-40 text-muted-foreground text-sm">لا توجد بيانات بحث بعد</div>
+          ) : (
+            <div className="space-y-3">
+              {Object.entries(stats.searchByType).sort((a, b) => b[1] - a[1]).map(([type, count], i) => {
+                const total = Object.values(stats.searchByType).reduce((s, v) => s + v, 0);
+                const pct = total > 0 ? (count / total) * 100 : 0;
+                return (
+                  <div key={type}>
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="text-sm font-bold" style={{ color: COLORS[i % COLORS.length] }}>{count}</span>
+                      <span className="text-sm text-muted-foreground">{type}</span>
+                    </div>
+                    <div className="h-1.5 rounded-full bg-muted overflow-hidden">
+                      <div className="h-full rounded-full transition-all" style={{ width: `${pct}%`, background: COLORS[i % COLORS.length] }} />
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
         </div>
       </div>
     </div>

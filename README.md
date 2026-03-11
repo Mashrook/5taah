@@ -48,20 +48,36 @@ VITE_SUPABASE_PROJECT_ID=your-project-id
 ### 1. ربط GitHub
 - اذهب لـ [railway.app](https://railway.app)
 - أنشئ مشروع جديد واختر "Deploy from GitHub repo"
+- اختر `Mashrook/5taah`
 
-### 2. متغيرات البيئة
-أضف في Railway Settings:
+### 2. اختيار الفرع (Branch)
+في إعدادات **Source → Branch connected to production**، اختر **`main`**
+
+> ✅ هذا هو الفرع الرئيسي الذي يحتوي على الكود النهائي
+
+### 3. إعدادات البناء والتشغيل
+Railway سيكتشف إعدادات `railway.json` تلقائياً:
+- **Build Command**: `npm run build`
+- **Start Command**: `npx serve -s dist --listen tcp://0.0.0.0:$PORT`
+
+### 4. متغيرات البيئة
+في تبويب **Variables**، أضف:
 
 ```
-AMADEUS_CLIENT_ID=your-amadeus-client-id
-AMADEUS_CLIENT_SECRET=your-amadeus-client-secret
-
 VITE_SUPABASE_URL=https://your-project.supabase.co
 VITE_SUPABASE_PUBLISHABLE_KEY=your-supabase-anon-key
 VITE_SUPABASE_PROJECT_ID=your-project-id
 ```
 
-### 3. نشر Supabase Functions
+> ⚠️ مفاتيح Amadeus تُضاف في **Supabase Edge Function Secrets** وليس هنا
+
+### 5. الدومين
+بعد النشر، ستجد رابط تطبيقك في **Settings → Networking**:
+```
+https://5taah-production.up.railway.app
+```
+
+### 6. نشر Supabase Functions
 
 ```bash
 # تثبيت Supabase CLI

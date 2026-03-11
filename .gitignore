@@ -1,5 +1,28 @@
+# ========================
+# Dependencies
+# ========================
+node_modules/
+vendor/
+.pnp
+.pnp.js
+
+# ========================
+# Build outputs
+# ========================
+dist/
+dist-ssr/
+build/
+out/
+.next/
+.nuxt/
+.output/
+.svelte-kit/
+.vercel/
+
+# ========================
 # Logs
-logs
+# ========================
+logs/
 *.log
 npm-debug.log*
 yarn-debug.log*
@@ -7,49 +30,88 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-node_modules
-dist
-dist-ssr
-*.local
+# ========================
+# Environment & Secrets
+# ========================
+.env
+.env.local
+.env.*.local
+.env.development
+.env.production
+.env.staging
+*.pem
+*.p12
+*.p8
+*.cer
+AuthKey*.p8
 
-# Editor directories and files
+# ========================
+# Editor & OS files
+# ========================
+.DS_Store
+Thumbs.db
+.idea/
 .vscode/*
 !.vscode/extensions.json
-.idea
-.DS_Store
 *.suo
 *.ntvs*
 *.njsproj
 *.sln
 *.sw?
+*.swp
 
-# Ignore Android build and asset files
+# ========================
+# Testing
+# ========================
+coverage/
+.nyc_output/
+.jest-cache/
+
+# ========================
+# Mobile (iOS / Android)
+# ========================
+ios/App/Pods/
 android/app/build/
 android/build/
 android/.gradle/
 android/.idea/
 *.iml
 *.apk
-*.lock
-
-# Xcode user state (ignore user-specific, keep project structure)
+*.ipa
 *.xcuserstate
 *.xcworkspace/xcuserdata/
 *.xcodeproj/xcuserdata/
 
-.env
-
-# Build artifacts
-build/
-*.p12
-*.p8
-*.ipa
-AuthKey*.p8
-
-# Swift build
+# ========================
+# Swift / Xcode
+# ========================
 .build/
 .swiftpm/
 
-# Stale lock files
-bun.lockb
+# ========================
+# Python
+# ========================
+__pycache__/
+*.py[cod]
+*.pyo
+.venv/
+venv/
+env/
+*.egg-info/
+.eggs/
 
+# ========================
+# Lock files (optional – remove lines below to track lock files)
+# ========================
+# package-lock.json
+# yarn.lock
+# pnpm-lock.yaml
+
+# ========================
+# Misc
+# ========================
+*.local
+*.cache
+.cache/
+tmp/
+temp/

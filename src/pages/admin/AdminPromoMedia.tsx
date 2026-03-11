@@ -61,6 +61,13 @@ export default function AdminPromoMedia() {
     setSlots(prev => prev.map(s => s.id === id ? { ...s, ...patch } : s));
   };
 
+  const extractStoragePath = (url: string, bucket: string): string | null => {
+    const marker = `/storage/v1/object/public/${bucket}/`;
+    const idx = url.indexOf(marker);
+    if (idx === -1) return null;
+    return url.substring(idx + marker.length);
+  };
+
   const handleFileUpload = async (slotId: string, e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -73,6 +80,7 @@ export default function AdminPromoMedia() {
     }
 
     setUploading(slotId);
+    const oldUrl = slots.find(s => s.id === slotId)?.url || "";
     const ext = file.name.split(".").pop();
     const fileName = `promo-${slotId}-${Date.now()}.${ext}`;
 
@@ -84,6 +92,14 @@ export default function AdminPromoMedia() {
       toast({ title: "خطأ في الرفع", description: error.message, variant: "destructive" });
       setUploading(null);
       return;
+    }
+
+    if (oldUrl) {
+      const oldPath = extractStoragePath(oldUrl, "promo-media");
+      if (oldPath) {
+        const { error: removeError } = await supabase.storage.from("promo-media").remove([oldPath]);
+        if (removeError) console.warn("تعذر حذف الملف القديم:", removeError.message);
+      }
     }
 
     const { data: publicUrl } = supabase.storage.from("promo-media").getPublicUrl(fileName);
@@ -122,6 +138,13 @@ export default function AdminPromoMedia() {
   };
 
   const handleRemoveSlot = async (slot: MediaItem) => {
+    if (slot.url) {
+      const oldPath = extractStoragePath(slot.url, "promo-media");
+      if (oldPath) {
+        const { error: removeError } = await supabase.storage.from("promo-media").remove([oldPath]);
+        if (removeError) console.warn("تعذر حذف الملف القديم:", removeError.message);
+      }
+    }
     updateSlot(slot.id, { url: "" });
     await supabase.from("site_settings").update({ setting_value: "" }).eq("setting_key", slot.settingKeyUrl);
     toast({ title: `تم حذف محتوى "${slot.label}"` });

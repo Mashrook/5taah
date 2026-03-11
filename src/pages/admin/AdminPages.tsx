@@ -179,6 +179,13 @@ export default function AdminPages() {
 
   const handleDelete = async () => {
     if (!deleteTarget) return;
+    if (deleteTarget.media_url) {
+      const oldPath = extractStoragePath(deleteTarget.media_url, "page-media");
+      if (oldPath) {
+        const { error: removeError } = await supabase.storage.from("page-media").remove([oldPath]);
+        if (removeError) console.warn("تعذر حذف الملف القديم:", removeError.message);
+      }
+    }
     const { error } = await supabase
       .from("managed_pages" as any)
       .delete()
@@ -190,6 +197,13 @@ export default function AdminPages() {
       fetchPages();
     }
     setDeleteTarget(null);
+  };
+
+  const extractStoragePath = (url: string, bucket: string): string | null => {
+    const marker = `/storage/v1/object/public/${bucket}/`;
+    const idx = url.indexOf(marker);
+    if (idx === -1) return null;
+    return url.substring(idx + marker.length);
   };
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -204,6 +218,7 @@ export default function AdminPages() {
     }
 
     setUploading(true);
+    const oldUrl = form.media_url || "";
     const ext = file.name.split(".").pop();
     const fileName = `page-${form.slug || "media"}-${Date.now()}.${ext}`;
 
@@ -217,6 +232,14 @@ export default function AdminPages() {
       return;
     }
 
+    if (oldUrl) {
+      const oldPath = extractStoragePath(oldUrl, "page-media");
+      if (oldPath) {
+        const { error: removeError } = await supabase.storage.from("page-media").remove([oldPath]);
+        if (removeError) console.warn("تعذر حذف الملف القديم:", removeError.message);
+      }
+    }
+
     const { data: publicUrl } = supabase.storage.from("page-media").getPublicUrl(fileName);
     setForm(prev => ({
       ...prev,
@@ -227,7 +250,14 @@ export default function AdminPages() {
     toast({ title: "تم رفع الملف بنجاح" });
   };
 
-  const removeMedia = () => {
+  const removeMedia = async () => {
+    if (form.media_url) {
+      const oldPath = extractStoragePath(form.media_url, "page-media");
+      if (oldPath) {
+        const { error: removeError } = await supabase.storage.from("page-media").remove([oldPath]);
+        if (removeError) console.warn("تعذر حذف الملف القديم:", removeError.message);
+      }
+    }
     setForm(prev => ({ ...prev, media_url: null, media_type: null }));
   };
 

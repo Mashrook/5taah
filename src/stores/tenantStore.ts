@@ -10,7 +10,7 @@ export interface Tenant {
   owner_user_id: string;
   contact_email: string | null;
   contact_phone: string | null;
-  metadata: any;
+  metadata: Record<string, unknown>;
   created_at: string;
   updated_at: string;
 }
@@ -36,7 +36,7 @@ export interface FeatureFlag {
   tenant_id: string;
   flag_key: string;
   is_enabled: boolean;
-  metadata: any;
+  metadata: Record<string, unknown>;
 }
 
 interface TenantState {
@@ -52,7 +52,7 @@ interface TenantState {
   clear: () => void;
 }
 
-async function loadTenantData(tenantId: string, set: any) {
+async function loadTenantData(tenantId: string, set: (state: Partial<TenantState>) => void) {
   try {
     const [tenantRes, brandingRes, flagsRes] = await Promise.all([
       supabase.from('tenants').select('*').eq('id', tenantId).single(),

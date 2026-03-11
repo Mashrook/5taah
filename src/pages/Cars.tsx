@@ -51,7 +51,7 @@ export default function Cars() {
     try {
       const originCode = resolveIata(city);
       const dateTime = `${pickupDate}T10:00:00`;
-      const params: any = {
+      const params: { startLocationCode: string; startDateTime: string; passengers: number; endLocationCode?: string } = {
         startLocationCode: originCode,
         startDateTime: dateTime,
         passengers,
@@ -62,8 +62,8 @@ export default function Cars() {
       }
       const result = await searchTransfers(params);
       setTransferResults(result.data || []);
-    } catch (err: any) {
-      setError(err.message || "فشل البحث — تأكد من إعداد Amadeus API في لوحة التحكم");
+    } catch (err) {
+      setError((err as Error)?.message || "فشل البحث — تأكد من إعداد Amadeus API في لوحة التحكم");
       setTransferResults([]);
     }
     setLoading(false);

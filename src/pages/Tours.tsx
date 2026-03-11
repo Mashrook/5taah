@@ -7,6 +7,17 @@ import { useNavigate } from "react-router-dom";
 import CityAutocomplete from "@/components/search/CityAutocomplete";
 import { searchActivities, getActivityDetails } from "@/services/amadeusService";
 
+interface Activity {
+  id: string;
+  name: string;
+  shortDescription?: string;
+  description?: string;
+  pictures?: string[];
+  bookingLink?: string;
+  rating?: string;
+  price?: { amount: string; currencyCode: string };
+}
+
 import hajjImg from "@/assets/seasonal/hajj-programs.jpg";
 import ramadanImg from "@/assets/seasonal/ramadan-offers.jpg";
 import summerImg from "@/assets/seasonal/summer-abha.jpg";
@@ -84,7 +95,7 @@ export default function Tours() {
   const [searchCity, setSearchCity] = useState("");
   const [searchLoading, setSearchLoading] = useState(false);
   const [searchError, setSearchError] = useState("");
-  const [activities, setActivities] = useState<any[]>([]);
+  const [activities, setActivities] = useState<Activity[]>([]);
   const [searched, setSearched] = useState(false);
 
   // City → lat/lng for Amadeus Activities API
@@ -122,7 +133,7 @@ export default function Tours() {
       }
       const result = await searchActivities({ latitude: coords.lat, longitude: coords.lng, radius: 20 });
       setActivities(result.data || []);
-    } catch (err: any) {
+    } catch (err) {
       setSearchError(err.message || "فشل البحث — تأكد من إعداد Amadeus API في لوحة التحكم");
       setActivities([]);
     }
@@ -191,7 +202,7 @@ export default function Tours() {
               </div>
             ) : (
               <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
-                {activities.slice(0, 12).map((activity: any) => (
+                {activities.slice(0, 12).map((activity) => (
                   <div key={activity.id} className="rounded-2xl bg-card border border-border/50 overflow-hidden hover:border-primary/30 transition-all group">
                     {activity.pictures?.[0] ? (
                       <div className="relative h-44 overflow-hidden">

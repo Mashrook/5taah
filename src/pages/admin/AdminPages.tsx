@@ -76,14 +76,14 @@ export default function AdminPages() {
   const fetchPages = async () => {
     setLoading(true);
     const { data, error } = await supabase
-      .from("managed_pages" as any)
+      .from("managed_pages" as unknown as "profiles")
       .select("*")
       .order("sort_order", { ascending: true });
 
     if (error) {
       toast({ title: "خطأ", description: "تعذر تحميل الصفحات", variant: "destructive" });
     } else {
-      setPages((data as any) || []);
+      setPages((data as unknown as ManagedPage[]) || []);
     }
     setLoading(false);
   };
@@ -121,7 +121,7 @@ export default function AdminPages() {
     try {
       if (editingPage) {
         const { error } = await supabase
-          .from("managed_pages" as any)
+          .from("managed_pages" as unknown as "profiles")
           .update({
             title: form.title,
             slug: form.slug,
@@ -134,13 +134,13 @@ export default function AdminPages() {
             icon: form.icon,
             route: form.route,
             updated_at: new Date().toISOString(),
-          } as any)
+          } as Record<string, unknown>)
           .eq("id", editingPage.id);
         if (error) throw error;
         toast({ title: "تم تحديث الصفحة بنجاح" });
       } else {
         const { error } = await supabase
-          .from("managed_pages" as any)
+          .from("managed_pages" as unknown as "profiles")
           .insert({
             title: form.title,
             slug: form.slug,
@@ -152,13 +152,13 @@ export default function AdminPages() {
             media_url: form.media_url,
             icon: form.icon,
             route: form.route || `/${form.slug}`,
-          } as any);
+          } as Record<string, unknown>);
         if (error) throw error;
         toast({ title: "تم إنشاء الصفحة بنجاح" });
       }
       setDialogOpen(false);
       fetchPages();
-    } catch (err: any) {
+    } catch (err) {
       toast({ title: "خطأ", description: err.message, variant: "destructive" });
     }
     setSaving(false);
@@ -166,8 +166,8 @@ export default function AdminPages() {
 
   const toggleStatus = async (page: ManagedPage, newStatus: string) => {
     const { error } = await supabase
-      .from("managed_pages" as any)
-      .update({ status: newStatus, updated_at: new Date().toISOString() } as any)
+      .from("managed_pages" as unknown as "profiles")
+      .update({ status: newStatus, updated_at: new Date().toISOString() } as Record<string, unknown>)
       .eq("id", page.id);
     if (error) {
       toast({ title: "خطأ", description: error.message, variant: "destructive" });
@@ -180,7 +180,7 @@ export default function AdminPages() {
   const handleDelete = async () => {
     if (!deleteTarget) return;
     const { error } = await supabase
-      .from("managed_pages" as any)
+      .from("managed_pages" as unknown as "profiles")
       .delete()
       .eq("id", deleteTarget.id);
     if (error) {

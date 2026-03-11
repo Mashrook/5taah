@@ -55,7 +55,7 @@ export default function HotelCart() {
       toast({ title: "تم الحجز بنجاح! 🏨", description: `${items.length} حجز تم إنشاؤه` });
       clearCart();
       navigate("/dashboard/bookings");
-    } catch (err: any) {
+    } catch (err) {
       toast({ title: "خطأ", description: err.message || "تعذر إتمام الحجز", variant: "destructive" });
     }
   };

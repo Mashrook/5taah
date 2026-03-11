@@ -2,7 +2,7 @@
  * Export utilities for CSV and PDF generation
  */
 
-export function exportToCSV(data: Record<string, any>[], filename: string, headers?: Record<string, string>) {
+export function exportToCSV(data: Record<string, unknown>[], filename: string, headers?: Record<string, string>) {
   if (data.length === 0) return;
 
   const keys = Object.keys(headers || data[0]);
@@ -29,7 +29,7 @@ export function exportToCSV(data: Record<string, any>[], filename: string, heade
   downloadBlob(blob, `${filename}.csv`);
 }
 
-export function exportToPDF(title: string, data: Record<string, any>[], headers?: Record<string, string>) {
+export function exportToPDF(title: string, data: Record<string, unknown>[], headers?: Record<string, string>) {
   if (data.length === 0) return;
 
   const keys = Object.keys(headers || data[0]);

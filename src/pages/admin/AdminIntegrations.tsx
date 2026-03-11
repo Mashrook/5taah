@@ -255,7 +255,7 @@ function QuickSetupPanel({ endpoints, keys, onRefresh, toast }: QuickSetupPanelP
           base_url: template.base_url,
           status: "enabled",
           notes: template.notes,
-        } as any);
+        } as Record<string, unknown>);
       } else if (existingEP.status !== "enabled") {
         await supabase.from("service_endpoints").update({ status: "enabled" }).eq("id", existingEP.id);
       }
@@ -272,13 +272,13 @@ function QuickSetupPanel({ endpoints, keys, onRefresh, toast }: QuickSetupPanelP
             key_name: rk.key_name,
             key_value: val,
             is_active: true,
-          } as any);
+          } as Record<string, unknown>);
         }
       }
 
       toast({ title: "تم الإعداد بنجاح", description: `تم تفعيل ${template.label}` });
       onRefresh();
-    } catch (err: any) {
+    } catch (err) {
       toast({ title: "خطأ", description: err.message, variant: "destructive" });
     }
     setSaving(null);
@@ -308,7 +308,7 @@ function QuickSetupPanel({ endpoints, keys, onRefresh, toast }: QuickSetupPanelP
             : { ok: false, message: "يرجى إكمال الإعداد" },
         }));
       }
-    } catch (err: any) {
+    } catch (err) {
       setTestResults((prev) => ({ ...prev, [service]: { ok: false, message: err.message } }));
     }
     setTesting(null);
@@ -496,7 +496,7 @@ export default function AdminIntegrations() {
       if (error) toast({ title: "خطأ", description: error.message, variant: "destructive" });
       else { toast({ title: "تم التحديث بنجاح" }); setEditEP(null); }
     } else {
-      const { error } = await supabase.from("service_endpoints").insert({ ...data, status: "enabled" } as any);
+      const { error } = await supabase.from("service_endpoints").insert({ ...data, status: "enabled" } as Record<string, unknown>);
       if (error) toast({ title: "خطأ", description: error.message, variant: "destructive" });
       else { toast({ title: "تمت الإضافة بنجاح" }); setShowAddEP(false); }
     }
@@ -519,7 +519,7 @@ export default function AdminIntegrations() {
       if (error) toast({ title: "خطأ", description: error.message, variant: "destructive" });
       else { toast({ title: "تم التحديث بنجاح" }); setEditKey(null); }
     } else {
-      const { error } = await supabase.from("api_keys").insert({ ...data, is_active: true } as any);
+      const { error } = await supabase.from("api_keys").insert({ ...data, is_active: true } as Record<string, unknown>);
       if (error) toast({ title: "خطأ", description: error.message, variant: "destructive" });
       else { toast({ title: "تمت الإضافة بنجاح" }); setShowAddKey(false); }
     }
@@ -539,7 +539,14 @@ export default function AdminIntegrations() {
     const table = deleteTarget.type === "ep" ? "service_endpoints" : "api_keys";
     const { error } = await supabase.from(table).delete().eq("id", deleteTarget.id);
     if (error) toast({ title: "خطأ", description: error.message, variant: "destructive" });
-    else { toast({ title: "تم الحذف بنجاح" }); deleteTarget.type === "ep" ? fetchEndpoints() : fetchKeys(); }
+    else {
+      toast({ title: "تم الحذف بنجاح" });
+      if (deleteTarget.type === "ep") {
+        fetchEndpoints();
+      } else {
+        fetchKeys();
+      }
+    }
     setDeleteTarget(null);
   };
 
@@ -832,7 +839,7 @@ export default function AdminIntegrations() {
                             onClick={() => {
                               setVisibleKeys((prev) => {
                                 const next = new Set(prev);
-                                next.has(k.id) ? next.delete(k.id) : next.add(k.id);
+                                if (next.has(k.id)) { next.delete(k.id); } else { next.add(k.id); }
                                 return next;
                               });
                             }}

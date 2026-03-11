@@ -116,7 +116,7 @@ export default function Flights() {
       const offers = result.data || [];
       setSearchResults(offers);
       if (offers.length === 0) setSearchError("لم يتم العثور على رحلات لهذا المسار. جرّب تغيير التاريخ أو الوجهة.");
-    } catch (err: any) {
+    } catch (err) {
       setSearchError(err.message || "حدث خطأ أثناء البحث");
       setSearchResults(null);
     } finally {
@@ -157,7 +157,7 @@ export default function Flights() {
       if (error) throw error;
       toast({ title: "تم الحجز بنجاح! ✈️", description: `${firstSeg.departure.iataCode} → ${lastSeg.arrival.iataCode} | ${totalPrice} ${offer.price.currency}` });
       navigate("/dashboard/bookings");
-    } catch (err: any) {
+    } catch (err) {
       toast({ title: "خطأ", description: err.message || "تعذر إتمام الحجز", variant: "destructive" });
     } finally {
       setBookingLoading(null);

@@ -41,7 +41,7 @@ Deno.serve(async (req) => {
       .select("role")
       .eq("user_id", userId);
 
-    const userRoles = (roles || []).map((r: any) => r.role);
+    const userRoles = (roles || []).map((r: { role: string }) => r.role);
     const isAdmin = userRoles.includes("admin") || userRoles.includes("super_admin");
     if (!isAdmin) {
       return new Response(JSON.stringify({ error: "Forbidden" }), { status: 403, headers: corsHeaders });

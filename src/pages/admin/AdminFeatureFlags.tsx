@@ -25,8 +25,14 @@ interface Flag {
   is_enabled: boolean;
 }
 
+interface Tenant {
+  id: string;
+  name: string;
+  slug: string;
+}
+
 export default function AdminFeatureFlags() {
-  const [tenants, setTenants] = useState<any[]>([]);
+  const [tenants, setTenants] = useState<Tenant[]>([]);
   const [selectedTenantId, setSelectedTenantId] = useState("");
   const [flags, setFlags] = useState<Flag[]>([]);
   const [newFlagKey, setNewFlagKey] = useState("");

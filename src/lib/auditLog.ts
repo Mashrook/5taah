@@ -4,8 +4,8 @@ interface AuditLogEntry {
   action: string;
   entity_type: string;
   entity_id?: string;
-  before?: Record<string, any>;
-  after?: Record<string, any>;
+  before?: Record<string, unknown>;
+  after?: Record<string, unknown>;
 }
 
 export async function logAudit(entry: AuditLogEntry) {

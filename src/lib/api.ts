@@ -5,7 +5,7 @@ import { supabase } from '@/integrations/supabase/client';
 // This file is kept for backward compatibility but most calls
 // should go through the supabase client directly.
 
-export async function callEdgeFunction(functionName: string, body?: any) {
+export async function callEdgeFunction(functionName: string, body?: unknown) {
   const { data, error } = await supabase.functions.invoke(functionName, {
     body,
   });

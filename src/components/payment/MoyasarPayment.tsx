@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 declare global {
   interface Window {
     Moyasar: {
-      init: (config: any) => void;
+      init: (config: Record<string, unknown>) => void;
     };
   }
 }
@@ -69,7 +69,7 @@ export default function MoyasarPayment({
       supported_networks: ["visa", "mastercard", "mada"],
       methods,
       metadata: metadata || {},
-      on_initiating: (payment: any) => {
+      on_initiating: (payment: { id?: string }) => {
         onInitiated?.(payment?.id);
       },
       language: "ar",

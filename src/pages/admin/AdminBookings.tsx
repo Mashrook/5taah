@@ -2,9 +2,9 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-import { CalendarDays, Plane, Hotel, Car, Map, ArrowRightLeft, CheckCircle, XCircle, Clock } from "lucide-react";
+import { CalendarDays, Plane, Hotel, Car, Map, ArrowRightLeft, CheckCircle, XCircle, Clock, type LucideIcon } from "lucide-react";
 
-const typeIcons: Record<string, any> = { flight: Plane, hotel: Hotel, car: Car, tour: Map, transfer: ArrowRightLeft };
+const typeIcons: Record<string, LucideIcon> = { flight: Plane, hotel: Hotel, car: Car, tour: Map, transfer: ArrowRightLeft };
 const typeLabels: Record<string, string> = { flight: "طيران", hotel: "فندق", car: "سيارة", tour: "جولة", transfer: "تنقل" };
 const statusLabels: Record<string, string> = { pending: "قيد الانتظار", confirmed: "مؤكد", cancelled: "ملغي", completed: "مكتمل" };
 const statusColors: Record<string, string> = {
@@ -12,8 +12,20 @@ const statusColors: Record<string, string> = {
   cancelled: "bg-destructive/10 text-destructive", completed: "bg-primary/10 text-primary",
 };
 
+interface Booking {
+  id: string;
+  booking_type: string;
+  status: string;
+  total_price: number;
+  currency: string;
+  payment_status: string;
+  created_at: string;
+  user_id: string;
+  details_json?: Record<string, unknown>;
+}
+
 export default function AdminBookings() {
-  const [bookings, setBookings] = useState<any[]>([]);
+  const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
   const [updatingId, setUpdatingId] = useState<string | null>(null);
   const { toast } = useToast();

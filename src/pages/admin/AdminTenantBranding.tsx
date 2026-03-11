@@ -22,7 +22,7 @@ interface BrandingForm {
 }
 
 export default function AdminTenantBranding() {
-  const [tenants, setTenants] = useState<any[]>([]);
+  const [tenants, setTenants] = useState<{ id: string; name: string; slug: string }[]>([]);
   const [selectedTenantId, setSelectedTenantId] = useState("");
   const [form, setForm] = useState<BrandingForm>({
     logo_url: "", favicon_url: "", primary_color: "#D4A017",

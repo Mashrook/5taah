@@ -11,8 +11,8 @@ interface AuditLog {
   action: string;
   entity_type: string;
   entity_id: string | null;
-  before: any;
-  after: any;
+  before: Record<string, unknown>;
+  after: Record<string, unknown>;
   user_agent: string | null;
   created_at: string;
 }

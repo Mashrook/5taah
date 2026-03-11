@@ -193,7 +193,7 @@ export default function Hotels() {
       if (offers.length === 0) {
         setSearchError("لم يتم العثور على عروض متاحة. جرّب تغيير التواريخ أو المدينة.");
       }
-    } catch (err: any) {
+    } catch (err) {
       console.error("Hotel search error:", err);
       setSearchError(err.message || "حدث خطأ أثناء البحث");
       setLiveResults([]);

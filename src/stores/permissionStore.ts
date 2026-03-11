@@ -50,7 +50,7 @@ export const usePermissionStore = create<PermissionState>((set, get) => ({
       const { data: rp } = await supabase
         .from("role_permissions")
         .select("permission_id")
-        .in("role", userRoles as any);
+        .in("role", userRoles as string[]);
 
       const permIds = (rp || []).map((r) => r.permission_id);
       if (permIds.length === 0) {

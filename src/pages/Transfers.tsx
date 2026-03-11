@@ -64,7 +64,7 @@ export default function Transfers() {
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [bookingLoading, setBookingLoading] = useState(false);
-  const [bookingResult, setBookingResult] = useState<any>(null);
+  const [bookingResult, setBookingResult] = useState<unknown>(null);
 
   const { isAuthenticated, user } = useAuthStore();
   const { tenant } = useTenantStore();
@@ -105,7 +105,7 @@ export default function Transfers() {
       if (data.length === 0) {
         setSearchError("لم يتم العثور على عروض نقل. جرّب تغيير الموقع أو التاريخ.");
       }
-    } catch (err: any) {
+    } catch (err) {
       console.error("Transfer search error:", err);
       setSearchError(err.message || "حدث خطأ أثناء البحث");
     } finally {
@@ -165,7 +165,7 @@ export default function Transfers() {
       setBookingResult(result);
       setCurrentStep(3);
       toast({ title: "تم الحجز بنجاح! 🚗", description: `${selectedOffer.serviceProvider?.name} - ${selectedOffer.quotation.monetaryAmount} ${selectedOffer.quotation.currencyCode}` });
-    } catch (err: any) {
+    } catch (err) {
       toast({ title: "خطأ في الحجز", description: err.message || "تعذر إتمام الحجز", variant: "destructive" });
     } finally {
       setBookingLoading(false);

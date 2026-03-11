@@ -1,10 +1,19 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { Users, Mail, Phone, Calendar } from "lucide-react";
+import { Users, Phone, Calendar } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
+interface UserProfile {
+  id: string;
+  user_id: string;
+  full_name: string | null;
+  avatar_url: string | null;
+  phone: string | null;
+  created_at: string;
+}
+
 export default function AdminUsers() {
-  const [profiles, setProfiles] = useState<any[]>([]);
+  const [profiles, setProfiles] = useState<UserProfile[]>([]);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
 

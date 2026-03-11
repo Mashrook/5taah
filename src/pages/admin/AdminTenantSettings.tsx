@@ -7,11 +7,11 @@ import { Settings, Save, Globe, Users, Plus, Trash2 } from "lucide-react";
 import PermissionGate from "@/components/auth/PermissionGate";
 
 export default function AdminTenantSettings() {
-  const [tenants, setTenants] = useState<any[]>([]);
+  const [tenants, setTenants] = useState<{ id: string; name: string; slug: string }[]>([]);
   const [selectedTenantId, setSelectedTenantId] = useState("");
-  const [tenant, setTenant] = useState<any>(null);
-  const [domains, setDomains] = useState<any[]>([]);
-  const [members, setMembers] = useState<any[]>([]);
+  const [tenant, setTenant] = useState<Record<string, unknown> | null>(null);
+  const [domains, setDomains] = useState<Record<string, unknown>[]>([]);
+  const [members, setMembers] = useState<Record<string, unknown>[]>([]);
   const [newDomain, setNewDomain] = useState("");
   const [saving, setSaving] = useState(false);
   const { toast } = useToast();

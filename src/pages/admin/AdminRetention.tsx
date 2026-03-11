@@ -78,7 +78,7 @@ export default function AdminRetention() {
 
       toast({ title: "تم التنظيف", description: `النتائج: ${JSON.stringify(result.results)}` });
       fetchPolicies();
-    } catch (err: any) {
+    } catch (err) {
       toast({ title: "خطأ", description: err.message, variant: "destructive" });
     }
     setRunningCleanup(false);

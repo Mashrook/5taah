@@ -52,7 +52,7 @@ export default function AdminResetPassword() {
       if (error) throw error;
       toast({ title: "تم التحديث", description: "تم تغيير كلمة المرور بنجاح" });
       navigate("/admin/login");
-    } catch (err: any) {
+    } catch (err) {
       toast({ title: "خطأ", description: err.message, variant: "destructive" });
     } finally {
       setLoading(false);

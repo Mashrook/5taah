@@ -55,7 +55,7 @@ interface BillingState {
   loadPlans: () => Promise<void>;
   loadSubscription: (tenantId: string) => Promise<void>;
   loadInvoices: (tenantId: string) => Promise<void>;
-  checkout: (tenantId: string, planSlug: string, billingCycle: string) => Promise<any>;
+  checkout: (tenantId: string, planSlug: string, billingCycle: string) => Promise<unknown>;
   cancelSubscription: (tenantId: string) => Promise<void>;
 }
 

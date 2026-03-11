@@ -2,10 +2,10 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useAuthStore } from "@/stores/authStore";
 import { supabase } from "@/integrations/supabase/client";
-import { CalendarDays, Heart, Bell, User, Settings, Plane, Hotel, Car, Map, ArrowRightLeft } from "lucide-react";
+import { CalendarDays, Heart, Bell, User, Settings, Plane, Hotel, Car, Map, ArrowRightLeft, type LucideIcon } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
-const bookingTypeIcons: Record<string, any> = {
+const bookingTypeIcons: Record<string, LucideIcon> = {
   flight: Plane, hotel: Hotel, car: Car, tour: Map, transfer: ArrowRightLeft,
 };
 const bookingTypeLabels: Record<string, string> = {
@@ -15,9 +15,19 @@ const statusLabels: Record<string, string> = {
   pending: "قيد الانتظار", confirmed: "مؤكد", cancelled: "ملغي", completed: "مكتمل",
 };
 
+interface Booking {
+  id: string;
+  booking_type: string;
+  status: string;
+  total_price: number;
+  currency: string;
+  created_at: string;
+  details_json?: Record<string, unknown>;
+}
+
 export default function Dashboard() {
   const { user, profile } = useAuthStore();
-  const [bookings, setBookings] = useState<any[]>([]);
+  const [bookings, setBookings] = useState<Booking[]>([]);
   const [loadingBookings, setLoadingBookings] = useState(true);
   const { toast } = useToast();
 

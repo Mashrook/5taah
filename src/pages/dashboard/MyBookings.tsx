@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
 import { useAuthStore } from "@/stores/authStore";
 import { supabase } from "@/integrations/supabase/client";
-import { CalendarDays, Plane, Hotel, Car, Map, ArrowRightLeft } from "lucide-react";
+import { CalendarDays, Plane, Hotel, Car, Map, ArrowRightLeft, type LucideIcon } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
-const bookingTypeIcons: Record<string, any> = {
+const bookingTypeIcons: Record<string, LucideIcon> = {
   flight: Plane, hotel: Hotel, car: Car, tour: Map, transfer: ArrowRightLeft,
 };
 const bookingTypeLabels: Record<string, string> = {
@@ -18,9 +18,18 @@ const statusColors: Record<string, string> = {
   cancelled: "bg-destructive/10 text-destructive", completed: "bg-primary/10 text-primary",
 };
 
+interface Booking {
+  id: string;
+  booking_type: string;
+  status: string;
+  total_price: number;
+  currency: string;
+  created_at: string;
+}
+
 export default function MyBookings() {
   const { user } = useAuthStore();
-  const [bookings, setBookings] = useState<any[]>([]);
+  const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
 

@@ -15,11 +15,21 @@ interface BookingStats {
   byType: Record<string, number>;
 }
 
+interface Booking {
+  id: string;
+  booking_type: string;
+  status: string;
+  total_price: number;
+  currency: string;
+  payment_status: string;
+  created_at: string;
+}
+
 export default function AdminReports() {
   const { toast } = useToast();
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState<BookingStats>({ total: 0, confirmed: 0, pending: 0, cancelled: 0, revenue: 0, byType: {} });
-  const [bookings, setBookings] = useState<any[]>([]);
+  const [bookings, setBookings] = useState<Booking[]>([]);
   const [period, setPeriod] = useState<"7" | "30" | "90" | "all">("30");
 
   useEffect(() => { fetchData(); }, [period]);
@@ -100,7 +110,7 @@ export default function AdminReports() {
   const exportAuditCSV = async () => {
     const { data } = await supabase.from("audit_logs").select("*").order("created_at", { ascending: false }).limit(500);
     if (!data?.length) { toast({ title: "فارغ", description: "لا توجد سجلات" }); return; }
-    exportToCSV(data.map((l: any) => ({
+    exportToCSV(data.map((l) => ({
       action: l.action,
       entity: l.entity_type,
       entity_id: l.entity_id || "",
@@ -119,7 +129,7 @@ export default function AdminReports() {
   const exportIncidentsCSV = async () => {
     const { data } = await supabase.from("incidents").select("*").order("created_at", { ascending: false }).limit(500);
     if (!data?.length) { toast({ title: "فارغ", description: "لا توجد حوادث" }); return; }
-    exportToCSV(data.map((i: any) => ({
+    exportToCSV(data.map((i) => ({
       title: i.title,
       severity: i.severity,
       status: i.status,

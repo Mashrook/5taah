@@ -83,7 +83,7 @@ export default function AdminIncidents() {
 
   const updateStatus = async (id: string, newStatus: string) => {
     try {
-      const updates: any = { status: newStatus, updated_at: new Date().toISOString() };
+      const updates: Record<string, string> = { status: newStatus, updated_at: new Date().toISOString() };
       if (newStatus === "resolved") {
         updates.resolved_at = new Date().toISOString();
       }

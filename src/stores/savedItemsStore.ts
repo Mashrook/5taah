@@ -5,7 +5,7 @@ export interface SavedItem {
   id?: string;
   item_type: string;
   item_id: string;
-  item_data: Record<string, any>;
+  item_data: Record<string, unknown>;
   created_at?: string;
 }
 
@@ -51,7 +51,7 @@ export const useSavedItemsStore = create<SavedItemsState>((set, get) => ({
       id: d.id,
       item_type: d.item_type,
       item_id: d.item_id,
-      item_data: d.item_data as Record<string, any>,
+      item_data: d.item_data as Record<string, unknown>,
       created_at: d.created_at,
     }));
     set({ items, loading: false });

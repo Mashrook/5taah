@@ -10,9 +10,17 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import { isAmadeusConfigured, testAmadeusConnection } from "@/services/amadeusService";
 import { isMoyasarConfigured } from "@/services/moyasarService";
 
+interface RecentBooking {
+  id: string;
+  booking_type: string;
+  status: string;
+  total_price: number;
+  currency: string;
+}
+
 export default function AdminDashboard() {
   const [stats, setStats] = useState({ bookings: 0, users: 0, revenue: 0 });
-  const [recentBookings, setRecentBookings] = useState<any[]>([]);
+  const [recentBookings, setRecentBookings] = useState<RecentBooking[]>([]);
   const [apiKeysCount, setApiKeysCount] = useState(0);
   const [endpointsCount, setEndpointsCount] = useState(0);
   const [amadeusOk, setAmadeusOk] = useState<boolean | null>(null);
@@ -78,7 +86,7 @@ export default function AdminDashboard() {
       setNewEmail("");
       setNewPassword("");
       setNewFullName("");
-    } catch (err: any) {
+    } catch (err) {
       toast({ title: "خطأ", description: err.message, variant: "destructive" });
     }
     setCreating(false);

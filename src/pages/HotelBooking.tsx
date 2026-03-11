@@ -43,7 +43,7 @@ export default function HotelBooking() {
   const { toast } = useToast();
   const { isAuthenticated, user } = useAuthStore();
   const { tenant } = useTenantStore();
-  const { selectedOffer, selectedOfferId, searchParams, setBookingConfirmation, clearBookingFlow } = useHotelCartStore();
+  const { selectedOffer, selectedOfferId, searchParams, setBookingConfirmation, clearBookingFlow, bookingConfirmation } = useHotelCartStore();
 
   const [step, setStep] = useState(1); // 1=booker info, 2=traveler info, 3=payment, 4=confirm
   const [loading, setLoading] = useState(false);
@@ -183,7 +183,7 @@ export default function HotelBooking() {
 
       setStep(4);
       toast({ title: "تم الحجز بنجاح! 🏨" });
-    } catch (err: any) {
+    } catch (err) {
       console.error("Hotel booking error:", err);
       toast({
         title: "خطأ في الحجز",
@@ -194,8 +194,6 @@ export default function HotelBooking() {
       setLoading(false);
     }
   };
-
-  const { bookingConfirmation } = useHotelCartStore();
 
   return (
     <div className="min-h-screen section-padding">

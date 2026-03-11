@@ -32,7 +32,7 @@ export default function AdminForgotPassword() {
       if (error) throw error;
       setSent(true);
       toast({ title: "تم الإرسال", description: "تحقق من بريدك الإلكتروني لإعادة تعيين كلمة المرور" });
-    } catch (err: any) {
+    } catch (err) {
       toast({ title: "خطأ", description: err.message, variant: "destructive" });
     } finally {
       setLoading(false);

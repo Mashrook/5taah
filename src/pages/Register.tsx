@@ -47,7 +47,7 @@ export default function Register() {
         description: "يرجى التحقق من بريدك الإلكتروني لتأكيد الحساب",
       });
       navigate("/login");
-    } catch (err: any) {
+    } catch (err) {
       toast({ title: "خطأ", description: err.message, variant: "destructive" });
     } finally {
       setLoading(false);

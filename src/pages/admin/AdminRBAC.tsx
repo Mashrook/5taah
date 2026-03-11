@@ -84,7 +84,7 @@ export default function AdminRBAC() {
       const { data: rp } = await supabase.from("role_permissions").select("*");
       const map: RolePermMap = {};
       ROLES.forEach((r) => (map[r] = new Set()));
-      (rp || []).forEach((r: any) => {
+      (rp || []).forEach((r) => {
         if (map[r.role]) map[r.role].add(r.permission_id);
       });
       setRolePerms(map);
@@ -95,18 +95,18 @@ export default function AdminRBAC() {
         .select("user_id, role");
 
       if (urs && urs.length > 0) {
-        const userIds = [...new Set(urs.map((u: any) => u.user_id))];
+        const userIds = [...new Set(urs.map((u) => u.user_id))];
         const { data: profiles } = await supabase
           .from("profiles")
           .select("user_id, full_name")
           .in("user_id", userIds);
 
         const profileMap: Record<string, string | null> = {};
-        (profiles || []).forEach((p: any) => {
+        (profiles || []).forEach((p) => {
           profileMap[p.user_id] = p.full_name;
         });
 
-        const admins: AdminUser[] = urs.map((u: any) => ({
+        const admins: AdminUser[] = urs.map((u) => ({
           user_id: u.user_id,
           role: u.role,
           profile_name: profileMap[u.user_id] || null,

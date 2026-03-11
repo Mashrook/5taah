@@ -128,7 +128,7 @@ export default function AdminLogin() {
 
       toast({ title: "مرحباً!", description: "تم تسجيل الدخول كمدير" });
       navigate("/admin");
-    } catch (err: any) {
+    } catch (err) {
       toast({
         title: "خطأ في تسجيل الدخول",
         description: err.message === "Invalid login credentials" ? "بيانات الدخول غير صحيحة" : err.message,

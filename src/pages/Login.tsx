@@ -36,7 +36,7 @@ export default function Login() {
       if (error) throw error;
       toast({ title: "مرحباً!", description: "تم تسجيل الدخول بنجاح" });
       navigate("/dashboard");
-    } catch (err: any) {
+    } catch (err) {
       toast({
         title: "خطأ في تسجيل الدخول",
         description: err.message === "Invalid login credentials" ? "بيانات الدخول غير صحيحة" : err.message,

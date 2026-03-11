@@ -30,7 +30,7 @@ export default function AdminHealth() {
       const data = await res.json();
       if (!res.ok && !data.status) throw new Error("Health check failed");
       setHealth(data);
-    } catch (err: any) {
+    } catch (err) {
       setError(err.message);
     }
     setLoading(false);

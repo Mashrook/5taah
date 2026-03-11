@@ -105,7 +105,7 @@ export default function AdminBilling() {
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
               <div>
                 <p className="text-sm text-muted-foreground">الخطة</p>
-                <p className="font-semibold">{(subscription as any).plans?.name_ar || "—"}</p>
+                <p className="font-semibold">{subscription.plans?.name_ar || "—"}</p>
               </div>
               <div>
                 <p className="text-sm text-muted-foreground">الحالة</p>

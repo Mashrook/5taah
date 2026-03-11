@@ -27,6 +27,10 @@ const footerLinks = {
     { href: "/privacy", label: "سياسة الخصوصية" },
     { href: "/terms", label: "الشروط والأحكام" },
   ],
+  admin: [
+    { href: "/admin/stats", label: "لوحة الإحصاءات" },
+    { href: "/admin/dashboard", label: "لوحة التحكم" },
+  ],
 };
 
 export default function Footer() {
@@ -100,6 +104,18 @@ export default function Footer() {
             <h4 className="text-foreground font-bold mb-6">الشركة</h4>
             <ul className="space-y-3">
               {footerLinks.company.map((link) => (
+                <li key={link.href}>
+                  <Link to={link.href} className="text-muted-foreground hover:text-primary transition-colors text-sm">{link.label}</Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Admin */}
+          <div>
+            <h4 className="text-foreground font-bold mb-6">الإدارة</h4>
+            <ul className="space-y-3">
+              {footerLinks.admin.map((link) => (
                 <li key={link.href}>
                   <Link to={link.href} className="text-muted-foreground hover:text-primary transition-colors text-sm">{link.label}</Link>
                 </li>

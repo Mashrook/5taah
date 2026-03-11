@@ -108,11 +108,38 @@ const quickFilters = [
   { label: "فنادق عائلية", value: "family" },
 ];
 
+interface DbHotel {
+  id: string;
+  name: string;
+  city: string;
+  stars: number;
+  price_per_night: number;
+  currency: string;
+  image_url: string | null;
+}
+
 export default function Hotels() {
   const navigate = useNavigate();
   const { toast } = useToast();
   const cartItems = useHotelCartStore((s) => s.items);
   const [urlParams] = useSearchParams();
+  const [featuredHotels, setFeaturedHotels] = useState<DbHotel[]>([]);
+  const [featuredLoading, setFeaturedLoading] = useState(true);
+
+  // Fetch featured hotels from database
+  useEffect(() => {
+    supabase.from("hotels")
+      .select("*")
+      .eq("is_active", true)
+      .order("sort_order", { ascending: true })
+      .limit(6)
+      .then(({ data, error }) => {
+        if (!error && data) {
+          setFeaturedHotels(data as DbHotel[]);
+        }
+        setFeaturedLoading(false);
+      });
+  }, []);
 
   // Static filters
   const [searchQuery, setSearchQuery] = useState("");
@@ -364,6 +391,48 @@ export default function Hotels() {
       </section>
 
       <div className="container mx-auto px-4 lg:px-8 -mt-8">
+        {/* Featured Hotels from Database */}
+        {featuredHotels.length > 0 && (
+          <section className="py-8 mb-8">
+            <div className="text-center mb-6">
+              <h2 className="text-2xl font-bold text-foreground">فنادق مميزة من قاعدة البيانات</h2>
+              <p className="text-muted-foreground text-sm mt-1">أفضل الفنادق اختيرت خصيصاً لك</p>
+            </div>
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {featuredHotels.map((hotel) => (
+                <div key={hotel.id} className="rounded-2xl bg-card border border-border overflow-hidden hover:border-primary/30 transition-all group">
+                  <div className="relative h-48 overflow-hidden">
+                    {hotel.image_url ? (
+                      <img src={hotel.image_url} alt={hotel.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy" />
+                    ) : (
+                      <div className="w-full h-full bg-muted/30 flex items-center justify-center">
+                        <HotelIcon className="w-12 h-12 text-muted-foreground/30" />
+                      </div>
+                    )}
+                    {hotel.stars > 0 && (
+                      <div className="absolute top-3 right-3 bg-primary/90 text-primary-foreground text-xs font-bold px-2 py-1 rounded-lg">
+                        {"★".repeat(hotel.stars)}
+                      </div>
+                    )}
+                  </div>
+                  <div className="p-4">
+                    <h3 className="font-bold text-lg mb-1">{hotel.name}</h3>
+                    <p className="text-sm text-muted-foreground mb-3">{hotel.city}</p>
+                    <div className="flex items-center justify-between">
+                      <span className="text-xl font-bold text-primary">
+                        {Number(hotel.price_per_night).toLocaleString()} <span className="text-sm font-normal">ر.س</span>
+                      </span>
+                      <Button variant="outline" size="sm" onClick={() => navigate(`/hotels?city=${hotel.city}`)}>
+                        احجز الآن
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
+
         {/* Quick Filter Tags */}
         <div className="max-w-5xl mx-auto mb-6">
           <div className="flex flex-wrap items-center gap-2 justify-center">

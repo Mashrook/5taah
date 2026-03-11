@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import DatePickerInput from "@/components/ui/date-picker-input";
-import { User, Phone, CreditCard, Calendar, ChevronLeft, ChevronRight } from "lucide-react";
+import { User, Phone, CreditCard, Calendar, ChevronLeft, ChevronRight, Mail } from "lucide-react";
 import { z } from "zod";
 
 export interface TravelerData {
@@ -14,6 +14,7 @@ export interface TravelerData {
   passportExpiry?: string;
   dateOfBirth: string;
   phone: string;
+  email: string;
 }
 
 const travelerSchema = z.object({
@@ -24,6 +25,7 @@ const travelerSchema = z.object({
   passportExpiry: z.string().optional(),
   dateOfBirth: z.string().min(1, "تاريخ الميلاد مطلوب"),
   phone: z.string().regex(/^[+\d\s-]{9,15}$/, "رقم الجوال غير صحيح"),
+  email: z.string().email("البريد الإلكتروني غير صحيح").optional().or(z.literal("")),
 });
 
 interface TravelerFormProps {
@@ -42,6 +44,7 @@ export default function TravelerForm({ onSubmit, onBack, title = "بيانات �
     passportExpiry: "",
     dateOfBirth: "",
     phone: "",
+    email: "",
   });
   const [errors, setErrors] = useState<Partial<Record<keyof TravelerData, string>>>({});
 
@@ -199,6 +202,23 @@ export default function TravelerForm({ onSubmit, onBack, title = "بيانات �
             />
           </div>
           {errors.phone && <p className="text-xs text-destructive mt-1">{errors.phone}</p>}
+        </div>
+
+        {/* Email - Optional */}
+        <div>
+          <Label className="text-sm font-medium mb-1.5 block">البريد الإلكتروني (اختياري)</Label>
+          <div className="relative">
+            <Mail className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+            <Input
+              type="email"
+              value={form.email}
+              onChange={(e) => set("email", e.target.value)}
+              placeholder="email@example.com"
+              dir="ltr"
+              className={`pr-10 bg-muted/30 ${errors.email ? "border-destructive" : ""}`}
+            />
+          </div>
+          {errors.email && <p className="text-xs text-destructive mt-1">{errors.email}</p>}
         </div>
       </div>
 

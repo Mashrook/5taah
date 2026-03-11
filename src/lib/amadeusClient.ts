@@ -63,6 +63,7 @@ export interface FlightSearchParams {
   returnDate?: string;
   adults: number;
   max?: number;
+  travelClass?: string;
 }
 
 // ─── Hotel Types ───
@@ -192,6 +193,7 @@ export async function searchFlights(params: FlightSearchParams) {
     max: String(params.max || 10),
   });
   if (params.returnDate) qs.set("returnDate", params.returnDate);
+  if (params.travelClass) qs.set("travelClass", params.travelClass);
 
   const url = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/${FUNCTION_NAME}?${qs}`;
   const res = await fetch(url, { headers: defaultHeaders });
@@ -535,9 +537,57 @@ const cityNames: Record<string, string> = {
   CAI: "القاهرة",
   IST: "إسطنبول",
   LHR: "لندن",
+  LGW: "لندن",
+  STN: "لندن",
   CDG: "باريس",
+  ORY: "باريس",
+  JFK: "نيويورك",
+  EWR: "نيويورك",
+  LGA: "نيويورك",
   NYC: "نيويورك",
-  LON: "لندن",
+  KUL: "كوالالمبور",
+  BKK: "بانكوك",
+  SIN: "سنغافورة",
+  HKG: "هونغ كونغ",
+  TYO: "طوكيو",
+  NRT: "طوكيو",
+  AMS: "أمستردام",
+  FRA: "فرانكفورت",
+  MUC: "ميونخ",
+  MAD: "مدريد",
+  BCN: "برشلونة",
+  ROM: "روما",
+  FCO: "روما",
+  MCO: "أورلاندو",
+  LAX: "لوس أنجلوس",
+  SFO: "سان فرانسيسكو",
+  SEA: "سياتل",
+  WAS: "واشنطن",
+  DCA: "واشنطن",
+  BOS: "بوسطن",
+  YYZ: "تورنتو",
+  YVR: "فانكوفر",
+  SYD: "سيدني",
+  MEL: "ميلبورن",
+  AKL: "أوكلاند",
+  DOH: "الدوحة",
+  AUH: "أبوظبي",
+  SHJ: "الشارقة",
+  BAH: "البحرين",
+  KWI: "الكويت",
+  AMM: "عمّان",
+  BEY: "بيروت",
+  BGW: "بغداد",
+  CMN: "الدار البيضاء",
+  TUN: "تونس",
+  CGK: "جاكرتا",
+  DAM: "الدمام",
+  ABT: "الباحة",
+  EAM: "نجران",
+  YNB: "ينبع",
+  HAS: "حائل",
+  ELQ: "القصيم",
+  GIZ: "جازان",
 };
 
 export function getCityName(code: string): string {

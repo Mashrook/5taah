@@ -111,7 +111,7 @@ function buildAmadeusTraveler(data: TravelerData, id: string) {
     name: { firstName: data.firstName, lastName: data.lastName },
     gender: "MALE",
     contact: {
-      emailAddress: "guest@khattah.com",
+      emailAddress: data.email || "guest@khattah.com",
       phones: [{ deviceType: "MOBILE", countryCallingCode: "966", number: data.phone.replace(/^\+966/, "").replace(/\s/g, "") }],
     },
     documents: [
@@ -131,7 +131,7 @@ function buildAmadeusTraveler(data: TravelerData, id: string) {
         : {
             documentType: "IDENTITY_CARD",
             number: data.idNumber,
-            expiryDate: "2035-01-01",
+            expiryDate: new Date(Date.now() + 5 * 365.25 * 24 * 60 * 60 * 1000).toISOString().split("T")[0],
             issuanceCountry: "SA",
             validityCountry: "SA",
             nationality: "SA",
@@ -154,6 +154,8 @@ export default function Flights() {
   const [searchError, setSearchError] = useState("");
   const [destTab, setDestTab] = useState<DestTab>("domestic");
   const [tpFlightLink, setTpFlightLink] = useState("");
+  const [travelClass, setTravelClass] = useState("ECONOMY");
+  const [airlineFilter, setAirlineFilter] = useState("");
 
   // Multi-step booking state
   const [step, setStep] = useState<BookingStep>("search");
@@ -190,9 +192,16 @@ export default function Flights() {
         returnDate: tripType === "roundtrip" && retParam ? retParam : undefined,
         adults: passengers,
         max: 250,
+        travelClass: travelClass,
       })
         .then((result) => {
-          const offers = result.data || [];
+          let offers = result.data || [];
+          if (airlineFilter) {
+            offers = offers.filter((o: AmadeusFlightOffer) => 
+              o.validatingAirlineCodes?.includes(airlineFilter) ||
+              o.itineraries?.[0]?.segments?.[0]?.carrierCode === airlineFilter
+            );
+          }
           setSearchResults(offers);
           if (offers.length === 0) setSearchError("لم يتم العثور على رحلات لهذا المسار. جرّب تغيير التاريخ أو الوجهة.");
           // Get Travelpayouts comparison link
@@ -205,7 +214,7 @@ export default function Flights() {
         })
         .finally(() => setSearching(false));
     }
-  }, []);
+  }, [travelClass, airlineFilter]);
 
   // ── Step 1: Search ──
   const handleSearch = async (e: React.FormEvent) => {
@@ -223,9 +232,15 @@ export default function Flights() {
       const result = await amadeusSearch({
         origin: originCode, destination: destCode, departureDate: departDate,
         returnDate: tripType === "roundtrip" && returnDate ? returnDate : undefined,
-        adults: passengers, max: 250,
+        adults: passengers, max: 250, travelClass: travelClass,
       });
-      const offers = result.data || [];
+      let offers = result.data || [];
+      if (airlineFilter) {
+        offers = offers.filter((o: AmadeusFlightOffer) => 
+          o.validatingAirlineCodes?.includes(airlineFilter) ||
+          o.itineraries?.[0]?.segments?.[0]?.carrierCode === airlineFilter
+        );
+      }
       setSearchResults(offers);
       if (offers.length === 0) setSearchError("لم يتم العثور على رحلات لهذا المسار. جرّب تغيير التاريخ أو الوجهة.");
       // Get Travelpayouts comparison link
@@ -454,10 +469,15 @@ export default function Flights() {
                       <label className="text-sm text-muted-foreground block mb-1.5 text-right">درجة السفر</label>
                       <div className="bg-muted/50 border border-border rounded-xl px-4 py-2.5 flex items-center gap-2">
                         <Plane className="w-4 h-4 text-muted-foreground shrink-0" />
-                        <select title="درجة السفر" className="bg-transparent w-full text-sm text-foreground outline-none text-right">
-                          <option>الاقتصادية</option>
-                          <option>رجال الأعمال</option>
-                          <option>الأولى</option>
+                        <select 
+                          title="درجة السفر" 
+                          className="bg-transparent w-full text-sm text-foreground outline-none text-right"
+                          value={travelClass}
+                          onChange={(e) => setTravelClass(e.target.value)}
+                        >
+                          <option value="ECONOMY">الاقتصادية</option>
+                          <option value="BUSINESS">رجال الأعمال</option>
+                          <option value="FIRST">الأولى</option>
                         </select>
                       </div>
                     </div>
@@ -465,8 +485,13 @@ export default function Flights() {
                       <label className="text-sm text-muted-foreground block mb-1.5 text-right">شركة الطيران (اختياري)</label>
                       <div className="bg-muted/50 border border-border rounded-xl px-4 py-2.5 flex items-center gap-2">
                         <Plane className="w-4 h-4 text-muted-foreground shrink-0" />
-                        <select title="شركة الطيران" className="bg-transparent w-full text-sm text-foreground outline-none text-right">
-                          <option>كل الشركات</option>
+                        <select 
+                          title="شركة الطيران" 
+                          className="bg-transparent w-full text-sm text-foreground outline-none text-right"
+                          value={airlineFilter}
+                          onChange={(e) => setAirlineFilter(e.target.value)}
+                        >
+                          <option value="">كل الشركات</option>
                           {airlines.map(a => <option key={a.code} value={a.code}>{a.name}</option>)}
                         </select>
                       </div>

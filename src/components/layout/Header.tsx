@@ -27,6 +27,7 @@ const moreLinks = [
   { href: "/destinations", label: "الوجهات" },
   { href: "/about", label: "من نحن" },
   { href: "/contact", label: "اتصل بنا" },
+  { href: "/admin/stats", label: "لوحة الإحصاءات" },
 ];
 
 export default function Header() {

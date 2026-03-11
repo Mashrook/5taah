@@ -1,13 +1,31 @@
-import { useState } from "react";
-import { Tag, Sparkles, Check, Calendar, Info, Plane, Hotel, MapPin, Clock, Users, ChevronLeft } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Tag, Sparkles, Check, Calendar, Info, Plane, Hotel, MapPin, Clock, Users, ChevronLeft, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
 
 import alulaImg from "@/assets/offers/alula-winter.jpg";
 import jeddahImg from "@/assets/offers/jeddah-sea.jpg";
 import riyadhImg from "@/assets/destinations/riyadh.jpg";
 import taifImg from "@/assets/offers/taif-cool.jpg";
+
+interface DbOffer {
+  id: string;
+  title: string;
+  subtitle: string | null;
+  image_url: string | null;
+  season: string | null;
+  discount: number | null;
+  price: number;
+  original_price: number | null;
+  currency: string;
+  valid_until: string | null;
+  destination: string | null;
+  includes: string[] | null;
+  before_travel: string[] | null;
+  duration: string | null;
+}
 
 interface OfferPackage {
   id: string;
@@ -102,6 +120,40 @@ const seasonLabels: Record<string, { label: string; color: string }> = {
 
 export default function Offers() {
   const navigate = useNavigate();
+  const [dbOffers, setDbOffers] = useState<DbOffer[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    supabase.from("offers" as any)
+      .select("*")
+      .eq("is_active", true)
+      .order("sort_order", { ascending: true })
+      .then(({ data }) => {
+        if (data) {
+          setDbOffers(data as unknown as DbOffer[]);
+        }
+      });
+    setLoading(false);
+  }, []);
+
+  const allOffers: OfferPackage[] = dbOffers.length > 0 
+    ? dbOffers.map(o => ({
+        id: o.id,
+        title: o.title,
+        subtitle: o.subtitle || "",
+        image: o.image_url || alulaImg,
+        season: o.season || "عائلي",
+        discount: o.discount || 0,
+        price: o.price,
+        originalPrice: o.original_price || o.price,
+        currency: o.currency || "ر.س",
+        validUntil: o.valid_until || "31-12-2026",
+        destination: o.destination || "",
+        includes: o.includes || [],
+        beforeTravel: o.before_travel || [],
+        duration: o.duration || "",
+      }))
+    : offers;
 
   return (
     <div className="min-h-screen">

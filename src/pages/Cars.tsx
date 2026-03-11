@@ -1,11 +1,12 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { Car, Star, MapPin, Users, Fuel, Settings2, Search, Loader2 } from "lucide-react";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import { Car, Star, MapPin, Users, Fuel, Settings2, Search, Loader2, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import CityAutocomplete from "@/components/search/CityAutocomplete";
 import DatePickerInput from "@/components/ui/date-picker-input";
 import { supabase } from "@/integrations/supabase/client";
+import { getCarDeeplink } from "@/lib/travelpayoutsClient";
 
 import economyImg from "@/assets/cars/economy-car.jpg";
 import midsizeImg from "@/assets/cars/midsize-car.jpg";
@@ -47,11 +48,13 @@ interface DbCar {
 
 export default function Cars() {
   const navigate = useNavigate();
-  const [city, setCity] = useState("");
-  const [pickupDate, setPickupDate] = useState("");
-  const [returnDate, setReturnDate] = useState("");
+  const [urlParams] = useSearchParams();
+  const [city, setCity] = useState(urlParams.get("city") || "");
+  const [pickupDate, setPickupDate] = useState(urlParams.get("pickup") || "");
+  const [returnDate, setReturnDate] = useState(urlParams.get("return") || "");
   const [dbCars, setDbCars] = useState<DbCar[]>([]);
   const [loading, setLoading] = useState(true);
+  const [partnerLink, setPartnerLink] = useState("");
 
   useEffect(() => {
     supabase.from("cars").select("*").eq("is_active", true).order("sort_order")
@@ -60,6 +63,23 @@ export default function Cars() {
         setLoading(false);
       });
   }, []);
+
+  // Generate Travelpayouts partner link when search params are available
+  useEffect(() => {
+    if (city && pickupDate) {
+      getCarDeeplink({ city, pickup: pickupDate, dropoff: returnDate || undefined })
+        .then(setPartnerLink)
+        .catch(() => setPartnerLink(""));
+    }
+  }, [city, pickupDate, returnDate]);
+
+  const handleSearch = () => {
+    if (city && pickupDate) {
+      getCarDeeplink({ city, pickup: pickupDate, dropoff: returnDate || undefined })
+        .then(setPartnerLink)
+        .catch(() => setPartnerLink(""));
+    }
+  };
 
   const displayCars = dbCars.length > 0 ? dbCars : null;
 
@@ -85,10 +105,16 @@ export default function Cars() {
                 <DatePickerInput value={returnDate} onChange={setReturnDate} placeholder="تاريخ الإرجاع" disabled={(date) => date < new Date(new Date().setHours(0, 0, 0, 0)) || (pickupDate ? date <= new Date(pickupDate) : false)} className="bg-muted/30" />
               </div>
             </div>
-            <Button variant="gold" size="lg" className="w-full">
+            <Button variant="gold" size="lg" className="w-full" onClick={handleSearch}>
               <Search className="w-5 h-5 ml-2" />
               بحث عن السيارات
             </Button>
+            {partnerLink && (
+              <a href={partnerLink} target="_blank" rel="noopener noreferrer" className="mt-3 flex items-center justify-center gap-2 text-sm text-primary hover:underline">
+                <ExternalLink className="w-4 h-4" />
+                قارن الأسعار على مواقع التأجير العالمية
+              </a>
+            )}
           </div>
         </div>
       </section>

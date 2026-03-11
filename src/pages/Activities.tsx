@@ -1,11 +1,13 @@
-import { useState, useMemo } from "react";
-import { Search, Star, MapPin, Clock, Users, Filter, Calendar, Sparkles, SlidersHorizontal } from "lucide-react";
+import { useState, useMemo, useEffect } from "react";
+import { Search, Star, MapPin, Clock, Users, Filter, Calendar, Sparkles, SlidersHorizontal, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import CityAutocomplete from "@/components/search/CityAutocomplete";
 import DatePickerInput from "@/components/ui/date-picker-input";
+import { useSearchParams } from "react-router-dom";
+import { getTourDeeplink } from "@/lib/travelpayoutsClient";
 
 import redSeaImg from "@/assets/tours/red-sea.jpg";
 import desertImg from "@/assets/tours/desert-safari.jpg";
@@ -112,22 +114,34 @@ const tours: Tour[] = [
 const categories = ["الكل", "بحرية", "مغامرات", "ثقافية", "ترفيهية", "دينية"];
 
 export default function Activities() {
-  const [destination, setDestination] = useState("");
-  const [tourDate, setTourDate] = useState("");
-  const [guests, setGuests] = useState(2);
+  const [urlParams] = useSearchParams();
+  const [destination, setDestination] = useState(urlParams.get("city") || "");
+  const [tourDate, setTourDate] = useState(urlParams.get("date") || "");
+  const [guests, setGuests] = useState(Number(urlParams.get("guests")) || 2);
   const [selectedCategory, setSelectedCategory] = useState("الكل");
   const [priceMin, setPriceMin] = useState("");
   const [priceMax, setPriceMax] = useState("");
   const [showAdvanced, setShowAdvanced] = useState(false);
+  const [partnerLink, setPartnerLink] = useState("");
+
+  // Generate Travelpayouts tour deeplink
+  useEffect(() => {
+    if (destination) {
+      getTourDeeplink({ city: destination, date: tourDate || undefined })
+        .then(setPartnerLink)
+        .catch(() => setPartnerLink(""));
+    }
+  }, [destination, tourDate]);
 
   const filteredTours = useMemo(() => {
     return tours.filter((t) => {
       if (selectedCategory !== "الكل" && t.category !== selectedCategory) return false;
       if (priceMin && t.price < Number(priceMin)) return false;
       if (priceMax && t.price > Number(priceMax)) return false;
+      if (destination && !t.destination.includes(destination.replace(/\(.*\)/, "").trim())) return false;
       return true;
     });
-  }, [selectedCategory, priceMin, priceMax]);
+  }, [selectedCategory, priceMin, priceMax, destination]);
 
   return (
     <div className="min-h-screen">
@@ -181,6 +195,12 @@ export default function Activities() {
               <SlidersHorizontal className="w-3.5 h-3.5" />
               تصفية متقدمة
             </button>
+            {partnerLink && (
+              <a href={partnerLink} target="_blank" rel="noopener noreferrer" className="text-xs text-primary flex items-center gap-1.5 hover:underline">
+                <ExternalLink className="w-3.5 h-3.5" />
+                استكشف جولات إضافية عبر شركائنا
+              </a>
+            )}
           </div>
 
           {showAdvanced && (

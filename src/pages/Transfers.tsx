@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { ArrowRightLeft, Search, Loader2, Clock, Users, MapPin, Car, CheckCircle, AlertCircle, Luggage } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,6 +8,7 @@ import BookingStepper from "@/components/ui/BookingStepper";
 import CityAutocomplete from "@/components/search/CityAutocomplete";
 import DatePickerInput from "@/components/ui/date-picker-input";
 import { useAuthStore } from "@/stores/authStore";
+import { useSearchParams } from "react-router-dom";
 import { useTenantStore } from "@/stores/tenantStore";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -45,17 +46,19 @@ function resolveIata(input: string): string {
 }
 
 export default function Transfers() {
+  const [urlParams] = useSearchParams();
   const [currentStep, setCurrentStep] = useState(0);
-  const [fromCity, setFromCity] = useState("");
-  const [toCity, setToCity] = useState("");
-  const [transferDate, setTransferDate] = useState("");
-  const [transferTime, setTransferTime] = useState("");
-  const [passengers, setPassengers] = useState(2);
+  const [fromCity, setFromCity] = useState(urlParams.get("from") || "");
+  const [toCity, setToCity] = useState(urlParams.get("to") || "");
+  const [transferDate, setTransferDate] = useState(urlParams.get("date") || "");
+  const [transferTime, setTransferTime] = useState("10:00");
+  const [passengers, setPassengers] = useState(Number(urlParams.get("passengers")) || 2);
   const [transferType, setTransferType] = useState("");
   const [searching, setSearching] = useState(false);
   const [searchError, setSearchError] = useState("");
   const [offers, setOffers] = useState<TransferOffer[]>([]);
   const [selectedOffer, setSelectedOffer] = useState<TransferOffer | null>(null);
+  const autoSearchDone = useRef(false);
 
   // Booking form
   const [firstName, setFirstName] = useState("");
@@ -69,6 +72,19 @@ export default function Transfers() {
   const { tenant } = useTenantStore();
   const { toast } = useToast();
   const navigate = useNavigate();
+
+  // Auto-search from URL params (homepage)
+  useEffect(() => {
+    if (autoSearchDone.current) return;
+    const fromParam = urlParams.get("from");
+    const dateParam = urlParams.get("date");
+    if (fromParam && dateParam) {
+      autoSearchDone.current = true;
+      const fakeEvent = { preventDefault: () => {} } as React.FormEvent;
+      // Small delay to let state settle
+      setTimeout(() => handleSearch(fakeEvent), 200);
+    }
+  }, []);
 
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();

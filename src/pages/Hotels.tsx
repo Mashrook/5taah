@@ -6,7 +6,7 @@ import {
   Hotel as HotelIcon, Star, Search, SlidersHorizontal, MapPin,
   Wifi, Coffee, Waves, Car, Dumbbell, Sparkles, Baby, Briefcase, ConciergeBell,
   ChevronLeft, ShoppingCart, Loader2, RefreshCw, Users, Heart, ArrowUpDown,
-  Phone, Check,
+  Phone, Check, ExternalLink,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -26,6 +26,7 @@ import {
   type AmadeusHotelListItem,
   getCityName,
 } from "@/lib/amadeusClient";
+import { getHotelDeeplink } from "@/lib/travelpayoutsClient";
 
 // Fallback hotel images for live Amadeus results
 import hotelImg1 from "@/assets/hotels/ritz-carlton-riyadh.jpg";
@@ -132,6 +133,7 @@ export default function Hotels() {
   const [liveResults, setLiveResults] = useState<AmadeusHotelOffer[]>([]);
   const [searchError, setSearchError] = useState("");
   const autoSearchDone = useRef(false);
+  const [tpHotelLink, setTpHotelLink] = useState("");
 
   // Auto-search when navigating from homepage
   useEffect(() => {
@@ -162,6 +164,10 @@ export default function Hotels() {
           const offers = (offersResult.data || []).filter((o: AmadeusHotelOffer) => o.available && o.offers?.length > 0);
           setLiveResults(offers);
           if (offers.length === 0) setSearchError("لم يتم العثور على عروض متاحة. جرّب تغيير التواريخ أو المدينة.");
+          if (offers.length > 0) {
+            getHotelDeeplink({ city: cityCode, checkIn: checkInParam, checkOut: checkOutParam, adults })
+              .then(setTpHotelLink).catch(() => {});
+          }
         })
         .catch((err: unknown) => {
           const message = err instanceof Error ? err.message : "حدث خطأ";
@@ -253,6 +259,9 @@ export default function Hotels() {
 
       if (offers.length === 0) {
         setSearchError("لم يتم العثور على عروض متاحة. جرّب تغيير التواريخ أو المدينة.");
+      } else {
+        getHotelDeeplink({ city: resolveIata(liveCity), checkIn, checkOut, adults })
+          .then(setTpHotelLink).catch(() => {});
       }
     } catch (err: unknown) {
       console.error("Hotel search error:", err);
@@ -386,7 +395,14 @@ export default function Hotels() {
         {viewMode === "live" && liveResults.length > 0 && (
           <div className="max-w-5xl mx-auto mb-10">
             <div className="flex items-center justify-between mb-6">
-              <h3 className="text-xl font-bold">نتائج البحث ({liveResults.length} فندق)</h3>
+              <div className="flex items-center gap-4">
+                <h3 className="text-xl font-bold">نتائج البحث ({liveResults.length} فندق)</h3>
+                {tpHotelLink && (
+                  <a href={tpHotelLink} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5 text-sm text-primary hover:underline">
+                    <ExternalLink className="w-4 h-4" /> قارن الأسعار
+                  </a>
+                )}
+              </div>
               <Button variant="outline" size="sm" onClick={() => setViewMode("static")}>عرض الفنادق المميزة</Button>
             </div>
             <div className="space-y-4">

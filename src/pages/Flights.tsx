@@ -22,6 +22,7 @@ import {
   ChevronRight,
   CreditCard,
   Check,
+  ExternalLink,
 } from "lucide-react";
 import { useAuthStore } from "@/stores/authStore";
 import { supabase } from "@/integrations/supabase/client";
@@ -40,6 +41,7 @@ import {
   formatDuration,
   getAirlineName,
 } from "@/lib/amadeusClient";
+import { getFlightDeeplink } from "@/lib/travelpayoutsClient";
 
 const cityToIata: Record<string, string> = {
   "الرياض": "RUH", "جدة": "JED", "الدمام": "DMM", "المدينة المنورة": "MED",
@@ -151,6 +153,7 @@ export default function Flights() {
   const [searching, setSearching] = useState(false);
   const [searchError, setSearchError] = useState("");
   const [destTab, setDestTab] = useState<DestTab>("domestic");
+  const [tpFlightLink, setTpFlightLink] = useState("");
 
   // Multi-step booking state
   const [step, setStep] = useState<BookingStep>("search");
@@ -192,6 +195,9 @@ export default function Flights() {
           const offers = result.data || [];
           setSearchResults(offers);
           if (offers.length === 0) setSearchError("لم يتم العثور على رحلات لهذا المسار. جرّب تغيير التاريخ أو الوجهة.");
+          // Get Travelpayouts comparison link
+          getFlightDeeplink({ origin: originCode, destination: destCode, departDate: departParam, returnDate: retParam, adults: passengers })
+            .then(setTpFlightLink).catch(() => {});
         })
         .catch((err: unknown) => {
           const message = err instanceof Error ? err.message : "حدث خطأ";
@@ -222,6 +228,12 @@ export default function Flights() {
       const offers = result.data || [];
       setSearchResults(offers);
       if (offers.length === 0) setSearchError("لم يتم العثور على رحلات لهذا المسار. جرّب تغيير التاريخ أو الوجهة.");
+      // Get Travelpayouts comparison link
+      getFlightDeeplink({
+        origin: originCode, destination: destCode, departDate: departDate,
+        returnDate: tripType === "roundtrip" && returnDate ? returnDate : undefined,
+        adults: passengers,
+      }).then(setTpFlightLink).catch(() => {});
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : "حدث خطأ";
       setSearchError(message);
@@ -489,7 +501,15 @@ export default function Flights() {
               <section className="section-padding bg-muted/20">
                 <div className="container mx-auto px-4 lg:px-8">
                   <div className="max-w-5xl mx-auto">
-                    <h3 className="text-xl font-bold mb-6 text-right">نتائج البحث ({searchResults.length} رحلة)</h3>
+                    <div className="flex items-center justify-between mb-6">
+                      <h3 className="text-xl font-bold text-right">نتائج البحث ({searchResults.length} رحلة)</h3>
+                      {tpFlightLink && (
+                        <a href={tpFlightLink} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5 text-sm text-primary hover:underline">
+                          <ExternalLink className="w-4 h-4" />
+                          قارن الأسعار
+                        </a>
+                      )}
+                    </div>
                     <div className="space-y-4">
                       {searchResults.map((offer) => {
                         const outbound = offer.itineraries[0];

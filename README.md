@@ -62,12 +62,32 @@ This project is built with:
 
 ## How can I deploy this project?
 
-Simply open [Lovable](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and click on Share -> Publish.
+### Automatic deployment via GitHub Actions (Vercel)
 
-## Can I connect a custom domain to my Lovable project?
+The repository includes a GitHub Actions workflow (`.github/workflows/deploy.yml`) that automatically builds and deploys the app to Vercel on every push to `main` and creates preview deployments for pull requests.
+
+To enable it, add the following secrets in **Settings → Secrets and variables → Actions**:
+
+| Secret | How to get it |
+|--------|---------------|
+| `VERCEL_TOKEN` | [Vercel dashboard](https://vercel.com/account/tokens) → Create token |
+| `VERCEL_ORG_ID` | Found in Vercel project settings or run `vercel link` locally |
+| `VERCEL_PROJECT_ID` | Found in Vercel project settings or run `vercel link` locally |
+| `VITE_SUPABASE_URL` | Your Supabase project URL |
+| `VITE_SUPABASE_PUBLISHABLE_KEY` | Your Supabase anon/public key |
+
+Once the secrets are set, every push to `main` will trigger a production deployment and every pull request will get a preview URL.
+
+### Manual deployment via Lovable
+
+Simply open [Lovable](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and click on Share → Publish.
+
+## Can I connect a custom domain?
 
 Yes, you can!
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+**Vercel**: Go to your Vercel project → Settings → Domains and add your custom domain.
+
+**Lovable**: Navigate to Project → Settings → Domains and click Connect Domain.
 
 Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)

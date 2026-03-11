@@ -145,6 +145,7 @@ export default function AdminPromoMedia() {
               ref={fileInputRef}
               type="file"
               accept="video/*,image/*"
+              aria-label="اختيار ملف دعائي"
               className="hidden"
               onChange={handleFileUpload}
             />

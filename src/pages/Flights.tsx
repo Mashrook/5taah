@@ -454,7 +454,7 @@ export default function Flights() {
                       <label className="text-sm text-muted-foreground block mb-1.5 text-right">درجة السفر</label>
                       <div className="bg-muted/50 border border-border rounded-xl px-4 py-2.5 flex items-center gap-2">
                         <Plane className="w-4 h-4 text-muted-foreground shrink-0" />
-                        <select className="bg-transparent w-full text-sm text-foreground outline-none text-right">
+                        <select title="درجة السفر" className="bg-transparent w-full text-sm text-foreground outline-none text-right">
                           <option>الاقتصادية</option>
                           <option>رجال الأعمال</option>
                           <option>الأولى</option>
@@ -465,7 +465,7 @@ export default function Flights() {
                       <label className="text-sm text-muted-foreground block mb-1.5 text-right">شركة الطيران (اختياري)</label>
                       <div className="bg-muted/50 border border-border rounded-xl px-4 py-2.5 flex items-center gap-2">
                         <Plane className="w-4 h-4 text-muted-foreground shrink-0" />
-                        <select className="bg-transparent w-full text-sm text-foreground outline-none text-right">
+                        <select title="شركة الطيران" className="bg-transparent w-full text-sm text-foreground outline-none text-right">
                           <option>كل الشركات</option>
                           {airlines.map(a => <option key={a.code} value={a.code}>{a.name}</option>)}
                         </select>

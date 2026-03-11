@@ -315,9 +315,9 @@ export default function HeroSection() {
                     <div className="bg-muted/50 rounded-xl px-3 py-2 flex items-center gap-2 border border-border/50 h-10">
                       <Users className="w-4 h-4 text-muted-foreground" />
                       <span className="text-sm text-muted-foreground flex-1 text-right">عدد الأشخاص</span>
-                      <button type="button" onClick={() => setTourGuests(Math.max(1, tourGuests - 1))} className="w-6 h-6 rounded-full bg-muted text-muted-foreground flex items-center justify-center"><Minus className="w-3 h-3" /></button>
+                      <button type="button" aria-label="تقليل عدد الأشخاص" onClick={() => setTourGuests(Math.max(1, tourGuests - 1))} className="w-6 h-6 rounded-full bg-muted text-muted-foreground flex items-center justify-center"><Minus className="w-3 h-3" /></button>
                       <span className="text-sm font-medium min-w-[16px] text-center">{tourGuests}</span>
-                      <button type="button" onClick={() => setTourGuests(Math.min(20, tourGuests + 1))} className="w-6 h-6 rounded-full bg-primary/20 text-primary flex items-center justify-center"><Plus className="w-3 h-3" /></button>
+                      <button type="button" aria-label="زيادة عدد الأشخاص" onClick={() => setTourGuests(Math.min(20, tourGuests + 1))} className="w-6 h-6 rounded-full bg-primary/20 text-primary flex items-center justify-center"><Plus className="w-3 h-3" /></button>
                     </div>
                   </div>
                 </>
@@ -363,6 +363,7 @@ export default function HeroSection() {
                 <div className="bg-muted/50 rounded-xl px-3 py-2 flex items-center gap-2 border border-border/50">
                   <button
                     type="button"
+                    aria-label="زيادة عدد المسافرين"
                     onClick={() => {
                       if (searchTab === "flights") setPassengers(Math.min(9, passengers + 1));
                       else if (searchTab === "hotels") setGuests(Math.min(9, guests + 1));
@@ -377,6 +378,7 @@ export default function HeroSection() {
                   </span>
                   <button
                     type="button"
+                    aria-label="تقليل عدد المسافرين"
                     onClick={() => {
                       if (searchTab === "flights") setPassengers(Math.max(1, passengers - 1));
                       else if (searchTab === "hotels") setGuests(Math.max(1, guests - 1));

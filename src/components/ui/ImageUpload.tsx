@@ -91,6 +91,7 @@ export default function ImageUpload({
           ref={fileInputRef}
           type="file"
           accept={accept}
+          aria-label="اختيار صورة"
           className="hidden"
           onChange={handleFileChange}
         />
@@ -104,6 +105,7 @@ export default function ImageUpload({
             />
             <button
               type="button"
+              aria-label="حذف الصورة"
               onClick={(e) => { e.stopPropagation(); onChange(""); }}
               className="absolute top-2 left-2 p-1 rounded-full bg-destructive text-destructive-foreground opacity-0 group-hover:opacity-100 transition-opacity"
             >

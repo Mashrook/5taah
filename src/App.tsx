@@ -62,7 +62,6 @@ import AdminForgotPassword from "./pages/admin/AdminForgotPassword";
 import AdminResetPassword from "./pages/admin/AdminResetPassword";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminBookings from "./pages/admin/AdminBookings";
-import AdminUsers from "./pages/admin/AdminUsers";
 import AdminUsersEnhanced from "./pages/admin/AdminUsersEnhanced";
 import AdminIntegrations from "./pages/admin/AdminIntegrations";
 import AdminRBAC from "./pages/admin/AdminRBAC";

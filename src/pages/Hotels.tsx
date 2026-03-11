@@ -344,7 +344,7 @@ export default function Hotels() {
                 <div className="bg-muted/30 border border-border rounded-lg px-3 h-10 flex items-center gap-2">
                   <Users className="w-4 h-4 text-muted-foreground" />
                   <select value={adults} onChange={(e) => setAdults(Number(e.target.value))}
-                    className="bg-transparent w-full text-sm text-foreground outline-none text-right">
+                    title="عدد الضيوف" className="bg-transparent w-full text-sm text-foreground outline-none text-right">
                     {[1, 2, 3, 4, 5, 6].map(n => <option key={n} value={n}>{n} ضيف</option>)}
                   </select>
                 </div>
@@ -623,7 +623,7 @@ export default function Hotels() {
                           ))}
                         </div>
                         {/* Save Button */}
-                        <button className="absolute top-3 left-3 w-8 h-8 rounded-full bg-card/70 backdrop-blur flex items-center justify-center hover:bg-primary/20 transition-colors">
+                        <button aria-label="حفظ الفندق" className="absolute top-3 left-3 w-8 h-8 rounded-full bg-card/70 backdrop-blur flex items-center justify-center hover:bg-primary/20 transition-colors">
                           <Heart className="w-4 h-4 text-foreground/70" />
                         </button>
                         {/* Stars */}

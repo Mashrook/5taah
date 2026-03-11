@@ -2,9 +2,9 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Car, Star, MapPin, Users, Fuel, Settings2, Search, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import CityAutocomplete from "@/components/search/CityAutocomplete";
+import DatePickerInput from "@/components/ui/date-picker-input";
 import { supabase } from "@/integrations/supabase/client";
 
 import economyImg from "@/assets/cars/economy-car.jpg";
@@ -78,11 +78,11 @@ export default function Cars() {
               <CityAutocomplete value={city} onChange={setCity} placeholder="مدينة الاستلام" label="مدينة الاستلام" />
               <div>
                 <label className="text-sm text-muted-foreground block mb-1">تاريخ الاستلام</label>
-                <Input type="date" value={pickupDate} onChange={(e) => setPickupDate(e.target.value)} className="bg-muted/30" />
+                <DatePickerInput value={pickupDate} onChange={setPickupDate} placeholder="تاريخ الاستلام" disabled={(date) => date < new Date(new Date().setHours(0, 0, 0, 0))} className="bg-muted/30" />
               </div>
               <div>
                 <label className="text-sm text-muted-foreground block mb-1">تاريخ الإرجاع</label>
-                <Input type="date" value={returnDate} onChange={(e) => setReturnDate(e.target.value)} className="bg-muted/30" />
+                <DatePickerInput value={returnDate} onChange={setReturnDate} placeholder="تاريخ الإرجاع" disabled={(date) => date < new Date(new Date().setHours(0, 0, 0, 0)) || (pickupDate ? date <= new Date(pickupDate) : false)} className="bg-muted/30" />
               </div>
             </div>
             <Button variant="gold" size="lg" className="w-full">

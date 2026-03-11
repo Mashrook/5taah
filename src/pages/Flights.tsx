@@ -30,6 +30,7 @@ import { useNavigate } from "react-router-dom";
 import { useTenantStore } from "@/stores/tenantStore";
 import PaywallGate from "@/components/billing/PaywallGate";
 import CityAutocomplete from "@/components/search/CityAutocomplete";
+import DatePickerInput from "@/components/ui/date-picker-input";
 import TravelerForm, { type TravelerData } from "@/components/booking/TravelerForm";
 import MoyasarPayment from "@/components/payment/MoyasarPayment";
 import {
@@ -402,22 +403,29 @@ export default function Flights() {
                       <CityAutocomplete value={to} onChange={setTo} placeholder="اختر المدينة أو المطار" label="" showCode />
                     </div>
                   </div>
-                  <div className="grid md:grid-cols-2 gap-4 mb-4">
+                  <div className={`grid ${tripType === "roundtrip" ? "md:grid-cols-2" : "md:grid-cols-1"} gap-4 mb-4`}>
                     <div>
                       <label className="text-sm text-muted-foreground block mb-1.5 text-right">تاريخ المغادرة</label>
-                      <div className="bg-muted/50 border border-border rounded-xl px-4 py-2.5 flex items-center gap-2">
-                        <Calendar className="w-4 h-4 text-muted-foreground shrink-0" />
-                        <Input type="date" value={departDate} onChange={(e) => setDepartDate(e.target.value)} className="bg-transparent border-0 p-0 h-auto shadow-none" required />
-                      </div>
+                      <DatePickerInput
+                        value={departDate}
+                        onChange={setDepartDate}
+                        placeholder="اختر تاريخ المغادرة"
+                        disabled={(date) => date < new Date(new Date().setHours(0, 0, 0, 0))}
+                        className="bg-muted/50 border-border"
+                      />
                     </div>
-                    <div>
-                      <label className="text-sm text-muted-foreground block mb-1.5 text-right">تاريخ العودة</label>
-                      <div className="bg-muted/50 border border-border rounded-xl px-4 py-2.5 flex items-center gap-2">
-                        <Calendar className="w-4 h-4 text-muted-foreground shrink-0" />
-                        <Input type="date" value={returnDate} onChange={(e) => setReturnDate(e.target.value)}
-                          className="bg-transparent border-0 p-0 h-auto shadow-none" disabled={tripType === "oneway"} />
+                    {tripType === "roundtrip" && (
+                      <div>
+                        <label className="text-sm text-muted-foreground block mb-1.5 text-right">تاريخ العودة</label>
+                        <DatePickerInput
+                          value={returnDate}
+                          onChange={setReturnDate}
+                          placeholder="اختر تاريخ العودة"
+                          disabled={(date) => date < new Date(new Date().setHours(0, 0, 0, 0)) || (departDate ? date < new Date(departDate) : false)}
+                          className="bg-muted/50 border-border"
+                        />
                       </div>
-                    </div>
+                    )}
                   </div>
                   <div className="grid md:grid-cols-3 gap-4 mb-6">
                     <div>

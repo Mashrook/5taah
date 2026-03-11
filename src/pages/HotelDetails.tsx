@@ -8,6 +8,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import DatePickerInput from "@/components/ui/date-picker-input";
 import { useToast } from "@/hooks/use-toast";
 import { hotels } from "@/data/hotelsData";
 import { useHotelCartStore, type CartItem } from "@/stores/hotelCartStore";
@@ -187,11 +188,11 @@ export default function HotelDetails() {
               <div className="space-y-2 mb-4">
                 <div>
                   <label className="text-[10px] text-muted-foreground block mb-0.5 text-right">تاريخ الدخول</label>
-                  <Input type="date" value={checkInDate} onChange={(e) => setCheckInDate(e.target.value)} className="bg-muted/30 h-9 text-sm" />
+                  <DatePickerInput value={checkInDate} onChange={setCheckInDate} placeholder="تاريخ الدخول" disabled={(date) => date < new Date(new Date().setHours(0, 0, 0, 0))} className="bg-muted/30 h-9 text-sm" />
                 </div>
                 <div>
                   <label className="text-[10px] text-muted-foreground block mb-0.5 text-right">تاريخ الخروج</label>
-                  <Input type="date" value={checkOutDate} onChange={(e) => setCheckOutDate(e.target.value)} className="bg-muted/30 h-9 text-sm" />
+                  <DatePickerInput value={checkOutDate} onChange={setCheckOutDate} placeholder="تاريخ الخروج" disabled={(date) => date < new Date(new Date().setHours(0, 0, 0, 0)) || (checkInDate ? date <= new Date(checkInDate) : false)} className="bg-muted/30 h-9 text-sm" />
                 </div>
               </div>
 

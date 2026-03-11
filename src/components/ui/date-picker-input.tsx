@@ -52,7 +52,7 @@ function DatePickerInput({
             className,
           )}
         >
-          <span className="truncate">{selected ? format(selected, "yyyy-MM-dd") : placeholder}</span>
+          <span className="truncate">{selected ? selected.toLocaleDateString("ar-SA", { year: "numeric", month: "long", day: "numeric" }) : placeholder}</span>
           <CalendarIcon className="h-4 w-4 opacity-70" />
         </Button>
       </PopoverTrigger>

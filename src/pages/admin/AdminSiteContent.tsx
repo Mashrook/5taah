@@ -10,7 +10,7 @@ import { toast } from "@/hooks/use-toast";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Image, LayoutGrid, Plus, Trash2, Save, Eye, EyeOff, Upload } from "lucide-react";
+import { Image, LayoutGrid, Plus, Trash2, Save, Eye, EyeOff, Upload, Loader2, Hotel, Car, Map, Plane, RefreshCw } from "lucide-react";
 
 // ─── Site Images Manager ───
 interface SiteImage {
@@ -44,17 +44,34 @@ const DEFAULT_SECTIONS = [
 ];
 
 const IMAGE_KEYS = [
-  { key: "img_hero", label: "صورة البانر الرئيسي" },
-  { key: "img_featured_offer", label: "صورة العرض المميز" },
-  { key: "img_riyadh", label: "صورة الرياض" },
-  { key: "img_jeddah", label: "صورة جدة" },
-  { key: "img_medina", label: "صورة المدينة" },
-  { key: "img_abha", label: "صورة أبها" },
-  { key: "img_alula", label: "صورة العلا" },
-  { key: "img_tabuk", label: "صورة تبوك" },
-  { key: "img_dubai", label: "صورة دبي" },
-  { key: "img_diriyah", label: "صورة الدرعية" },
+  { key: "img_hero", label: "صورة البانر الرئيسي", category: "عام" },
+  { key: "img_featured_offer", label: "صورة العرض المميز", category: "عام" },
+  { key: "img_riyadh", label: "صورة الرياض", category: "وجهات" },
+  { key: "img_jeddah", label: "صورة جدة", category: "وجهات" },
+  { key: "img_medina", label: "صورة المدينة", category: "وجهات" },
+  { key: "img_abha", label: "صورة أبها", category: "وجهات" },
+  { key: "img_alula", label: "صورة العلا", category: "وجهات" },
+  { key: "img_tabuk", label: "صورة تبوك", category: "وجهات" },
+  { key: "img_dubai", label: "صورة دبي", category: "وجهات" },
+  { key: "img_diriyah", label: "صورة الدرعية", category: "وجهات" },
+  { key: "img_hotel_ritz", label: "فندق الريتز كارلتون", category: "فنادق" },
+  { key: "img_hotel_hilton", label: "فندق هيلتون جدة", category: "فنادق" },
+  { key: "img_hotel_radisson", label: "فندق راديسون أبها", category: "فنادق" },
+  { key: "img_hotel_movenpick", label: "فندق موفنبيك المدينة", category: "فنادق" },
+  { key: "img_car_economy", label: "سيارة اقتصادية", category: "سيارات" },
+  { key: "img_car_luxury", label: "سيارة فاخرة", category: "سيارات" },
+  { key: "img_car_suv", label: "سيارة SUV", category: "سيارات" },
+  { key: "img_car_family", label: "سيارة عائلية", category: "سيارات" },
+  { key: "img_tour_desert", label: "جولة صحراوية", category: "جولات" },
+  { key: "img_tour_redsea", label: "البحر الأحمر", category: "جولات" },
+  { key: "img_tour_jeddah", label: "جدة التاريخية", category: "جولات" },
+  { key: "img_tour_riyadh", label: "ليل الرياض", category: "جولات" },
+  { key: "img_seasonal_hajj", label: "برامج الحج", category: "موسمية" },
+  { key: "img_seasonal_ramadan", label: "عروض رمضان", category: "موسمية" },
+  { key: "img_seasonal_summer", label: "صيف عسير", category: "موسمية" },
 ];
+
+const IMAGE_CATEGORIES = ["الكل", "عام", "وجهات", "فنادق", "سيارات", "جولات", "موسمية"];
 
 export default function AdminSiteContent() {
   const [images, setImages] = useState<SiteImage[]>([]);
@@ -65,7 +82,11 @@ export default function AdminSiteContent() {
   const [addDialog, setAddDialog] = useState(false);
   const [newSetting, setNewSetting] = useState({ key: "", value: "", type: "text", label: "" });
   const [uploadingKey, setUploadingKey] = useState<string | null>(null);
+  const [imageCategory, setImageCategory] = useState("الكل");
+  const [galleryFiles, setGalleryFiles] = useState<{ name: string; url: string; created_at: string }[]>([]);
+  const [galleryLoading, setGalleryLoading] = useState(false);
   const fileInputRefs = useRef<Record<string, HTMLInputElement | null>>({});
+  const galleryInputRef = useRef<HTMLInputElement | null>(null);
 
   useEffect(() => { loadAll(); }, []);
 
@@ -94,6 +115,22 @@ export default function AdminSiteContent() {
     setCustomSettings(custom.map((c) => ({ id: c.id, setting_key: c.setting_key, setting_value: c.setting_value, setting_type: c.setting_type })));
 
     setLoading(false);
+  };
+
+  const loadGallery = async () => {
+    setGalleryLoading(true);
+    const { data, error } = await supabase.storage.from("admin-uploads").list("site", { limit: 100, sortBy: { column: "created_at", order: "desc" } });
+    if (!error && data) {
+      setGalleryFiles(
+        data
+          .filter(f => f.name && !f.name.startsWith("."))
+          .map(f => {
+            const { data: urlData } = supabase.storage.from("admin-uploads").getPublicUrl("site/" + f.name);
+            return { name: f.name, url: urlData.publicUrl, created_at: f.created_at || "" };
+          })
+      );
+    }
+    setGalleryLoading(false);
   };
 
   const upsertSetting = async (key: string, value: string, type: string = "text") => {
@@ -167,6 +204,35 @@ export default function AdminSiteContent() {
     loadAll();
   };
 
+  const handleGalleryUpload = async (files: FileList) => {
+    setGalleryLoading(true);
+    for (const file of Array.from(files)) {
+      if (!file.type.startsWith("image/")) continue;
+      const ext = file.name.split(".").pop();
+      const fileName = `gallery-${Date.now()}-${Math.random().toString(36).slice(2, 6)}.${ext}`;
+      await supabase.storage.from("admin-uploads").upload("site/" + fileName, file, { upsert: true });
+    }
+    toast({ title: `تم رفع ${files.length} صورة بنجاح` });
+    loadGallery();
+  };
+
+  const deleteGalleryFile = async (name: string) => {
+    if (!confirm("هل تريد حذف هذه الصورة؟")) return;
+    await supabase.storage.from("admin-uploads").remove(["site/" + name]);
+    toast({ title: "تم حذف الصورة" });
+    loadGallery();
+  };
+
+  const copyToClipboard = (url: string) => {
+    navigator.clipboard.writeText(url);
+    toast({ title: "تم نسخ الرابط" });
+  };
+
+  const filteredImages = imageCategory === "الكل" ? images : images.filter(img => {
+    const meta = IMAGE_KEYS.find(k => k.key === img.setting_key);
+    return meta?.category === imageCategory;
+  });
+
   if (loading) return <div className="p-8 text-center text-muted-foreground" dir="rtl">جاري التحميل...</div>;
 
   return (
@@ -180,8 +246,9 @@ export default function AdminSiteContent() {
       </div>
 
       <Tabs defaultValue="images">
-        <TabsList className="grid w-full grid-cols-3">
+        <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="images"><Image className="w-4 h-4 ml-2" />الصور</TabsTrigger>
+          <TabsTrigger value="gallery" onClick={loadGallery}><Upload className="w-4 h-4 ml-2" />معرض الصور</TabsTrigger>
           <TabsTrigger value="sections"><LayoutGrid className="w-4 h-4 ml-2" />الأقسام</TabsTrigger>
           <TabsTrigger value="custom">إعدادات أخرى</TabsTrigger>
         </TabsList>
@@ -189,51 +256,141 @@ export default function AdminSiteContent() {
         {/* ─── Images Tab ─── */}
         <TabsContent value="images">
           <Card>
-            <CardHeader><CardTitle>صور الموقع</CardTitle></CardHeader>
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <CardTitle>صور الموقع ({filteredImages.length})</CardTitle>
+                <div className="flex gap-1 bg-muted/50 rounded-lg p-1">
+                  {IMAGE_CATEGORIES.map((cat) => (
+                    <button
+                      key={cat}
+                      onClick={() => setImageCategory(cat)}
+                      className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all ${
+                        imageCategory === cat ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"
+                      }`}
+                    >
+                      {cat}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </CardHeader>
             <CardContent className="space-y-4">
-              {images.map((img) => {
-                const label = IMAGE_KEYS.find((k) => k.key === img.setting_key)?.label || img.setting_key;
-                return (
-                  <div key={img.setting_key} className="space-y-2 p-3 rounded-lg border border-border">
-                    <Label className="font-medium">{label}</Label>
-                    <div className="flex gap-2 items-center">
-                      <Input
-                        value={img.setting_value || ""}
-                        onChange={(e) => updateImageUrl(img.setting_key, e.target.value)}
-                        placeholder="https://..."
-                        dir="ltr"
-                        className="flex-1"
-                      />
-                      <input
-                        ref={(el) => { fileInputRefs.current[img.setting_key] = el; }}
-                        type="file"
-                        accept="image/*"
-                        className="hidden"
-                        onChange={(e) => {
-                          const file = e.target.files?.[0];
-                          if (file) handleFileUpload(img.setting_key, file);
-                          e.target.value = "";
-                        }}
-                      />
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => fileInputRefs.current[img.setting_key]?.click()}
-                        disabled={uploadingKey === img.setting_key}
-                      >
-                        <Upload className="w-4 h-4 ml-1" />
-                        {uploadingKey === img.setting_key ? "..." : "رفع"}
-                      </Button>
+              <div className="grid md:grid-cols-2 gap-4">
+                {filteredImages.map((img) => {
+                  const meta = IMAGE_KEYS.find((k) => k.key === img.setting_key);
+                  const label = meta?.label || img.setting_key;
+                  return (
+                    <div key={img.setting_key} className="space-y-2 p-4 rounded-xl border border-border bg-card hover:border-primary/20 transition-all">
+                      <div className="flex items-center justify-between">
+                        <Label className="font-medium">{label}</Label>
+                        {meta?.category && (
+                          <span className="text-[10px] px-2 py-0.5 rounded-full bg-primary/10 text-primary">{meta.category}</span>
+                        )}
+                      </div>
+                      {img.setting_value && (
+                        <img src={img.setting_value} alt={label} className="w-full h-32 rounded-lg object-cover border border-border" />
+                      )}
+                      <div className="flex gap-2 items-center">
+                        <Input
+                          value={img.setting_value || ""}
+                          onChange={(e) => updateImageUrl(img.setting_key, e.target.value)}
+                          placeholder="https://..."
+                          dir="ltr"
+                          className="flex-1 text-xs"
+                        />
+                        <input
+                          ref={(el) => { fileInputRefs.current[img.setting_key] = el; }}
+                          type="file"
+                          accept="image/*"
+                          className="hidden"
+                          title="رفع صورة"
+                          onChange={(e) => {
+                            const file = e.target.files?.[0];
+                            if (file) handleFileUpload(img.setting_key, file);
+                            e.target.value = "";
+                          }}
+                        />
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => fileInputRefs.current[img.setting_key]?.click()}
+                          disabled={uploadingKey === img.setting_key}
+                        >
+                          {uploadingKey === img.setting_key ? <Loader2 className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />}
+                        </Button>
+                      </div>
                     </div>
-                    {img.setting_value && (
-                      <img src={img.setting_value} alt={label} className="w-full max-w-xs h-24 rounded-lg object-cover border border-border" />
-                    )}
-                  </div>
-                );
-              })}
-              <Button onClick={saveImages} disabled={saving}>
+                  );
+                })}
+              </div>
+              <Button onClick={saveImages} disabled={saving} className="w-full">
                 <Save className="w-4 h-4 ml-2" />{saving ? "جاري الحفظ..." : "حفظ جميع الصور"}
               </Button>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* ─── Gallery Tab ─── */}
+        <TabsContent value="gallery">
+          <Card>
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <CardTitle>معرض الصور المرفوعة ({galleryFiles.length})</CardTitle>
+                <div className="flex gap-2">
+                  <input
+                    ref={galleryInputRef}
+                    type="file"
+                    accept="image/*"
+                    multiple
+                    className="hidden"
+                    title="رفع صور للمعرض"
+                    onChange={(e) => {
+                      if (e.target.files && e.target.files.length > 0) handleGalleryUpload(e.target.files);
+                      e.target.value = "";
+                    }}
+                  />
+                  <Button variant="outline" size="sm" onClick={loadGallery} disabled={galleryLoading}>
+                    <RefreshCw className={`w-4 h-4 ml-1 ${galleryLoading ? "animate-spin" : ""}`} />
+                    تحديث
+                  </Button>
+                  <Button size="sm" onClick={() => galleryInputRef.current?.click()}>
+                    <Upload className="w-4 h-4 ml-2" />
+                    رفع صور
+                  </Button>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent>
+              {galleryLoading ? (
+                <div className="flex items-center justify-center py-10">
+                  <Loader2 className="w-6 h-6 animate-spin text-primary" />
+                </div>
+              ) : galleryFiles.length === 0 ? (
+                <div className="text-center py-10 text-muted-foreground text-sm">
+                  <Image className="w-10 h-10 mx-auto mb-3 opacity-50" />
+                  <p>لا توجد صور مرفوعة بعد</p>
+                  <p className="text-xs mt-1">ارفع صوراً لاستخدامها في الموقع</p>
+                </div>
+              ) : (
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                  {galleryFiles.map((file) => (
+                    <div key={file.name} className="group relative rounded-xl overflow-hidden border border-border hover:border-primary/30 transition-all">
+                      <img src={file.url} alt={file.name} className="w-full h-32 object-cover" loading="lazy" />
+                      <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                        <Button size="sm" variant="secondary" className="text-xs h-7" onClick={() => copyToClipboard(file.url)}>
+                          نسخ الرابط
+                        </Button>
+                        <Button size="sm" variant="destructive" className="text-xs h-7" onClick={() => deleteGalleryFile(file.name)}>
+                          <Trash2 className="w-3 h-3" />
+                        </Button>
+                      </div>
+                      <div className="p-2">
+                        <p className="text-[10px] text-muted-foreground truncate" dir="ltr">{file.name}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
             </CardContent>
           </Card>
         </TabsContent>

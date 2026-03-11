@@ -355,7 +355,7 @@ export default function HotelBooking() {
                   amount={totalPrice}
                   description={`Hotel booking - ${selectedOffer.hotel.name}`}
                   callbackUrl={`${window.location.origin}/hotels/payment-callback?session=${paymentSessionId}`}
-                  methods={["creditcard", "applepay"]}
+                  methods={["creditcard"]}
                 />
               </div>
 

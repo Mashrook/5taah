@@ -274,7 +274,7 @@ export default function TourBooking() {
                   amount={totalPrice}
                   description={`Tour booking - ${tourTitle}`}
                   callbackUrl={`${window.location.origin}/tours/payment-callback?session=${paymentSessionId}`}
-                  methods={["creditcard", "applepay"]}
+                  methods={["creditcard"]}
                 />
               </div>
               <Button variant="outline" onClick={() => setStep("review")} className="w-full">

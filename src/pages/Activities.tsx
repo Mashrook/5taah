@@ -5,12 +5,13 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import CityAutocomplete from "@/components/search/CityAutocomplete";
+import DatePickerInput from "@/components/ui/date-picker-input";
 
 import redSeaImg from "@/assets/tours/red-sea.jpg";
 import desertImg from "@/assets/tours/desert-safari.jpg";
 import jeddahImg from "@/assets/tours/jeddah-history.jpg";
 import tabukImg from "@/assets/tours/tabuk-adventure.jpg";
-import riyadhImg from "@/assets/tours/riyadh-night.jpg";
+import riyadhImg from "@/assets/festivals/riyadh-season.jpg";
 import umrahImg from "@/assets/tours/umrah-tour.jpg";
 
 interface Tour {
@@ -150,7 +151,7 @@ export default function Activities() {
             <CityAutocomplete value={destination} onChange={setDestination} placeholder="اختر المدينة" label="المدينة" />
             <div>
               <label className="text-xs text-muted-foreground block mb-1 text-right">تاريخ الجولة</label>
-              <Input type="date" value={tourDate} onChange={(e) => setTourDate(e.target.value)} className="bg-muted/30 h-10" />
+              <DatePickerInput value={tourDate} onChange={setTourDate} placeholder="اختر التاريخ" className="h-10" />
             </div>
             <div>
               <label className="text-xs text-muted-foreground block mb-1 text-right">عدد الأشخاص</label>

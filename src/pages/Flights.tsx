@@ -839,7 +839,7 @@ export default function Flights() {
                     amount={parseFloat(displayOffer.price.grandTotal) * passengers}
                     description={`Flight booking ${displayOffer.id}`}
                     callbackUrl={`${window.location.origin}/flights/payment-callback?session=${paymentSessionId}`}
-                    methods={["creditcard", "applepay"]}
+                    methods={["creditcard"]}
                   />
                 </div>
 

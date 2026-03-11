@@ -247,7 +247,7 @@ export default function CarBooking() {
                   amount={totalPrice}
                   description={`Car rental - ${carName}`}
                   callbackUrl={`${window.location.origin}/cars/payment-callback?session=${paymentSessionId}`}
-                  methods={["creditcard", "applepay"]}
+                  methods={["creditcard"]}
                 />
               </div>
               <Button variant="outline" onClick={() => setStep("review")} className="w-full">

@@ -27,6 +27,21 @@ import {
   getCityName,
 } from "@/lib/amadeusClient";
 
+// Fallback hotel images for live Amadeus results
+import hotelImg1 from "@/assets/hotels/ritz-carlton-riyadh.jpg";
+import hotelImg2 from "@/assets/hotels/hilton-jeddah.jpg";
+import hotelImg3 from "@/assets/hotels/sheraton-mecca.jpg";
+import hotelImg4 from "@/assets/hotels/movenpick-medina.jpg";
+import hotelImg5 from "@/assets/hotels/novotel-dammam.jpg";
+import hotelImg6 from "@/assets/hotels/radisson-abha.jpg";
+
+const hotelFallbackImages = [hotelImg1, hotelImg2, hotelImg3, hotelImg4, hotelImg5, hotelImg6];
+function getHotelImage(hotelId: string): string {
+  let hash = 0;
+  for (let i = 0; i < hotelId.length; i++) hash = ((hash << 5) - hash + hotelId.charCodeAt(i)) | 0;
+  return hotelFallbackImages[Math.abs(hash) % hotelFallbackImages.length];
+}
+
 const cityToIata: Record<string, string> = {
   "الرياض": "RUH", "جدة": "JED", "الدمام": "DMM", "المدينة المنورة": "MED",
   "أبها": "AHB", "تبوك": "TUU", "الطائف": "TIF", "مكة المكرمة": "MKX",
@@ -386,8 +401,8 @@ export default function Hotels() {
                 return (
                   <div key={hotel.hotel.hotelId + offer.id} className="rounded-2xl bg-card border border-border/50 hover:border-primary/30 transition-all overflow-hidden">
                     <div className="flex flex-col md:flex-row">
-                      <div className="md:w-48 lg:w-56 h-40 md:h-auto bg-muted/30 flex items-center justify-center shrink-0">
-                        <HotelIcon className="w-16 h-16 text-muted-foreground/30" />
+                      <div className="md:w-48 lg:w-56 h-40 md:h-auto shrink-0 overflow-hidden">
+                        <img src={getHotelImage(hotel.hotel.hotelId)} alt={hotel.hotel.name} className="w-full h-full object-cover" />
                       </div>
                       <div className="flex-1 p-5 lg:p-6">
                         <h3 className="text-lg font-bold mb-1">{hotel.hotel.name}</h3>

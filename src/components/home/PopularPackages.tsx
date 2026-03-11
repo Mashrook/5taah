@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, MapPin, Eye } from "lucide-react";
-import riyadhImg from "@/assets/offers/riyadh-family.jpg";
+import riyadhImg from "@/assets/destinations/riyadh.jpg";
 import jeddahImg from "@/assets/destinations/jeddah.jpg";
 import alulaImg from "@/assets/destinations/alula.jpg";
 import medinaImg from "@/assets/destinations/medina.jpg";

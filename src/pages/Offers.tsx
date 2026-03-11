@@ -6,7 +6,7 @@ import { useNavigate } from "react-router-dom";
 
 import alulaImg from "@/assets/offers/alula-winter.jpg";
 import jeddahImg from "@/assets/offers/jeddah-sea.jpg";
-import riyadhImg from "@/assets/offers/riyadh-family.jpg";
+import riyadhImg from "@/assets/destinations/riyadh.jpg";
 import taifImg from "@/assets/offers/taif-cool.jpg";
 
 interface OfferPackage {

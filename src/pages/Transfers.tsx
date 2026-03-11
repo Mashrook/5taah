@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import BookingStepper from "@/components/ui/BookingStepper";
 import CityAutocomplete from "@/components/search/CityAutocomplete";
+import DatePickerInput from "@/components/ui/date-picker-input";
 import { useAuthStore } from "@/stores/authStore";
 import { useTenantStore } from "@/stores/tenantStore";
 import { supabase } from "@/integrations/supabase/client";
@@ -47,7 +48,8 @@ export default function Transfers() {
   const [currentStep, setCurrentStep] = useState(0);
   const [fromCity, setFromCity] = useState("");
   const [toCity, setToCity] = useState("");
-  const [dateTime, setDateTime] = useState("");
+  const [transferDate, setTransferDate] = useState("");
+  const [transferTime, setTransferTime] = useState("");
   const [passengers, setPassengers] = useState(2);
   const [transferType, setTransferType] = useState("");
   const [searching, setSearching] = useState(false);
@@ -74,8 +76,9 @@ export default function Transfers() {
     setOffers([]);
 
     const startCode = resolveIata(fromCity);
-    if (!startCode || !dateTime) {
-      toast({ title: "بيانات ناقصة", description: "يرجى تحديد موقع الانطلاق والتاريخ", variant: "destructive" });
+    const combinedDateTime = transferDate && transferTime ? `${transferDate}T${transferTime}` : "";
+    if (!startCode || !combinedDateTime) {
+      toast({ title: "بيانات ناقصة", description: "يرجى تحديد موقع الانطلاق والتاريخ والوقت", variant: "destructive" });
       return;
     }
 
@@ -83,7 +86,7 @@ export default function Transfers() {
     try {
       const params: TransferSearchParams = {
         startLocationCode: startCode,
-        startDateTime: dateTime,
+        startDateTime: combinedDateTime,
         passengers,
         currency: "SAR",
       };
@@ -192,8 +195,12 @@ export default function Transfers() {
             </div>
             <div className="grid md:grid-cols-3 gap-4 mb-4">
               <div>
-                <label className="text-sm text-muted-foreground block mb-1.5">تاريخ ووقت الرحلة</label>
-                <Input type="datetime-local" value={dateTime} onChange={(e) => setDateTime(e.target.value)} className="bg-muted/20" required />
+                <label className="text-sm text-muted-foreground block mb-1.5">تاريخ الرحلة</label>
+                <DatePickerInput value={transferDate} onChange={setTransferDate} placeholder="اختر التاريخ" disabled={(d) => d < new Date()} />
+              </div>
+              <div>
+                <label className="text-sm text-muted-foreground block mb-1.5">وقت الرحلة</label>
+                <Input type="time" value={transferTime} onChange={(e) => setTransferTime(e.target.value)} className="bg-muted/20" required />
               </div>
               <div>
                 <label className="text-sm text-muted-foreground block mb-1.5">عدد الركاب</label>

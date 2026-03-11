@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import DatePickerInput from "@/components/ui/date-picker-input";
 import { User, Phone, CreditCard, Calendar, ChevronLeft, ChevronRight } from "lucide-react";
 import { z } from "zod";
 
@@ -156,16 +157,13 @@ export default function TravelerForm({ onSubmit, onBack, title = "بيانات �
         {form.idType === "passport" && (
           <div>
             <Label className="text-sm font-medium mb-1.5 block">تاريخ انتهاء الجواز *</Label>
-            <div className="relative">
-              <Calendar className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-              <Input
-                type="date"
-                value={form.passportExpiry}
-                onChange={(e) => set("passportExpiry", e.target.value)}
-                min={new Date().toISOString().split("T")[0]}
-                className={`pr-10 bg-muted/30 ${errors.passportExpiry ? "border-destructive" : ""}`}
-              />
-            </div>
+            <DatePickerInput
+              value={form.passportExpiry || ""}
+              onChange={(v) => set("passportExpiry", v)}
+              placeholder="اختر تاريخ الانتهاء"
+              disabled={(d) => d < new Date()}
+              className={errors.passportExpiry ? "border-destructive" : ""}
+            />
             {errors.passportExpiry && <p className="text-xs text-destructive mt-1">{errors.passportExpiry}</p>}
           </div>
         )}
@@ -173,16 +171,13 @@ export default function TravelerForm({ onSubmit, onBack, title = "بيانات �
         {/* Date of Birth */}
         <div>
           <Label className="text-sm font-medium mb-1.5 block">تاريخ الميلاد *</Label>
-          <div className="relative">
-            <Calendar className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-            <Input
-              type="date"
-              value={form.dateOfBirth}
-              onChange={(e) => set("dateOfBirth", e.target.value)}
-              max={new Date(Date.now() - 18 * 365.25 * 24 * 3600 * 1000).toISOString().split("T")[0]}
-              className={`pr-10 bg-muted/30 ${errors.dateOfBirth ? "border-destructive" : ""}`}
-            />
-          </div>
+          <DatePickerInput
+            value={form.dateOfBirth}
+            onChange={(v) => set("dateOfBirth", v)}
+            placeholder="اختر تاريخ الميلاد"
+            disabled={(d) => d > new Date(Date.now() - 18 * 365.25 * 24 * 3600 * 1000)}
+            className={errors.dateOfBirth ? "border-destructive" : ""}
+          />
           {errors.dateOfBirth && <p className="text-xs text-destructive mt-1">{errors.dateOfBirth}</p>}
         </div>
 

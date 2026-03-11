@@ -271,7 +271,7 @@ export default function TransferBooking() {
                   amount={price}
                   description={`Transfer booking - ${title}`}
                   callbackUrl={`${window.location.origin}/transfers/payment-callback?session=${paymentSessionId}`}
-                  methods={["creditcard", "applepay"]}
+                  methods={["creditcard", "applepay", "samsungpay"]}
                 />
               </div>
               <Button variant="outline" onClick={() => setStep("review")} className="w-full">

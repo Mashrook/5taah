@@ -22,7 +22,7 @@ export default function MoyasarPayment({
   amount,
   description,
   callbackUrl,
-  methods = ["creditcard"],
+  methods = ["creditcard", "applepay"],
   onInitiated,
   metadata,
 }: MoyasarPaymentProps) {

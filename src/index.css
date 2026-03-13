@@ -167,6 +167,11 @@
   .glass { @apply bg-background/80 backdrop-blur-xl; }
   .glass-strong { @apply bg-background/95 backdrop-blur-2xl; }
 
+  /* Dark mode card border for visibility */
+  .dark .shadow-xl {
+    border: 1px solid hsl(var(--border));
+  }
+
   /* Fix native select dropdown visibility */
   select option {
     background-color: hsl(var(--popover));

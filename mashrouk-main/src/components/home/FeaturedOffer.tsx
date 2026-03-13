@@ -32,10 +32,3 @@ export default function FeaturedOffer() {
     </section>
   );
 }
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-}

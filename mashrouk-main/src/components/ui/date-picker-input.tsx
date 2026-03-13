@@ -270,6 +270,3 @@ function DatePickerInput(props: DatePickerInputProps) {
 }
 
 export default DatePickerInput;
-}
-
-export default DatePickerInput;

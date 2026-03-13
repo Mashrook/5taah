@@ -28,6 +28,10 @@ dist-ssr
 
 supabase/.temp/
 
+# Other projects (separate repos)
+MohCom/
+mashrouk-main/
+
 
 bun.lock
 bun.lockb

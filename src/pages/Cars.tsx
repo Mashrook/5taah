@@ -86,14 +86,14 @@ export default function Cars() {
   return (
     <div className="min-h-screen">
       {/* Hero + Search */}
-      <section className="bg-gradient-to-b from-primary/5 to-background pt-8 pb-16">
+      <section className="bg-gradient-to-br from-primary via-primary to-orange-600 pt-8 pb-20">
         <div className="container mx-auto px-4 lg:px-8">
           <div className="text-center mb-8">
-            <h1 className="text-3xl lg:text-4xl font-bold text-foreground mb-2">تأجير السيارات</h1>
-            <p className="text-muted-foreground text-sm">استأجر سيارتك المفضلة بأفضل الأسعار في جميع مدن المملكة</p>
+            <h1 className="text-3xl lg:text-4xl font-bold text-white mb-2">تأجير السيارات</h1>
+            <p className="text-white/80 text-sm">استأجر سيارتك المفضلة بأفضل الأسعار في جميع مدن المملكة</p>
           </div>
 
-          <div className="max-w-4xl mx-auto p-6 rounded-2xl bg-card border border-border shadow-sm">
+          <div className="max-w-4xl mx-auto p-6 rounded-2xl bg-card shadow-xl -mt-10 relative z-10">
             <div className="grid md:grid-cols-3 gap-4 mb-4">
               <CityAutocomplete value={city} onChange={setCity} placeholder="مدينة الاستلام" label="مدينة الاستلام" />
               <div>

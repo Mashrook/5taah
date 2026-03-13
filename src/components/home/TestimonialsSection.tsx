@@ -23,7 +23,7 @@ const testimonials = [
 
 export default function TestimonialsSection() {
   return (
-    <section className="py-10 bg-muted/30">
+    <section className="py-12 bg-secondary/50">
       <div className="container mx-auto px-4 lg:px-8">
         <div className="text-center mb-8">
           <h2 className="text-2xl lg:text-3xl font-bold text-foreground">آراء العملاء</h2>
@@ -32,7 +32,7 @@ export default function TestimonialsSection() {
 
         <div className="grid md:grid-cols-3 gap-5">
           {testimonials.map((t) => (
-            <div key={t.name} className="bg-card rounded-2xl border border-border p-5 text-right">
+            <div key={t.name} className="bg-card rounded-2xl shadow-[var(--shadow-card)] p-6 text-right">
               <Quote className="w-8 h-8 text-primary/20 mb-3" />
               <div className="flex gap-0.5 justify-end mb-3">
                 {Array.from({ length: t.rating }).map((_, i) => (

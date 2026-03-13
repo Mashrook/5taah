@@ -7,7 +7,7 @@ export default function ContactSection() {
 
   return (
     <>
-      <section className="py-10 bg-muted/30">
+      <section className="py-12 bg-secondary/50">
         <div className="container mx-auto px-4 lg:px-8">
           <div className="grid md:grid-cols-2 gap-8">
             {/* Form */}
@@ -66,7 +66,7 @@ export default function ContactSection() {
                 </div>
               </div>
 
-              <div className="bg-card rounded-2xl border border-border p-5 text-right">
+              <div className="bg-card rounded-2xl shadow-[var(--shadow-card)] p-5 text-right">
                 <div className="flex items-center gap-3 justify-end mb-3">
                   <div>
                     <h3 className="font-bold text-foreground">مساعد خته الذكي</h3>

@@ -158,16 +158,16 @@ export default function Offers() {
   return (
     <div className="min-h-screen">
       {/* Hero */}
-      <section className="bg-gradient-to-b from-primary/5 to-background pt-10 pb-14">
+      <section className="bg-gradient-to-br from-primary via-primary to-orange-600 pt-10 pb-20">
         <div className="container mx-auto px-4 lg:px-8 text-center">
-          <Badge className="bg-primary/10 text-primary border-primary/20 mb-4 text-sm px-4 py-1.5">
+          <Badge className="bg-white/20 text-white border-white/30 mb-4 text-sm px-4 py-1.5">
             <Sparkles className="w-4 h-4 ml-1.5" />
             باقات مختارة بعناية لعملائنا
           </Badge>
-          <h1 className="text-3xl lg:text-5xl font-bold text-foreground mb-3">
+          <h1 className="text-3xl lg:text-5xl font-bold text-white mb-3">
             عروض سفر راقية من الخليج إلى العالم
           </h1>
-          <p className="text-muted-foreground text-sm lg:text-base max-w-2xl mx-auto">
+          <p className="text-white/80 text-sm lg:text-base max-w-2xl mx-auto">
             باقات متكاملة تجمع بين الطيران والإقامة الفاخرة والتجارب الحصرية — صُممت لتناسب ذوقك العائلي وتوقعاتك المالية
           </p>
         </div>

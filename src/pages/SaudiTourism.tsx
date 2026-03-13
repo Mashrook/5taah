@@ -136,13 +136,13 @@ export default function SaudiTourism() {
   return (
     <div className="min-h-screen">
       {/* Hero */}
-      <section className="bg-gradient-to-b from-primary/5 to-background pt-10 pb-14">
+      <section className="bg-gradient-to-br from-primary via-primary to-orange-600 pt-10 pb-20">
         <div className="container mx-auto px-4 lg:px-8 text-center">
-          <p className="text-muted-foreground text-sm mb-2">السياحة في السعودية</p>
-          <h1 className="text-3xl lg:text-5xl font-bold text-foreground mb-3">
+          <p className="text-white/80 text-sm mb-2">السياحة في السعودية</p>
+          <h1 className="text-3xl lg:text-5xl font-bold text-white mb-3">
             اكتشف جمال المملكة العربية السعودية
           </h1>
-          <p className="text-muted-foreground text-sm lg:text-base max-w-2xl mx-auto">
+          <p className="text-white/80 text-sm lg:text-base max-w-2xl mx-auto">
             من الصحاري الذهبية إلى الجبال الخضراء، ومن الشواطئ البكر إلى المعالم التاريخية — تجارب سفر لا تُنسى
           </p>
         </div>

@@ -14,7 +14,7 @@ const hotels = [
 
 export default function FeaturedHotels() {
   return (
-    <section className="py-10 bg-muted/30">
+    <section className="py-12 bg-secondary/50">
       <div className="container mx-auto px-4 lg:px-8">
         <div className="flex items-center justify-between mb-6">
           <Link to="/hotels" className="text-primary text-sm font-medium hover:underline flex items-center gap-1">
@@ -30,7 +30,7 @@ export default function FeaturedHotels() {
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-5">
           {hotels.map((hotel) => (
             <Link key={hotel.name} to={hotel.href} className="group">
-              <div className="bg-card rounded-2xl border border-border overflow-hidden hover:shadow-lg transition-all duration-300">
+                <div className="bg-card rounded-2xl shadow-[var(--shadow-card)] overflow-hidden hover:shadow-[var(--shadow-card-hover)] transition-all duration-300">
                 <div className="relative h-44 overflow-hidden">
                   <img src={hotel.image} alt={hotel.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy" />
                   <div className="absolute top-3 right-3">

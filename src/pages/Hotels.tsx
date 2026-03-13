@@ -311,23 +311,23 @@ export default function Hotels() {
   return (
     <div className="min-h-screen">
       {/* Hero + Search */}
-      <section className="bg-gradient-to-b from-primary/5 to-background pt-10 pb-20">
+      <section className="bg-gradient-to-br from-primary via-primary to-orange-600 pt-10 pb-24">
         <div className="container mx-auto px-4 lg:px-8">
           <div className="text-center mb-8">
-            <p className="text-muted-foreground text-sm mb-2 flex items-center justify-center gap-2">
+            <p className="text-white/80 text-sm mb-2 flex items-center justify-center gap-2">
               <HotelIcon className="w-4 h-4" />
               أكثر من ٥٠٠ فندق حول العالم
             </p>
-            <h1 className="text-3xl lg:text-5xl font-bold text-foreground mb-3">
+            <h1 className="text-3xl lg:text-5xl font-bold text-white mb-3">
               اكتشف أفضل الفنادق واحجز بأقل الأسعار
             </h1>
-            <p className="text-muted-foreground text-sm max-w-xl mx-auto">
+            <p className="text-white/80 text-sm max-w-xl mx-auto">
               قارن الأسعار من مئات المواقع واحصل على أفضل عروض الفنادق
             </p>
           </div>
 
           {/* Search Form */}
-          <form onSubmit={handleLiveSearch} className="max-w-5xl mx-auto p-5 lg:p-6 rounded-2xl bg-card border border-border shadow-sm">
+          <form onSubmit={handleLiveSearch} className="max-w-5xl mx-auto p-5 lg:p-6 rounded-2xl bg-card shadow-xl -mt-10 relative z-10">
             <div className="grid grid-cols-2 md:grid-cols-5 gap-3 items-end">
               <div className="col-span-2 md:col-span-1">
                 <label className="text-xs text-muted-foreground block mb-1 text-right">الوجهة</label>

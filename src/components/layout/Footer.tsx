@@ -44,7 +44,7 @@ export default function Footer() {
   const footerText = branding?.footer_text || `© ${new Date().getFullYear()} Khattah - خته. جميع الحقوق محفوظة.`;
 
   return (
-    <footer className="bg-muted/30 border-t border-border mt-auto">
+    <footer className="bg-secondary/50 border-t border-border mt-auto">
       <div className="container mx-auto px-4 lg:px-8 py-12 lg:py-16">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12">
           {/* Brand */}

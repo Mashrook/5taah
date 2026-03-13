@@ -193,18 +193,18 @@ export default function Transfers() {
   return (
     <div className="min-h-screen">
       {/* Hero + Search */}
-      <section className="bg-gradient-to-b from-primary/5 to-background pt-8 pb-16">
+      <section className="bg-gradient-to-br from-primary via-primary to-orange-600 pt-8 pb-20">
         <div className="container mx-auto px-4 lg:px-8">
           <BookingStepper steps={transferSteps} currentStep={currentStep} className="max-w-2xl mx-auto mb-8" />
 
           <div className="text-center mb-8">
-            <h1 className="text-3xl lg:text-4xl font-bold text-foreground mb-2">النقل والمواصلات</h1>
-            <p className="text-muted-foreground text-sm">احجز نقلك من وإلى المطار — سيارة خاصة، تاكسي، فان، ليموزين</p>
+            <h1 className="text-3xl lg:text-4xl font-bold text-white mb-2">النقل والمواصلات</h1>
+            <p className="text-white/80 text-sm">احجز نقلك من وإلى المطار — سيارة خاصة، تاكسي، فان، ليموزين</p>
           </div>
 
         {/* Step 0: Search */}
         {currentStep <= 1 && !selectedOffer && (
-          <form onSubmit={handleSearch} className="max-w-4xl mx-auto p-6 lg:p-8 rounded-2xl bg-card border border-border shadow-sm">
+          <form onSubmit={handleSearch} className="max-w-4xl mx-auto p-6 lg:p-8 rounded-2xl bg-card shadow-xl -mt-10 relative z-10">
             <div className="grid md:grid-cols-2 gap-4 mb-4">
               <CityAutocomplete value={fromCity} onChange={setFromCity} placeholder="مطار الانطلاق (مثال: الرياض)" label="من (كود IATA)" showCode />
               <CityAutocomplete value={toCity} onChange={setToCity} placeholder="الوجهة (مثال: جدة)" label="إلى (اختياري)" showCode />

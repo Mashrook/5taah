@@ -172,24 +172,24 @@ export default function Festivals() {
   return (
     <div className="min-h-screen">
       {/* Hero */}
-      <section className="bg-gradient-to-b from-primary/5 to-background pt-10 pb-14">
+      <section className="bg-gradient-to-br from-primary via-primary to-orange-600 pt-10 pb-20">
         <div className="container mx-auto px-4 lg:px-8 text-center">
           <div className="flex items-center justify-center gap-2 mb-3">
-            <Flame className="w-6 h-6 text-primary" />
-            <p className="text-muted-foreground text-sm">المهرجانات والفعاليات</p>
+            <Flame className="w-6 h-6 text-white" />
+            <p className="text-white/80 text-sm">المهرجانات والفعاليات</p>
           </div>
-          <h1 className="text-3xl lg:text-5xl font-bold text-foreground mb-3">
+          <h1 className="text-3xl lg:text-5xl font-bold text-white mb-3">
             اكتشف أجمل الفعاليات والمغامرات
           </h1>
-          <p className="text-muted-foreground text-sm lg:text-base max-w-2xl mx-auto">
+          <p className="text-white/80 text-sm lg:text-base max-w-2xl mx-auto">
             مهرجانات ترفيهية، رحلات تسلق جبال، سفاري صحراوي، وأنشطة بحرية — تجارب لا تُنسى في المملكة
           </p>
         </div>
       </section>
 
       {/* Search & Filters */}
-      <div className="container mx-auto px-4 lg:px-8 -mt-6">
-        <div className="max-w-5xl mx-auto p-5 lg:p-7 rounded-2xl bg-card border border-border shadow-sm">
+      <div className="container mx-auto px-4 lg:px-8 -mt-10">
+        <div className="max-w-5xl mx-auto p-5 lg:p-7 rounded-2xl bg-card shadow-xl relative z-10">
           <div className="grid md:grid-cols-3 gap-4 mb-4">
             <div className="md:col-span-2">
               <label className="text-xs text-muted-foreground block mb-1 text-right">ابحث عن فعالية</label>

@@ -402,15 +402,15 @@ export default function Flights() {
         {step === "search" && (
           <>
             {/* Hero + Search */}
-            <section className="bg-gradient-to-b from-primary/5 to-background pt-8 pb-16">
+            <section className="bg-gradient-to-br from-primary via-primary to-orange-600 pt-8 pb-20">
               <div className="container mx-auto px-4 lg:px-8">
                 <div className="text-center mb-8">
-                  <h1 className="text-3xl lg:text-4xl font-bold text-foreground mb-2">احجز رحلتك القادمة</h1>
-                  <p className="text-muted-foreground text-sm">أفضل أسعار تذاكر الطيران مع خدمات إضافية مميزة</p>
+                  <h1 className="text-3xl lg:text-4xl font-bold text-white mb-2">احجز رحلتك القادمة</h1>
+                  <p className="text-white/80 text-sm">أفضل أسعار تذاكر الطيران مع خدمات إضافية مميزة</p>
                 </div>
 
                 {/* Search Card */}
-                <form onSubmit={handleSearch} className="max-w-5xl mx-auto bg-card rounded-2xl border border-border p-6 lg:p-8 shadow-sm">
+                <form onSubmit={handleSearch} className="max-w-5xl mx-auto bg-card rounded-2xl shadow-xl p-6 lg:p-8 -mt-10 relative z-10">
                   <div className="flex gap-2 justify-end mb-6">
                     <button type="button" onClick={() => setTripType("oneway")}
                       className={`flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-medium transition-colors ${tripType === "oneway" ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"}`}>

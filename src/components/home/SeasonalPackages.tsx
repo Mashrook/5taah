@@ -36,7 +36,7 @@ const packages = [
 
 export default function SeasonalPackages() {
   return (
-    <section className="py-10 bg-muted/30">
+    <section className="py-12 bg-secondary/50">
       <div className="container mx-auto px-4 lg:px-8">
         <div className="flex items-center justify-between mb-6">
           <Link to="/offers" className="text-primary text-sm font-medium hover:underline flex items-center gap-1">
@@ -49,7 +49,7 @@ export default function SeasonalPackages() {
         <div className="grid md:grid-cols-3 gap-5">
           {packages.map((pkg) => (
             <Link key={pkg.title} to={pkg.href} className="group">
-              <div className="bg-card rounded-2xl border border-border overflow-hidden hover:shadow-lg transition-all duration-300">
+              <div className="bg-card rounded-2xl shadow-[var(--shadow-card)] overflow-hidden hover:shadow-[var(--shadow-card-hover)] transition-all duration-300">
                 <div className="relative h-52 overflow-hidden">
                   <img src={pkg.image} alt={pkg.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy" />
                   <div className="absolute top-3 right-3">

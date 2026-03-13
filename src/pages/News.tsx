@@ -128,24 +128,24 @@ export default function News() {
   return (
     <div className="min-h-screen">
       {/* Hero */}
-      <section className="bg-gradient-to-b from-primary/5 to-background pt-10 pb-14">
+      <section className="bg-gradient-to-br from-primary via-primary to-orange-600 pt-10 pb-20">
         <div className="container mx-auto px-4 lg:px-8 text-center">
           <div className="flex items-center justify-center gap-2 mb-3">
-            <Newspaper className="w-6 h-6 text-primary" />
-            <p className="text-muted-foreground text-sm">الأخبار والمقالات</p>
+            <Newspaper className="w-6 h-6 text-white" />
+            <p className="text-white/80 text-sm">الأخبار والمقالات</p>
           </div>
-          <h1 className="text-3xl lg:text-5xl font-bold text-foreground mb-3">
+          <h1 className="text-3xl lg:text-5xl font-bold text-white mb-3">
             آخر أخبار السياحة والسفر
           </h1>
-          <p className="text-muted-foreground text-sm lg:text-base max-w-2xl mx-auto">
+          <p className="text-white/80 text-sm lg:text-base max-w-2xl mx-auto">
             تابع أحدث الأخبار والمقالات عن السياحة في المملكة والعالم — أدلة سفر ونصائح وتغطيات حصرية
           </p>
         </div>
       </section>
 
       {/* Search & Categories */}
-      <div className="container mx-auto px-4 lg:px-8 -mt-6">
-        <div className="max-w-4xl mx-auto p-5 rounded-2xl bg-card border border-border shadow-sm">
+      <div className="container mx-auto px-4 lg:px-8 -mt-10">
+        <div className="max-w-4xl mx-auto p-5 rounded-2xl bg-card shadow-xl relative z-10">
           <div className="flex items-center gap-2 bg-muted/30 border border-input rounded-xl px-3 h-10 mb-4">
             <Search className="w-4 h-4 text-muted-foreground" />
             <Input

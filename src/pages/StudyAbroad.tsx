@@ -265,14 +265,14 @@ export default function StudyAbroad() {
   return (
     <div className="min-h-screen">
       {/* Hero */}
-      <section className="bg-gradient-to-b from-primary/5 to-background pt-10 pb-16">
+      <section className="bg-gradient-to-br from-primary via-primary to-orange-600 pt-10 pb-20">
         <div className="container mx-auto px-4 lg:px-8 text-center">
-          <div className="inline-flex items-center gap-2 bg-primary/10 px-4 py-1.5 rounded-full mb-4">
-            <GraduationCap className="w-4 h-4 text-primary" />
-            <span className="text-sm text-foreground/80">الدراسة بالخارج مع خته</span>
+          <div className="inline-flex items-center gap-2 bg-white/20 px-4 py-1.5 rounded-full mb-4">
+            <GraduationCap className="w-4 h-4 text-white" />
+            <span className="text-sm text-white/90">الدراسة بالخارج مع خته</span>
           </div>
-          <h1 className="text-3xl lg:text-5xl font-bold text-foreground mb-3">استثمر في مستقبل أبنائك بثقة</h1>
-          <p className="text-muted-foreground text-sm lg:text-base max-w-2xl mx-auto mb-6">
+          <h1 className="text-3xl lg:text-5xl font-bold text-white mb-3">استثمر في مستقبل أبنائك بثقة</h1>
+          <p className="text-white/80 text-sm lg:text-base max-w-2xl mx-auto mb-6">
             وفّر لهم فرصة دراسية في أفضل المعاهد والجامعات العالمية — مع السكن والدعم والمتابعة المتكاملة.
           </p>
           <div className="flex justify-center gap-3">
@@ -287,7 +287,7 @@ export default function StudyAbroad() {
       {/* Filters */}
       <section className="py-8">
         <div className="container mx-auto px-4 lg:px-8">
-          <div className="max-w-4xl mx-auto p-5 rounded-2xl bg-card/95 border border-border shadow-sm">
+          <div className="max-w-4xl mx-auto p-5 rounded-2xl bg-card shadow-xl">
             <h2 className="text-lg font-bold text-center mb-4">ابحث عن برنامجك المثالي</h2>
             <div className="grid sm:grid-cols-3 gap-3">
               <div>

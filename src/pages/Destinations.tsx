@@ -177,11 +177,11 @@ export default function Destinations() {
   return (
     <div className="min-h-screen">
       {/* Hero */}
-      <section className="bg-gradient-to-b from-primary/5 to-background pt-10 pb-16">
+      <section className="bg-gradient-to-br from-primary via-primary to-orange-600 pt-10 pb-20">
         <div className="container mx-auto px-4 lg:px-8">
           <div className="text-center mb-8">
-            <h1 className="text-3xl lg:text-4xl font-bold text-foreground mb-2">استكشف الوجهات</h1>
-            <p className="text-muted-foreground text-sm">اكتشف أفضل الوجهات حسب اهتماماتك واحجز رحلتك بسهولة</p>
+            <h1 className="text-3xl lg:text-4xl font-bold text-white mb-2">استكشف الوجهات</h1>
+            <p className="text-white/80 text-sm">اكتشف أفضل الوجهات حسب اهتماماتك واحجز رحلتك بسهولة</p>
           </div>
 
           {/* Region Tabs */}

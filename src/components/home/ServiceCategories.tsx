@@ -16,23 +16,16 @@ const services = [
 
 export default function ServiceCategories() {
   return (
-    <section className="py-10">
+    <section className="py-8">
       <div className="container mx-auto px-4 lg:px-8">
-        <div className="text-center mb-8">
-          <h2 className="text-2xl lg:text-3xl font-bold text-foreground">خدماتنا</h2>
-          <p className="text-muted-foreground text-sm mt-1">كل ما تحتاجه لرحلتك في مكان واحد</p>
-        </div>
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
+        <div className="flex items-center overflow-x-auto scrollbar-hide gap-4 md:gap-6 lg:justify-center pb-2">
           {services.map((s) => (
-            <Link key={s.href} to={s.href}>
-              <div className="flex flex-col items-center gap-3 p-4 rounded-2xl border border-border bg-card hover:border-primary/30 hover:shadow-md transition-all duration-200 group">
-                <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${s.color} group-hover:scale-110 transition-transform`}>
+            <Link key={s.href} to={s.href} className="shrink-0">
+              <div className="flex flex-col items-center gap-2 group cursor-pointer w-20">
+                <div className={`w-14 h-14 rounded-2xl flex items-center justify-center ${s.color} group-hover:scale-110 transition-transform shadow-sm`}>
                   <s.icon className="w-6 h-6" />
                 </div>
-                <div className="text-center">
-                  <p className="text-sm font-semibold text-foreground">{s.label}</p>
-                  <p className="text-[11px] text-muted-foreground">{s.desc}</p>
-                </div>
+                <p className="text-xs font-medium text-foreground text-center leading-tight">{s.label}</p>
               </div>
             </Link>
           ))}

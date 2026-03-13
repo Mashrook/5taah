@@ -9,9 +9,9 @@ const features = [
 
 export default function AppDownloadCTA() {
   return (
-    <section className="py-10">
+    <section className="py-12">
       <div className="container mx-auto px-4 lg:px-8">
-        <div className="bg-gradient-to-l from-primary/10 via-primary/5 to-background rounded-2xl border border-primary/20 p-8 lg:p-12">
+        <div className="bg-gradient-to-l from-primary/10 via-primary/5 to-transparent rounded-2xl p-8 lg:p-12">
           <div className="flex flex-col md:flex-row items-center gap-8">
             <div className="flex-1 text-right">
               <div className="inline-flex items-center gap-2 text-primary text-sm font-medium mb-3">

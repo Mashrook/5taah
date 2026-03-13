@@ -12,7 +12,7 @@ const Layout = forwardRef<HTMLDivElement, LayoutProps>(({ children }, ref) => {
     <div ref={ref} className="min-h-screen flex flex-col">
       <OfflineBanner />
       <Header />
-      <main className="flex-1 pt-16 lg:pt-20">
+      <main className="flex-1 pt-16 lg:pt-[108px]">
         {children}
       </main>
       <Footer />

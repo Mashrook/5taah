@@ -1,32 +1,38 @@
 import { Button } from "@/components/ui/button";
-import { Smartphone } from "lucide-react";
-import travelMapImg from "@/assets/travel-map.jpg";
+import { Smartphone, CheckCircle2 } from "lucide-react";
+
+const features = [
+  "تتبع حجوزاتك لحظياً",
+  "عروض حصرية للتطبيق",
+  "تنبيهات فورية لأفضل الأسعار",
+];
 
 export default function AppDownloadCTA() {
   return (
-    <section className="section-padding">
+    <section className="py-10">
       <div className="container mx-auto px-4 lg:px-8">
-        <div className="bg-background rounded-3xl overflow-hidden border-4 border-primary/30">
-          <div className="grid md:grid-cols-2 items-center">
-            {/* Image */}
-            <div className="h-56 md:h-72 overflow-hidden rounded-2xl m-2">
-              <img src={travelMapImg} alt="تطبيق خته" className="w-full h-full object-cover" loading="lazy" />
-            </div>
-            {/* Content */}
-            <div className="p-8 lg:p-12 text-right">
-              <span className="text-sm font-medium bg-secondary-foreground/20 text-secondary-foreground px-3 py-1 rounded-full inline-flex items-center gap-1 mb-4">
+        <div className="bg-gradient-to-l from-primary/10 via-primary/5 to-background rounded-2xl border border-primary/20 p-8 lg:p-12">
+          <div className="flex flex-col md:flex-row items-center gap-8">
+            <div className="flex-1 text-right">
+              <div className="inline-flex items-center gap-2 text-primary text-sm font-medium mb-3">
                 <Smartphone className="w-4 h-4" />
-                تحميل التطبيق
-              </span>
-              <h2 className="text-2xl lg:text-3xl font-bold text-secondary-foreground mb-4">
-                عروض حصرية في جيبك مع تطبيق خته
-              </h2>
-              <p className="text-secondary-foreground/80 mb-6 text-sm leading-relaxed">
-                حمّل التطبيق لتتابع حجوزاتك، تحصل على عروض التطبيق الحصرية وتستلم تنبيهات فورية لكل جديد.
-              </p>
-              <Button className="bg-secondary-foreground text-secondary hover:bg-secondary-foreground/90 rounded-xl px-8 py-3 font-bold">
-                حمّل التطبيق الآن
+                تطبيق خته
+              </div>
+              <h2 className="text-2xl lg:text-3xl font-bold text-foreground mb-3">عروض حصرية في جيبك</h2>
+              <div className="space-y-2 mb-6">
+                {features.map((f) => (
+                  <div key={f} className="flex items-center gap-2 justify-end text-sm text-foreground/80">
+                    <span>{f}</span>
+                    <CheckCircle2 className="w-4 h-4 text-primary shrink-0" />
+                  </div>
+                ))}
+              </div>
+              <Button className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-xl px-8 font-bold">
+                حمّل التطبيق
               </Button>
+            </div>
+            <div className="w-48 h-48 bg-primary/10 rounded-3xl flex items-center justify-center shrink-0">
+              <Smartphone className="w-20 h-20 text-primary/40" />
             </div>
           </div>
         </div>

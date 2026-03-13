@@ -1,6 +1,5 @@
 import { Link } from "react-router-dom";
-import { Button } from "@/components/ui/button";
-import { ArrowLeft, MapPin, Eye } from "lucide-react";
+import { ArrowLeft, MapPin } from "lucide-react";
 import riyadhImg from "@/assets/destinations/riyadh.jpg";
 import jeddahImg from "@/assets/destinations/jeddah.jpg";
 import alulaImg from "@/assets/destinations/alula.jpg";
@@ -9,144 +8,57 @@ import abhaImg from "@/assets/destinations/abha.jpg";
 import taifImg from "@/assets/offers/taif-cool.jpg";
 
 const packages = [
-  {
-    title: "عطلة الرياض العائلية",
-    season: "الربيع",
-    seasonColor: "bg-primary",
-    discount: "خصم 20%",
-    location: "الرياض",
-    validUntil: "2026-05-01",
-    price: "1,920",
-    tags: ["إقامة 2 ليالي", "تنقلات", "تذاكر فعالية"],
-    image: riyadhImg,
-    href: "/tours",
-  },
-  {
-    title: "باقة جدة البحرية",
-    season: "الربيع",
-    seasonColor: "bg-primary",
-    discount: "خصم 25%",
-    location: "جدة",
-    validUntil: "2026-04-15",
-    price: "2,325",
-    tags: ["رحلة بحرية", "تذاكر نشاط بحري", "إقامة ليلتين"],
-    image: jeddahImg,
-    href: "/tours",
-  },
-  {
-    title: "عرض شتاء العلا",
-    season: "الشتاء",
-    seasonColor: "bg-primary",
-    discount: "خصم 35%",
-    location: "العلا",
-    validUntil: "2026-03-31",
-    price: "2,730",
-    tags: ["إقامة 3 ليالي", "تنقلات داخلية", "جولة مدائن صالح"],
-    image: alulaImg,
-    href: "/tours",
-  },
-  {
-    title: "زيارة المدينة المنورة",
-    season: "رمضان",
-    seasonColor: "bg-primary",
-    discount: "خصم 15%",
-    location: "المدينة",
-    validUntil: "2026-03-20",
-    price: "1,615",
-    tags: ["إقامة ليلتين", "خدمة نقل", "إفطار"],
-    image: medinaImg,
-    href: "/tours",
-  },
-  {
-    title: "رحلة أبها الجبلية",
-    season: "الصيف",
-    seasonColor: "bg-primary",
-    discount: "خصم 22%",
-    location: "أبها",
-    validUntil: "2026-07-15",
-    price: "2,184",
-    tags: ["إقامة 3 ليالي", "جولات طبيعية", "تنقلات"],
-    image: abhaImg,
-    href: "/tours",
-  },
-  {
-    title: "جولة الطائف الباردة",
-    season: "الصيف",
-    seasonColor: "bg-primary",
-    discount: "خصم 18%",
-    location: "الطائف",
-    validUntil: "2026-06-10",
-    price: "1,640",
-    tags: ["إقامة ليلة", "جولة مزارع ورد", "مرشد محلي"],
-    image: taifImg,
-    href: "/tours",
-  },
+  { title: "عطلة الرياض العائلية", discount: "خصم 20%", location: "الرياض", price: "1,920", tags: ["إقامة 2 ليالي", "تنقلات"], image: riyadhImg, href: "/tours" },
+  { title: "باقة جدة البحرية", discount: "خصم 25%", location: "جدة", price: "2,325", tags: ["رحلة بحرية", "إقامة ليلتين"], image: jeddahImg, href: "/tours" },
+  { title: "عرض شتاء العلا", discount: "خصم 35%", location: "العلا", price: "2,730", tags: ["3 ليالي", "مدائن صالح"], image: alulaImg, href: "/tours" },
+  { title: "زيارة المدينة المنورة", discount: "خصم 15%", location: "المدينة", price: "1,615", tags: ["ليلتين", "إفطار"], image: medinaImg, href: "/tours" },
+  { title: "رحلة أبها الجبلية", discount: "خصم 22%", location: "أبها", price: "2,184", tags: ["3 ليالي", "جولات طبيعية"], image: abhaImg, href: "/tours" },
+  { title: "جولة الطائف الباردة", discount: "خصم 18%", location: "الطائف", price: "1,640", tags: ["مزارع ورد", "مرشد محلي"], image: taifImg, href: "/tours" },
 ];
 
 export default function PopularPackages() {
   return (
-    <section className="section-padding">
+    <section className="py-10">
       <div className="container mx-auto px-4 lg:px-8">
-        {/* Header */}
-        <div className="text-center mb-4">
-          <h2 className="text-3xl lg:text-4xl font-bold text-foreground mb-2">باقات مختارة لأكثر الوجهات طلباً</h2>
-          <p className="text-muted-foreground">
-            باقات متكاملة تشمل الطيران والإقامة والأنشطة والتنقلات بأسعار شفافة
-          </p>
-        </div>
-        <div className="flex justify-start mb-8">
-          <Link to="/offers">
-            <Button variant="outline" className="border-primary text-primary hover:bg-primary/10 rounded-xl">
-              عرض جميع العروض
-              <ArrowLeft className="w-4 h-4 mr-2" />
-            </Button>
+        <div className="flex items-center justify-between mb-6">
+          <Link to="/offers" className="text-primary text-sm font-medium hover:underline flex items-center gap-1">
+            عرض الكل
+            <ArrowLeft className="w-4 h-4" />
           </Link>
+          <div className="text-right">
+            <h2 className="text-2xl lg:text-3xl font-bold text-foreground">باقات مختارة</h2>
+            <p className="text-muted-foreground text-sm mt-1">أكثر الوجهات طلباً بأسعار شفافة</p>
+          </div>
         </div>
 
-        {/* Grid */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
           {packages.map((pkg) => (
-            <div key={pkg.title} className="bg-card rounded-2xl border border-border overflow-hidden hover:border-primary/40 transition-all duration-300 group">
-              <div className="relative h-52 overflow-hidden">
-                <img src={pkg.image} alt={pkg.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy" />
-                <div className="absolute top-3 right-3">
-                  <span className={`${pkg.seasonColor} text-primary-foreground text-xs font-bold px-3 py-1 rounded-full`}>{pkg.season}</span>
-                </div>
-                <div className="absolute top-3 left-3">
-                  <span className="bg-card/90 backdrop-blur text-primary text-xs font-bold px-3 py-1 rounded-full">{pkg.discount}</span>
-                </div>
-              </div>
-              <div className="p-5 text-right">
-                <div className="flex items-center justify-between mb-2">
-                  <div className="text-left">
-                    <p className="text-xs text-muted-foreground">يبدأ من</p>
-                    <p className="text-lg font-bold text-primary">{pkg.price} <span className="text-xs">ر.س</span></p>
+            <Link key={pkg.title} to={pkg.href} className="group">
+              <div className="bg-card rounded-2xl border border-border overflow-hidden hover:shadow-lg transition-all duration-300">
+                <div className="relative h-48 overflow-hidden">
+                  <img src={pkg.image} alt={pkg.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy" />
+                  <div className="absolute top-3 left-3">
+                    <span className="bg-red-500 text-white text-xs font-bold px-2.5 py-1 rounded-lg">{pkg.discount}</span>
                   </div>
-                  <h3 className="font-bold text-foreground">{pkg.title}</h3>
                 </div>
-                <div className="flex items-center gap-1 justify-end text-xs text-muted-foreground mb-1">
-                  <span>{pkg.location}</span>
-                  <MapPin className="w-3 h-3" />
-                </div>
-                <p className="text-xs text-muted-foreground mb-3">ساري حتى {pkg.validUntil}</p>
-                <div className="flex flex-wrap gap-1.5 mb-4">
-                  {pkg.tags.map((tag) => (
-                    <span key={tag} className="text-[11px] bg-muted text-muted-foreground px-2 py-0.5 rounded-full">{tag}</span>
-                  ))}
-                </div>
-                <div className="flex items-center gap-3">
-                  <Link to={pkg.href} className="flex-1">
-                    <Button className="w-full bg-primary text-primary-foreground hover:bg-primary/90 rounded-xl text-sm">احجز الآن</Button>
-                  </Link>
-                  <Link to={pkg.href}>
-                    <Button variant="outline" className="border-primary text-primary hover:bg-primary/10 rounded-xl text-sm px-4">
-                      <Eye className="w-4 h-4 ml-1" />
-                      التفاصيل
-                    </Button>
-                  </Link>
+                <div className="p-4 text-right">
+                  <h3 className="font-bold text-foreground mb-1">{pkg.title}</h3>
+                  <div className="flex items-center gap-1 justify-end text-xs text-muted-foreground mb-2">
+                    <span>{pkg.location}</span>
+                    <MapPin className="w-3 h-3" />
+                  </div>
+                  <div className="flex flex-wrap gap-1.5 mb-3">
+                    {pkg.tags.map((tag) => (
+                      <span key={tag} className="text-[11px] bg-muted text-muted-foreground px-2 py-0.5 rounded-full">{tag}</span>
+                    ))}
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs text-primary font-medium">عرض التفاصيل</span>
+                    <p className="text-lg font-bold text-primary">{pkg.price} <span className="text-xs text-muted-foreground">ر.س</span></p>
+                  </div>
                 </div>
               </div>
-            </div>
+            </Link>
           ))}
         </div>
       </div>

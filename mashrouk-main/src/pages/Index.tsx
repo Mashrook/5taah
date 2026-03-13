@@ -1,4 +1,5 @@
 import HeroSection from "@/components/home/HeroSection";
+import ServiceCategories from "@/components/home/ServiceCategories";
 import SeasonalPackages from "@/components/home/SeasonalPackages";
 import FeaturedOffer from "@/components/home/FeaturedOffer";
 import PopularPackages from "@/components/home/PopularPackages";
@@ -13,9 +14,10 @@ export default function Index() {
   return (
     <div className="min-h-screen bg-background">
       <HeroSection />
+      <ServiceCategories />
       <SeasonalPackages />
-      <FeaturedOffer />
       <PopularPackages />
+      <FeaturedOffer />
       <FeaturedHotels />
       <ActivitiesSection />
       <TestimonialsSection />

@@ -5,29 +5,33 @@ import featuredImg from "@/assets/featured-offer.jpg";
 
 export default function FeaturedOffer() {
   return (
-    <section className="section-padding">
+    <section className="py-10">
       <div className="container mx-auto px-4 lg:px-8">
-        <div className="bg-card rounded-3xl border border-border overflow-hidden shadow-card">
-          <div className="grid md:grid-cols-2 items-center">
-            {/* Image */}
-            <div className="h-64 md:h-80">
-              <img src={featuredImg} alt="عرض الموسم المميز" className="w-full h-full object-cover" loading="lazy" />
-            </div>
-            {/* Content */}
-            <div className="p-8 lg:p-12 text-right">
-              <span className="text-sm text-primary font-medium bg-primary/10 px-3 py-1 rounded-full inline-flex items-center gap-1 mb-4">
-                <Sparkles className="w-4 h-4" />
+        <div className="relative rounded-2xl overflow-hidden">
+          <img src={featuredImg} alt="عرض الموسم" className="w-full h-64 md:h-72 object-cover" loading="lazy" />
+          <div className="absolute inset-0 bg-gradient-to-l from-black/70 via-black/40 to-transparent" />
+          <div className="absolute inset-0 flex items-center justify-end p-8 lg:p-12">
+            <div className="text-right max-w-md">
+              <span className="inline-flex items-center gap-1 text-xs font-medium bg-white/20 backdrop-blur text-white px-3 py-1 rounded-full mb-3">
+                <Sparkles className="w-3.5 h-3.5" />
                 العرض المميز
               </span>
-              <h2 className="text-3xl lg:text-4xl font-bold text-foreground mb-4">عرض الموسم المميز</h2>
-              <p className="text-muted-foreground mb-8 leading-relaxed">
-                اختر باقتك المفضلة واستمتع بتجربة سفر متكاملة بأسعار شفافة وخيارات مرنة.
+              <h2 className="text-2xl lg:text-3xl font-bold text-white mb-2">عرض الموسم المميز</h2>
+              <p className="text-white/80 text-sm mb-5">
+                اختر باقتك المفضلة واستمتع بتجربة سفر متكاملة بأسعار شفافة.
               </p>
               <Link to="/offers">
-                <Button className="bg-primary text-primary-foreground hover:bg-primary/90 px-8 py-3 rounded-xl font-bold text-base">
+                <Button className="bg-primary text-primary-foreground hover:bg-primary/90 px-6 rounded-xl font-bold">
                   استكشف العرض
                 </Button>
               </Link>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
             </div>
           </div>
         </div>

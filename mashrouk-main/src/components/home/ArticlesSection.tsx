@@ -1,5 +1,4 @@
 import { Link } from "react-router-dom";
-import { Button } from "@/components/ui/button";
 import { ArrowLeft, Calendar } from "lucide-react";
 import alulaImg from "@/assets/destinations/alula.jpg";
 import jeddahImg from "@/assets/destinations/jeddah.jpg";
@@ -10,7 +9,7 @@ import redSeaImg from "@/assets/tours/red-sea.jpg";
 
 const articles = [
   { title: "دليل السفر إلى العلا", date: "2026-02-01", category: "وجهات", image: alulaImg },
-  { title: "أفضل الأنشطة في جدة البحرية", date: "2026-01-20", category: "نشاطات", image: jeddahImg },
+  { title: "أفضل الأنشطة في جدة", date: "2026-01-20", category: "نشاطات", image: jeddahImg },
   { title: "الرياض الحديثة: ماذا تزور؟", date: "2026-01-10", category: "مدن", image: riyadhImg },
   { title: "شتاء أبها وكيف تستمتع به", date: "2025-12-22", category: "مواسم", image: abhaImg },
   { title: "دليل زيارة المدينة المنورة", date: "2025-12-05", category: "روحانيات", image: medinaImg },
@@ -19,36 +18,31 @@ const articles = [
 
 export default function ArticlesSection() {
   return (
-    <section className="section-padding">
+    <section className="py-10">
       <div className="container mx-auto px-4 lg:px-8">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-8">
-          <Link to="/articles">
-            <Button variant="outline" className="border-primary text-primary hover:bg-primary/10 rounded-xl">
-              جميع المقالات
-              <ArrowLeft className="w-4 h-4 mr-2" />
-            </Button>
+        <div className="flex items-center justify-between mb-6">
+          <Link to="/articles" className="text-primary text-sm font-medium hover:underline flex items-center gap-1">
+            جميع المقالات
+            <ArrowLeft className="w-4 h-4" />
           </Link>
           <div className="text-right">
-            <span className="text-sm text-primary font-medium">الأخبار والمقالات</span>
-            <h2 className="text-3xl lg:text-4xl font-bold text-foreground mt-1">دليلك للسفر الذكي</h2>
-            <p className="text-muted-foreground mt-1">مقالات متخصصة في السفر والسياحة مع نصائح عملية لاختيار الوجهة والموسم المناسب.</p>
+            <h2 className="text-2xl lg:text-3xl font-bold text-foreground">دليلك للسفر</h2>
+            <p className="text-muted-foreground text-sm mt-1">مقالات ونصائح عملية لاختيار الوجهة المناسبة</p>
           </div>
         </div>
 
-        {/* Grid */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
           {articles.map((article) => (
             <Link key={article.title} to="/articles" className="group">
-              <div className="bg-card rounded-2xl border border-border overflow-hidden hover:border-primary/40 transition-all duration-300">
-                <div className="relative h-44 overflow-hidden">
+              <div className="bg-card rounded-2xl border border-border overflow-hidden hover:shadow-lg transition-all duration-300">
+                <div className="relative h-40 overflow-hidden">
                   <img src={article.image} alt={article.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy" />
                   <div className="absolute top-3 right-3">
-                    <span className="bg-primary text-primary-foreground text-xs font-bold px-3 py-1 rounded-full">{article.category}</span>
+                    <span className="bg-primary text-primary-foreground text-[11px] font-bold px-2.5 py-1 rounded-lg">{article.category}</span>
                   </div>
                 </div>
                 <div className="p-4 text-right">
-                  <h3 className="font-bold text-foreground mb-2">{article.title}</h3>
+                  <h3 className="font-bold text-foreground text-sm mb-2">{article.title}</h3>
                   <div className="flex items-center gap-1 justify-end text-xs text-muted-foreground">
                     <span>{article.date}</span>
                     <Calendar className="w-3 h-3" />

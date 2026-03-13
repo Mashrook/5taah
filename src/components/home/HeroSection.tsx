@@ -1,4 +1,4 @@
-﻿import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Plane, Hotel, Users, Search, Minus, Plus, Car, Map, ArrowRightLeft } from "lucide-react";
 import { useState } from "react";
@@ -10,11 +10,11 @@ import { useToast } from "@/hooks/use-toast";
 type SearchTab = "flights" | "hotels" | "cars" | "tours" | "transfers";
 
 const tabs = [
-  { key: "flights" as SearchTab, icon: Plane, label: "ط·ظٹط±ط§ظ†" },
-  { key: "hotels" as SearchTab, icon: Hotel, label: "ظپظ†ط§ط¯ظ‚" },
-  { key: "cars" as SearchTab, icon: Car, label: "ط³ظٹط§ط±ط§طھ" },
-  { key: "tours" as SearchTab, icon: Map, label: "ط¬ظˆظ„ط§طھ" },
-  { key: "transfers" as SearchTab, icon: ArrowRightLeft, label: "ظ†ظ‚ظ„" },
+  { key: "flights" as SearchTab, icon: Plane, label: "طيران" },
+  { key: "hotels" as SearchTab, icon: Hotel, label: "فنادق" },
+  { key: "cars" as SearchTab, icon: Car, label: "سيارات" },
+  { key: "tours" as SearchTab, icon: Map, label: "جولات" },
+  { key: "transfers" as SearchTab, icon: ArrowRightLeft, label: "نقل" },
 ];
 
 export default function HeroSection() {
@@ -53,7 +53,7 @@ export default function HeroSection() {
   const handleSearch = () => {
     if (searchTab === "flights") {
       if (!fromCity || !toCity || !departDate) {
-        toast({ title: "ط¨ظٹط§ظ†ط§طھ ظ†ط§ظ‚طµط©", description: "ظٹط±ط¬ظ‰ طھط­ط¯ظٹط¯ ظ…ط¯ظٹظ†ط© ط§ظ„ظ…ط؛ط§ط¯ط±ط© ظˆط§ظ„ظˆطµظˆظ„ ظˆطھط§ط±ظٹط® ط§ظ„ط°ظ‡ط§ط¨", variant: "destructive" });
+        toast({ title: "بيانات ناقصة", description: "يرجى تحديد مدينة المغادرة والوصول وتاريخ الذهاب", variant: "destructive" });
         return;
       }
       const params = new URLSearchParams({ from: fromCity, to: toCity, depart: departDate, passengers: String(passengers), tripType });
@@ -61,13 +61,13 @@ export default function HeroSection() {
       navigate(`/flights?${params.toString()}`);
     } else if (searchTab === "hotels") {
       if (!hotelCity || !checkIn || !checkOut) {
-        toast({ title: "ط¨ظٹط§ظ†ط§طھ ظ†ط§ظ‚طµط©", description: "ظٹط±ط¬ظ‰ طھط­ط¯ظٹط¯ ط§ظ„ظ…ط¯ظٹظ†ط© ظˆطھظˆط§ط±ظٹط® ط§ظ„ط¥ظ‚ط§ظ…ط©", variant: "destructive" });
+        toast({ title: "بيانات ناقصة", description: "يرجى تحديد المدينة وتواريخ الإقامة", variant: "destructive" });
         return;
       }
       navigate(`/hotels?${new URLSearchParams({ city: hotelCity, checkIn, checkOut, guests: String(guests) })}`);
     } else if (searchTab === "cars") {
       if (!carCity || !carPickup) {
-        toast({ title: "ط¨ظٹط§ظ†ط§طھ ظ†ط§ظ‚طµط©", description: "ظٹط±ط¬ظ‰ طھط­ط¯ظٹط¯ ط§ظ„ظ…ط¯ظٹظ†ط© ظˆطھط§ط±ظٹط® ط§ظ„ط§ط³طھظ„ط§ظ…", variant: "destructive" });
+        toast({ title: "بيانات ناقصة", description: "يرجى تحديد المدينة وتاريخ الاستلام", variant: "destructive" });
         return;
       }
       const params = new URLSearchParams({ city: carCity, pickup: carPickup });
@@ -81,7 +81,7 @@ export default function HeroSection() {
       navigate(`/activities?${params.toString()}`);
     } else if (searchTab === "transfers") {
       if (!transferFrom || !transferDate) {
-        toast({ title: "ط¨ظٹط§ظ†ط§طھ ظ†ط§ظ‚طµط©", description: "ظٹط±ط¬ظ‰ طھط­ط¯ظٹط¯ ظ…ظˆظ‚ط¹ ط§ظ„ط§ظ†ط·ظ„ط§ظ‚ ظˆط§ظ„طھط§ط±ظٹط®", variant: "destructive" });
+        toast({ title: "بيانات ناقصة", description: "يرجى تحديد موقع الانطلاق والتاريخ", variant: "destructive" });
         return;
       }
       const params = new URLSearchParams({ from: transferFrom, date: transferDate, passengers: String(transferPassengers) });
@@ -97,10 +97,10 @@ export default function HeroSection() {
         <div className="container mx-auto px-4 lg:px-8">
           <div className="text-center mb-6">
             <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white leading-tight mb-3">
-              ط§ظƒطھط´ظپ ظˆط¬ظ‡طھظƒ ط§ظ„ظ‚ط§ط¯ظ…ط© ظ…ط¹ ط®طھظ‡
+              اكتشف وجهتك القادمة مع خته
             </h1>
             <p className="text-white/80 text-base lg:text-lg max-w-2xl mx-auto">
-              ط§ط­ط¬ط² ط±ط­ظ„ط§طھ ط§ظ„ط·ظٹط±ط§ظ†طŒ ط§ظ„ظپظ†ط§ط¯ظ‚طŒ ط§ظ„ط³ظٹط§ط±ط§طھ ظˆط§ظ„ط¬ظˆظ„ط§طھ ط¨ط£ظپط¶ظ„ ط§ظ„ط£ط³ط¹ط§ط± ظ…ظ† ظ…ظƒط§ظ† ظˆط§ط­ط¯
+              احجز رحلات الطيران، الفنادق، السيارات والجولات بأفضل الأسعار من مكان واحد
             </p>
           </div>
         </div>
@@ -142,7 +142,7 @@ export default function HeroSection() {
                         tripType === "oneway" ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground hover:bg-muted/80"
                       }`}
                     >
-                      ط°ظ‡ط§ط¨ ظپظ‚ط·
+                      ذهاب فقط
                     </button>
                     <button
                       onClick={() => setTripType("roundtrip")}
@@ -150,15 +150,15 @@ export default function HeroSection() {
                         tripType === "roundtrip" ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground hover:bg-muted/80"
                       }`}
                     >
-                      ط°ظ‡ط§ط¨ ظˆط¹ظˆط¯ط©
+                      ذهاب وعودة
                     </button>
                   </div>
                   <div className={`grid grid-cols-2 ${tripType === "roundtrip" ? "lg:grid-cols-4" : "lg:grid-cols-3"} gap-3`}>
-                    <CityAutocomplete value={fromCity} onChange={setFromCity} placeholder="ظ…ظ† ط£ظٹظ†طں" showCode inputClassName="bg-secondary border-border text-sm text-right" />
-                    <CityAutocomplete value={toCity} onChange={setToCity} placeholder="ط¥ظ„ظ‰ ط£ظٹظ†طں" showCode inputClassName="bg-secondary border-border text-sm text-right" />
-                    <DatePickerInput value={departDate} onChange={setDepartDate} placeholder="طھط§ط±ظٹط® ط§ظ„ط°ظ‡ط§ط¨" disabled={disablePast} className="bg-secondary border-border text-sm" />
+                    <CityAutocomplete value={fromCity} onChange={setFromCity} placeholder="من أين؟" showCode inputClassName="bg-secondary border-border text-sm text-right" />
+                    <CityAutocomplete value={toCity} onChange={setToCity} placeholder="إلى أين؟" showCode inputClassName="bg-secondary border-border text-sm text-right" />
+                    <DatePickerInput value={departDate} onChange={setDepartDate} placeholder="تاريخ الذهاب" disabled={disablePast} className="bg-secondary border-border text-sm" />
                     {tripType === "roundtrip" && (
-                      <DatePickerInput value={returnDate} onChange={setReturnDate} placeholder="طھط§ط±ظٹط® ط§ظ„ط¹ظˆط¯ط©" disabled={(d) => disablePast(d) || (departDate ? d < new Date(departDate) : false)} className="bg-secondary border-border text-sm" />
+                      <DatePickerInput value={returnDate} onChange={setReturnDate} placeholder="تاريخ العودة" disabled={(d) => disablePast(d) || (departDate ? d < new Date(departDate) : false)} className="bg-secondary border-border text-sm" />
                     )}
                   </div>
                 </>
@@ -166,27 +166,27 @@ export default function HeroSection() {
 
               {searchTab === "hotels" && (
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
-                  <HotelAutocomplete value={hotelCity} onChange={setHotelCity} placeholder="ط§ظ„ظ…ط¯ظٹظ†ط© ط£ظˆ ط§ط³ظ… ط§ظ„ظپظ†ط¯ظ‚" inputClassName="bg-secondary border-border text-sm text-right" />
-                  <DatePickerInput value={checkIn} onChange={setCheckIn} placeholder="طھط³ط¬ظٹظ„ ط§ظ„ط¯ط®ظˆظ„" disabled={disablePast} className="bg-secondary border-border text-sm" />
-                  <DatePickerInput value={checkOut} onChange={setCheckOut} placeholder="طھط³ط¬ظٹظ„ ط§ظ„ط®ط±ظˆط¬" disabled={(d) => disablePast(d) || (checkIn ? d <= new Date(checkIn) : false)} className="bg-secondary border-border text-sm" />
+                  <HotelAutocomplete value={hotelCity} onChange={setHotelCity} placeholder="المدينة أو اسم الفندق" inputClassName="bg-secondary border-border text-sm text-right" />
+                  <DatePickerInput value={checkIn} onChange={setCheckIn} placeholder="تسجيل الدخول" disabled={disablePast} className="bg-secondary border-border text-sm" />
+                  <DatePickerInput value={checkOut} onChange={setCheckOut} placeholder="تسجيل الخروج" disabled={(d) => disablePast(d) || (checkIn ? d <= new Date(checkIn) : false)} className="bg-secondary border-border text-sm" />
                 </div>
               )}
 
               {searchTab === "cars" && (
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
-                  <CityAutocomplete value={carCity} onChange={setCarCity} placeholder="ظ…ط¯ظٹظ†ط© ط§ظ„ط§ط³طھظ„ط§ظ…" inputClassName="bg-secondary border-border text-sm text-right" />
-                  <DatePickerInput value={carPickup} onChange={setCarPickup} placeholder="طھط§ط±ظٹط® ط§ظ„ط§ط³طھظ„ط§ظ…" disabled={disablePast} className="bg-secondary border-border text-sm" />
-                  <DatePickerInput value={carReturn} onChange={setCarReturn} placeholder="طھط§ط±ظٹط® ط§ظ„ط¥ط±ط¬ط§ط¹" disabled={(d) => disablePast(d) || (carPickup ? d <= new Date(carPickup) : false)} className="bg-secondary border-border text-sm" />
+                  <CityAutocomplete value={carCity} onChange={setCarCity} placeholder="مدينة الاستلام" inputClassName="bg-secondary border-border text-sm text-right" />
+                  <DatePickerInput value={carPickup} onChange={setCarPickup} placeholder="تاريخ الاستلام" disabled={disablePast} className="bg-secondary border-border text-sm" />
+                  <DatePickerInput value={carReturn} onChange={setCarReturn} placeholder="تاريخ الإرجاع" disabled={(d) => disablePast(d) || (carPickup ? d <= new Date(carPickup) : false)} className="bg-secondary border-border text-sm" />
                 </div>
               )}
 
               {searchTab === "tours" && (
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
-                  <CityAutocomplete value={tourCity} onChange={setTourCity} placeholder="ط§ظ„ظ…ط¯ظٹظ†ط©" inputClassName="bg-secondary border-border text-sm text-right" />
-                  <DatePickerInput value={tourDate} onChange={setTourDate} placeholder="طھط§ط±ظٹط® ط§ظ„ط¬ظˆظ„ط©" disabled={disablePast} className="bg-secondary border-border text-sm" />
+                  <CityAutocomplete value={tourCity} onChange={setTourCity} placeholder="المدينة" inputClassName="bg-secondary border-border text-sm text-right" />
+                  <DatePickerInput value={tourDate} onChange={setTourDate} placeholder="تاريخ الجولة" disabled={disablePast} className="bg-secondary border-border text-sm" />
                   <div className="bg-muted/40 rounded-xl px-3 py-2 flex items-center gap-2 border border-border h-10">
                     <Users className="w-4 h-4 text-muted-foreground" />
-                    <span className="text-sm text-muted-foreground flex-1 text-right">ط¹ط¯ط¯ ط§ظ„ط£ط´ط®ط§طµ</span>
+                    <span className="text-sm text-muted-foreground flex-1 text-right">عدد الأشخاص</span>
                     <button type="button" onClick={() => setTourGuests(Math.max(1, tourGuests - 1))} className="w-6 h-6 rounded-full bg-muted text-muted-foreground flex items-center justify-center"><Minus className="w-3 h-3" /></button>
                     <span className="text-sm font-medium min-w-[16px] text-center">{tourGuests}</span>
                     <button type="button" onClick={() => setTourGuests(Math.min(20, tourGuests + 1))} className="w-6 h-6 rounded-full bg-primary/10 text-primary flex items-center justify-center"><Plus className="w-3 h-3" /></button>
@@ -196,9 +196,9 @@ export default function HeroSection() {
 
               {searchTab === "transfers" && (
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
-                  <CityAutocomplete value={transferFrom} onChange={setTransferFrom} placeholder="ظ…ظ† (ظ…ط·ط§ط± / ظ…ط¯ظٹظ†ط©)" showCode inputClassName="bg-secondary border-border text-sm text-right" />
-                  <CityAutocomplete value={transferTo} onChange={setTransferTo} placeholder="ط¥ظ„ظ‰ (ط§ط®طھظٹط§ط±ظٹ)" showCode inputClassName="bg-secondary border-border text-sm text-right" />
-                  <DatePickerInput value={transferDate} onChange={setTransferDate} placeholder="طھط§ط±ظٹط® ط§ظ„ط±ط­ظ„ط©" disabled={disablePast} className="bg-secondary border-border text-sm" />
+                  <CityAutocomplete value={transferFrom} onChange={setTransferFrom} placeholder="من (مطار / مدينة)" showCode inputClassName="bg-secondary border-border text-sm text-right" />
+                  <CityAutocomplete value={transferTo} onChange={setTransferTo} placeholder="إلى (اختياري)" showCode inputClassName="bg-secondary border-border text-sm text-right" />
+                  <DatePickerInput value={transferDate} onChange={setTransferDate} placeholder="تاريخ الرحلة" disabled={disablePast} className="bg-secondary border-border text-sm" />
                 </div>
               )}
 
@@ -206,7 +206,7 @@ export default function HeroSection() {
               <div className="flex items-center justify-between mt-4">
                 <Button onClick={handleSearch} className="bg-primary text-primary-foreground hover:bg-primary/90 px-8 py-2.5 rounded-xl font-bold">
                   <Search className="w-4 h-4 ml-2" />
-                  ط§ط¨ط­ط« ط§ظ„ط¢ظ†
+                  ابحث الآن
                 </Button>
                 {(searchTab === "flights" || searchTab === "hotels" || searchTab === "transfers") && (
                   <div className="bg-muted/40 rounded-xl px-3 py-2 flex items-center gap-2 border border-border">
@@ -238,4 +238,3 @@ export default function HeroSection() {
     </section>
   );
 }
-

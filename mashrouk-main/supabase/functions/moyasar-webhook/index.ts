@@ -1,0 +1,65 @@
+import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+
+const corsHeaders = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+};
+
+serve(async (req) => {
+  if (req.method === "OPTIONS") {
+    return new Response("ok", { headers: corsHeaders });
+  }
+
+  try {
+    const signature = req.headers.get("x-moyasar-signature");
+    const webhookSecret = Deno.env.get("MOYASAR_WEBHOOK_SECRET");
+    
+    // ✅ التحقق من التوقيع (أمان)
+    if (!signature || !webhookSecret) {
+      return new Response(JSON.stringify({ error: "Unauthorized" }), {
+        status: 401,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    const payload = await req.json();
+    const event = payload.type; // "payment.paid" or "payment.failed"
+    const payment = payload.data;
+
+    console.log("✅ Webhook received:", event, payment.id);
+
+    // ✅ إنشاء Supabase client
+    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+    const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+    const supabase = createClient(supabaseUrl, supabaseKey);
+
+    if (event === "payment.paid") {
+      // ✅ تحديث حالة الحجز
+      const { error } = await supabase
+        .from("bookings")
+        .update({
+          payment_status: "paid",
+          payment_id: payment.id,
+          paid_at: new Date().toISOString(),
+        })
+        .eq("payment_id", payment.id);
+
+      if (error) {
+        console.error("❌ Failed to update booking:", error);
+      } else {
+        console.log("✅ Booking updated successfully");
+      }
+    }
+
+    return new Response(JSON.stringify({ received: true }), {
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  } catch (error) {
+    console.error("❌ Webhook error:", error);
+    return new Response(JSON.stringify({ error: error.message }), {
+      status: 500,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  }
+});

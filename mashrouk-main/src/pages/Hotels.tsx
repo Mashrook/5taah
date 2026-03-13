@@ -311,23 +311,23 @@ export default function Hotels() {
   return (
     <div className="min-h-screen">
       {/* Hero + Search */}
-      <section className="bg-gradient-to-b from-primary/80 via-primary/50 to-background pt-10 pb-20">
+      <section className="bg-gradient-to-b from-primary/5 to-background pt-10 pb-20">
         <div className="container mx-auto px-4 lg:px-8">
           <div className="text-center mb-8">
-            <p className="text-primary-foreground/70 text-sm mb-2 flex items-center justify-center gap-2">
+            <p className="text-muted-foreground text-sm mb-2 flex items-center justify-center gap-2">
               <HotelIcon className="w-4 h-4" />
               أكثر من ٥٠٠ فندق حول العالم
             </p>
-            <h1 className="text-3xl lg:text-5xl font-bold text-primary-foreground mb-3">
+            <h1 className="text-3xl lg:text-5xl font-bold text-foreground mb-3">
               اكتشف أفضل الفنادق واحجز بأقل الأسعار
             </h1>
-            <p className="text-primary-foreground/80 text-sm max-w-xl mx-auto">
+            <p className="text-muted-foreground text-sm max-w-xl mx-auto">
               قارن الأسعار من مئات المواقع واحصل على أفضل عروض الفنادق
             </p>
           </div>
 
           {/* Search Form */}
-          <form onSubmit={handleLiveSearch} className="max-w-5xl mx-auto p-5 lg:p-6 rounded-2xl bg-card/95 backdrop-blur-xl border border-border shadow-card">
+          <form onSubmit={handleLiveSearch} className="max-w-5xl mx-auto p-5 lg:p-6 rounded-2xl bg-card border border-border shadow-sm">
             <div className="grid grid-cols-2 md:grid-cols-5 gap-3 items-end">
               <div className="col-span-2 md:col-span-1">
                 <label className="text-xs text-muted-foreground block mb-1 text-right">الوجهة</label>
@@ -439,7 +439,7 @@ export default function Hotels() {
             {quickFilters.map((f) => (
               <button
                 key={f.value}
-                className="px-4 py-2 rounded-full text-xs font-medium border border-border/50 bg-card/80 text-muted-foreground hover:border-primary/50 hover:text-primary transition-colors"
+                className="px-4 py-2 rounded-full text-xs font-medium border border-border bg-card/80 text-muted-foreground hover:border-primary/50 hover:text-primary transition-colors"
               >
                 {f.label}
               </button>
@@ -484,7 +484,7 @@ export default function Hotels() {
                 const cancellable = offer.policies?.cancellations?.[0];
 
                 return (
-                  <div key={hotel.hotel.hotelId + offer.id} className="rounded-2xl bg-card border border-border/50 hover:border-primary/30 transition-all overflow-hidden">
+                  <div key={hotel.hotel.hotelId + offer.id} className="rounded-2xl bg-card border border-border hover:border-primary/30 transition-all overflow-hidden">
                     <div className="flex flex-col md:flex-row">
                       <div className="md:w-48 lg:w-56 h-40 md:h-auto shrink-0 overflow-hidden">
                         <img src={getHotelImage(hotel.hotel.hotelId)} alt={hotel.hotel.name} className="w-full h-full object-cover" />
@@ -511,7 +511,7 @@ export default function Hotels() {
                           <p className="text-xs text-muted-foreground mb-2">{hotel.offers.length} عروض متاحة</p>
                         )}
                       </div>
-                      <div className="md:border-r border-t md:border-t-0 border-border/30 p-5 lg:p-6 flex flex-row md:flex-col items-center justify-between md:justify-center gap-3 md:min-w-[180px] bg-muted/10">
+                      <div className="md:border-r border-t md:border-t-0 border-border p-5 lg:p-6 flex flex-row md:flex-col items-center justify-between md:justify-center gap-3 md:min-w-[180px] bg-muted/10">
                         <div className="text-center">
                           <p className="text-2xl font-bold text-primary">{price.toLocaleString()}</p>
                           <p className="text-xs text-muted-foreground">{offer.price.currency} / إجمالي</p>
@@ -577,7 +577,7 @@ export default function Hotels() {
               {/* Sidebar Filters */}
               <aside className="hidden lg:block w-72 shrink-0 space-y-5 sticky top-24 self-start">
                 {/* Price Range */}
-                <div className="rounded-2xl bg-card border border-border/50 p-5">
+                <div className="rounded-2xl bg-card border border-border p-5">
                   <h3 className="font-bold text-sm mb-4">ميزانية الليلة (ر.س)</h3>
                   <Slider min={0} max={5000} step={100} value={priceRange} onValueChange={setPriceRange} className="mb-3" />
                   <div className="flex items-center justify-between text-xs text-muted-foreground">
@@ -587,7 +587,7 @@ export default function Hotels() {
                 </div>
 
                 {/* Star Rating */}
-                <div className="rounded-2xl bg-card border border-border/50 p-5">
+                <div className="rounded-2xl bg-card border border-border p-5">
                   <h3 className="font-bold text-sm mb-4">تصنيف النجوم</h3>
                   <div className="flex gap-2">
                     {[2, 3, 4, 5].map((star) => (
@@ -607,7 +607,7 @@ export default function Hotels() {
                 </div>
 
                 {/* Amenities */}
-                <div className="rounded-2xl bg-card border border-border/50 p-5">
+                <div className="rounded-2xl bg-card border border-border p-5">
                   <h3 className="font-bold text-sm mb-4">المرافق والخدمات</h3>
                   <div className="space-y-3">
                     {amenityFilterOptions.map((a) => (
@@ -623,7 +623,7 @@ export default function Hotels() {
                 </div>
 
                 {/* Search by Name */}
-                <div className="rounded-2xl bg-card border border-border/50 p-5">
+                <div className="rounded-2xl bg-card border border-border p-5">
                   <h3 className="font-bold text-sm mb-3">فندق بعينه</h3>
                   <Input
                     value={searchQuery}
@@ -634,7 +634,7 @@ export default function Hotels() {
                 </div>
 
                 {/* City Filter */}
-                <div className="rounded-2xl bg-card border border-border/50 p-5">
+                <div className="rounded-2xl bg-card border border-border p-5">
                   <h3 className="font-bold text-sm mb-3">المدينة</h3>
                   <Select value={cityFilter} onValueChange={setCityFilter}>
                     <SelectTrigger className="bg-muted/30 h-9 text-sm">
@@ -676,7 +676,7 @@ export default function Hotels() {
                 {filteredStaticHotels.map((hotel, idx) => (
                   <div
                     key={hotel.id}
-                    className="group rounded-2xl bg-card border border-border/50 overflow-hidden hover:border-primary/30 hover:shadow-card-hover transition-all duration-300 animate-fade-in-up"
+                    className="group rounded-2xl bg-card border border-border overflow-hidden hover:shadow-lg transition-all duration-300 animate-fade-in-up"
                     style={{ animationDelay: `${idx * 0.06}s` }}
                   >
                     <div className="flex flex-col md:flex-row">
@@ -692,7 +692,7 @@ export default function Hotels() {
                           ))}
                         </div>
                         {/* Save Button */}
-                        <button aria-label="حفظ الفندق" className="absolute top-3 left-3 w-8 h-8 rounded-full bg-card/70 backdrop-blur flex items-center justify-center hover:bg-primary/20 transition-colors">
+                        <button aria-label="حفظ الفندق" className="absolute top-3 left-3 w-8 h-8 rounded-full bg-card backdrop-blur flex items-center justify-center hover:bg-primary/20 transition-colors">
                           <Heart className="w-4 h-4 text-foreground/70" />
                         </button>
                         {/* Stars */}
@@ -720,7 +720,7 @@ export default function Hotels() {
                               <p className="text-[10px] text-muted-foreground">{hotel.reviewsCount.toLocaleString()} تقييم</p>
                             </div>
                             <div className="w-11 h-11 rounded-xl bg-primary flex items-center justify-center">
-                              <span className="text-sm font-bold text-primary-foreground">{hotel.rating}</span>
+                              <span className="text-sm font-bold text-foreground">{hotel.rating}</span>
                             </div>
                           </div>
                         </div>
@@ -743,7 +743,7 @@ export default function Hotels() {
                         </button>
 
                         {/* Price + Book */}
-                        <div className="mt-auto flex items-end justify-between pt-3 border-t border-border/30">
+                        <div className="mt-auto flex items-end justify-between pt-3 border-t border-border">
                           <Button variant="gold" className="gap-2" onClick={() => navigate(`/hotels/${hotel.id}`)}>
                             اعرض العرض
                             <ChevronLeft className="w-4 h-4" />
@@ -794,7 +794,7 @@ function FeaturedHotelsSection() {
       <h2 className="text-xl font-bold mb-6">فنادق مميزة من إدارتنا</h2>
       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
         {hotels.map((h) => (
-          <div key={h.id} className="rounded-2xl bg-card border border-border/50 overflow-hidden hover:border-primary/30 transition-all">
+          <div key={h.id} className="rounded-2xl bg-card border border-border overflow-hidden hover:border-primary/30 transition-all">
             {h.image_url ? (
               <img src={h.image_url} alt={h.name} className="w-full h-40 object-cover" loading="lazy" />
             ) : (
@@ -810,7 +810,7 @@ function FeaturedHotelsSection() {
                 <span>{"⭐".repeat(h.stars)}</span>
               </div>
               {h.description && <p className="text-xs text-muted-foreground mb-3 line-clamp-2">{h.description}</p>}
-              <div className="flex items-end justify-between pt-3 border-t border-border/30">
+              <div className="flex items-end justify-between pt-3 border-t border-border">
                 <div>
                   <p className="text-xs text-muted-foreground">يبدأ من</p>
                   <p className="text-lg font-bold text-primary">{Number(h.price_per_night).toLocaleString()} <span className="text-xs font-normal">{h.currency}/ليلة</span></p>

@@ -88,7 +88,7 @@ export default function FlightPaymentCallback() {
 
   return (
     <div className="min-h-[70vh] flex items-center justify-center" dir="rtl">
-      <div className="w-full max-w-xl p-6 rounded-2xl bg-card border border-border/50">
+      <div className="w-full max-w-xl p-6 rounded-2xl bg-card border border-border">
         {state === "loading" && (
           <div className="text-center space-y-3">
             <div className="mx-auto w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center">
@@ -112,7 +112,7 @@ export default function FlightPaymentCallback() {
             </p>
 
             {result?.reference && (
-              <div className="p-4 rounded-xl bg-muted/30 border border-border/50">
+              <div className="p-4 rounded-xl bg-muted/30 border border-border">
                 <p className="text-xs text-muted-foreground mb-1">رقم المرجع</p>
                 <p className="font-mono text-foreground text-sm" dir="ltr">{result.reference}</p>
               </div>

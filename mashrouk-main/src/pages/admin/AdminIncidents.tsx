@@ -126,14 +126,14 @@ export default function AdminIncidents() {
 
       {/* Create Form */}
       {showForm && (
-        <div className="rounded-2xl bg-card border border-border/50 p-6 mb-6 space-y-4">
+        <div className="rounded-2xl bg-card border border-border p-6 mb-6 space-y-4">
           <h3 className="font-bold">تقرير حادث جديد</h3>
           <Input placeholder="عنوان الحادث" value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} className="bg-muted/30" />
           <Textarea placeholder="وصف الحادث..." value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} className="bg-muted/30" rows={3} />
           <select
             value={form.severity}
             onChange={(e) => setForm({ ...form, severity: e.target.value })}
-            className="px-4 py-2 rounded-xl bg-muted border border-border/50 text-foreground text-sm"
+            className="px-4 py-2 rounded-xl bg-muted border border-border text-foreground text-sm"
           >
             <option value="low">منخفض</option>
             <option value="medium">متوسط</option>
@@ -159,7 +159,7 @@ export default function AdminIncidents() {
       ) : (
         <div className="space-y-3">
           {incidents.map((inc) => (
-            <div key={inc.id} className="rounded-xl bg-card border border-border/50 p-4">
+            <div key={inc.id} className="rounded-xl bg-card border border-border p-4">
               <div className="flex items-start justify-between gap-4">
                 <div className="flex-1">
                   <div className="flex items-center gap-2 mb-2 flex-wrap">

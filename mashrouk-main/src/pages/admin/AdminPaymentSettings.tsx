@@ -71,17 +71,17 @@ export default function AdminPaymentSettings() {
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="p-4 rounded-xl bg-muted/30 border border-border/50 text-center">
+            <div className="p-4 rounded-xl bg-muted/30 border border-border text-center">
               <p className="text-sm text-muted-foreground mb-1">المزود الحالي</p>
               <p className="font-bold text-foreground">
                 {provider === "moyasar" ? "Moyasar" : provider === "stripe" ? "Stripe" : "غير مهيأ"}
               </p>
             </div>
-            <div className="p-4 rounded-xl bg-muted/30 border border-border/50 text-center">
+            <div className="p-4 rounded-xl bg-muted/30 border border-border text-center">
               <p className="text-sm text-muted-foreground mb-1">مفتاح Stripe العام</p>
               <p className="font-bold text-foreground">{stripeKey ? "موجود" : "غير موجود"}</p>
             </div>
-            <div className="p-4 rounded-xl bg-muted/30 border border-border/50 text-center">
+            <div className="p-4 rounded-xl bg-muted/30 border border-border text-center">
               <p className="text-sm text-muted-foreground mb-1">مفتاح Moyasar العام</p>
               <p className="font-bold text-foreground">{moyasarKey ? "موجود" : "غير موجود"}</p>
             </div>

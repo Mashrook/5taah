@@ -133,7 +133,7 @@ export default function AdminUsersEnhanced() {
           <RefreshCw className="w-8 h-8 animate-spin text-primary" />
         </div>
       ) : filtered.length === 0 ? (
-        <div className="p-12 rounded-2xl bg-card border border-border/50 text-center">
+        <div className="p-12 rounded-2xl bg-card border border-border text-center">
           <Users className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
           <p className="text-muted-foreground">لا يوجد مستخدمين مطابقين</p>
         </div>
@@ -144,7 +144,7 @@ export default function AdminUsersEnhanced() {
             const isExpanded = expandedId === p.id;
 
             return (
-              <div key={p.id} className="rounded-2xl bg-card border border-border/50 overflow-hidden">
+              <div key={p.id} className="rounded-2xl bg-card border border-border overflow-hidden">
                 <button
                   onClick={() => setExpandedId(isExpanded ? null : p.id)}
                   className="w-full flex items-center gap-4 p-5 text-right hover:bg-muted/20 transition-colors"
@@ -187,7 +187,7 @@ export default function AdminUsersEnhanced() {
                 </button>
 
                 {isExpanded && (
-                  <div className="px-5 pb-5 border-t border-border/30 pt-4 space-y-4">
+                  <div className="px-5 pb-5 border-t border-border pt-4 space-y-4">
                     <div>
                       <p className="text-xs font-semibold text-muted-foreground mb-1">معرّف المستخدم</p>
                       <p className="text-xs font-mono bg-muted/30 px-3 py-1.5 rounded-lg" dir="ltr">{p.user_id}</p>

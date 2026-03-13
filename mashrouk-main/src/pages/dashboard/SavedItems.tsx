@@ -26,14 +26,14 @@ export default function SavedItems() {
         {loading ? (
           <p className="text-muted-foreground">جاري التحميل...</p>
         ) : items.length === 0 ? (
-          <div className="p-12 rounded-2xl bg-card border border-border/50 text-center">
+          <div className="p-12 rounded-2xl bg-card border border-border text-center">
             <Heart className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
             <p className="text-muted-foreground">لا توجد عناصر محفوظة</p>
           </div>
         ) : (
           <div className="space-y-4">
             {items.map((item) => (
-              <div key={`${item.item_type}-${item.item_id}`} className="flex items-center gap-4 p-5 rounded-2xl bg-card border border-border/50">
+              <div key={`${item.item_type}-${item.item_id}`} className="flex items-center gap-4 p-5 rounded-2xl bg-card border border-border">
                 <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center">
                   <Heart className="w-6 h-6 text-primary" />
                 </div>

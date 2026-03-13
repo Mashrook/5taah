@@ -278,7 +278,7 @@ export default function AdminIntegrations() {
 
       {/* Stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-        <div className="p-4 rounded-xl bg-card border border-border/50">
+        <div className="p-4 rounded-xl bg-card border border-border">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
               <Globe className="w-5 h-5 text-primary" />
@@ -289,7 +289,7 @@ export default function AdminIntegrations() {
             </div>
           </div>
         </div>
-        <div className="p-4 rounded-xl bg-card border border-border/50">
+        <div className="p-4 rounded-xl bg-card border border-border">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-lg bg-success/10 flex items-center justify-center">
               <CheckCircle className="w-5 h-5 text-success" />
@@ -300,7 +300,7 @@ export default function AdminIntegrations() {
             </div>
           </div>
         </div>
-        <div className="p-4 rounded-xl bg-card border border-border/50">
+        <div className="p-4 rounded-xl bg-card border border-border">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-lg bg-secondary/10 flex items-center justify-center">
               <Key className="w-5 h-5 text-secondary" />
@@ -311,7 +311,7 @@ export default function AdminIntegrations() {
             </div>
           </div>
         </div>
-        <div className="p-4 rounded-xl bg-card border border-border/50">
+        <div className="p-4 rounded-xl bg-card border border-border">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-lg bg-success/10 flex items-center justify-center">
               <CheckCircle className="w-5 h-5 text-success" />
@@ -375,12 +375,12 @@ export default function AdminIntegrations() {
           {loadingEP ? (
             <div className="p-12 text-center text-muted-foreground">جاري التحميل...</div>
           ) : filteredEP.length === 0 ? (
-            <div className="p-12 rounded-xl bg-card border border-border/50 text-center">
+            <div className="p-12 rounded-xl bg-card border border-border text-center">
               <Link2 className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
               <p className="text-muted-foreground">{searchEP ? "لا توجد نتائج" : "لا توجد روابط خدمات"}</p>
             </div>
           ) : (
-            <div className="rounded-xl border border-border/50 overflow-hidden">
+            <div className="rounded-xl border border-border overflow-hidden">
               <Table>
                 <TableHeader>
                   <TableRow className="bg-muted/30 hover:bg-muted/30">
@@ -474,12 +474,12 @@ export default function AdminIntegrations() {
           {loadingKeys ? (
             <div className="p-12 text-center text-muted-foreground">جاري التحميل...</div>
           ) : filteredKeys.length === 0 ? (
-            <div className="p-12 rounded-xl bg-card border border-border/50 text-center">
+            <div className="p-12 rounded-xl bg-card border border-border text-center">
               <Key className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
               <p className="text-muted-foreground">{searchKeys ? "لا توجد نتائج" : "لا توجد مفاتيح APIs"}</p>
             </div>
           ) : (
-            <div className="rounded-xl border border-border/50 overflow-hidden">
+            <div className="rounded-xl border border-border overflow-hidden">
               <Table>
                 <TableHeader>
                   <TableRow className="bg-muted/30 hover:bg-muted/30">

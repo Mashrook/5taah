@@ -50,7 +50,7 @@ export default function Footer() {
           {/* Brand */}
           <div>
             <Link to="/" className="flex items-center gap-3 mb-6">
-              <img src={logoUrl} alt={brandName} className="w-12 h-12 rounded-xl object-contain shadow-gold" />
+              <img src={logoUrl} alt={brandName} className="w-12 h-12 rounded-xl object-contain" />
               <div className="flex flex-col">
                 <span className="text-xl font-bold text-foreground">{brandName}</span>
                 <span className="text-xs text-muted-foreground tracking-wider">{brandNameEn}</span>

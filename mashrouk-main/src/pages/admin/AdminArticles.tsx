@@ -142,7 +142,7 @@ export default function AdminArticles() {
       ) : (
         <div className="space-y-3">
           {filtered.map((a) => (
-            <div key={a.id} className="flex items-center justify-between p-4 rounded-xl bg-card border border-border/50">
+            <div key={a.id} className="flex items-center justify-between p-4 rounded-xl bg-card border border-border">
               <div className="flex items-center gap-4 flex-1 min-w-0">
                 {a.image_url && (
                   <img src={a.image_url} alt={a.title} className="w-16 h-12 rounded-lg object-cover shrink-0" />

@@ -110,7 +110,7 @@ export default function AdminAuditLogs() {
           value={entityFilter}
           onChange={(e) => setEntityFilter(e.target.value)}
           title="تصفية حسب الكيان"
-          className="px-4 py-2 rounded-xl bg-muted border border-border/50 text-foreground text-sm"
+          className="px-4 py-2 rounded-xl bg-muted border border-border text-foreground text-sm"
         >
           <option value="">كل الكيانات</option>
           {Object.entries(ENTITY_LABELS).map(([k, v]) => (
@@ -133,7 +133,7 @@ export default function AdminAuditLogs() {
           {filtered.map((log) => (
             <div
               key={log.id}
-              className="rounded-xl bg-card border border-border/50 overflow-hidden"
+              className="rounded-xl bg-card border border-border overflow-hidden"
             >
               <button
                 onClick={() => setExpandedId(expandedId === log.id ? null : log.id)}
@@ -163,7 +163,7 @@ export default function AdminAuditLogs() {
               </button>
 
               {expandedId === log.id && (
-                <div className="px-4 pb-4 border-t border-border/30 space-y-3">
+                <div className="px-4 pb-4 border-t border-border space-y-3">
                   <div className="grid sm:grid-cols-2 gap-3 pt-3">
                     <div>
                       <p className="text-xs text-muted-foreground mb-1">المنفذ</p>

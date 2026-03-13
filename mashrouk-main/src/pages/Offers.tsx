@@ -158,16 +158,16 @@ export default function Offers() {
   return (
     <div className="min-h-screen">
       {/* Hero */}
-      <section className="bg-gradient-to-b from-primary/80 via-primary/50 to-background pt-10 pb-14">
+      <section className="bg-gradient-to-b from-primary/5 to-background pt-10 pb-14">
         <div className="container mx-auto px-4 lg:px-8 text-center">
-          <Badge className="bg-primary/20 text-primary-foreground border-primary/30 mb-4 text-sm px-4 py-1.5">
+          <Badge className="bg-primary/10 text-primary border-primary/20 mb-4 text-sm px-4 py-1.5">
             <Sparkles className="w-4 h-4 ml-1.5" />
             باقات مختارة بعناية لعملائنا
           </Badge>
-          <h1 className="text-3xl lg:text-5xl font-bold text-primary-foreground mb-3">
+          <h1 className="text-3xl lg:text-5xl font-bold text-foreground mb-3">
             عروض سفر راقية من الخليج إلى العالم
           </h1>
-          <p className="text-primary-foreground/80 text-sm lg:text-base max-w-2xl mx-auto">
+          <p className="text-muted-foreground text-sm lg:text-base max-w-2xl mx-auto">
             باقات متكاملة تجمع بين الطيران والإقامة الفاخرة والتجارب الحصرية — صُممت لتناسب ذوقك العائلي وتوقعاتك المالية
           </p>
         </div>
@@ -184,7 +184,7 @@ export default function Offers() {
 
       {/* Bottom CTA */}
       <div className="container mx-auto px-4 lg:px-8 py-16 text-center">
-        <div className="max-w-2xl mx-auto p-8 rounded-2xl bg-card/70 border border-border/30">
+        <div className="max-w-2xl mx-auto p-8 rounded-2xl bg-card border border-border">
           <Sparkles className="w-10 h-10 text-primary mx-auto mb-4" />
           <h3 className="text-xl font-bold mb-2">لم تجد ما يناسبك؟</h3>
           <p className="text-muted-foreground text-sm mb-5">تواصل معنا لتصميم باقة مخصصة تناسب احتياجاتك وميزانيتك</p>
@@ -203,7 +203,7 @@ function OfferCard({ offer, index }: { offer: OfferPackage; index: number }) {
   const season = seasonLabels[offer.season] || { label: offer.season, color: "bg-muted text-muted-foreground" };
 
   return (
-    <div className="rounded-2xl bg-card/70 border border-border/30 overflow-hidden hover:border-primary/20 transition-all">
+    <div className="rounded-2xl bg-card border border-border overflow-hidden hover:border-primary/20 transition-all">
       <div className={`flex flex-col ${isEven ? "lg:flex-row-reverse" : "lg:flex-row"}`}>
         {/* Image */}
         <div className="relative lg:w-[42%] min-h-[220px] lg:min-h-[340px]">
@@ -281,7 +281,7 @@ function OfferCard({ offer, index }: { offer: OfferPackage; index: number }) {
           </div>
 
           {/* Bottom: Price + Actions */}
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pt-4 border-t border-border/30">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pt-4 border-t border-border">
             <div className="flex items-baseline gap-3">
               <span className="text-3xl font-bold text-primary">{offer.price.toLocaleString()}</span>
               <span className="text-sm text-muted-foreground">{offer.currency}</span>

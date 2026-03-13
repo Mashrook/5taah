@@ -41,10 +41,10 @@ export default function AdminForgotPassword() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center py-12 bg-gradient-hero">
+    <div className="min-h-screen flex items-center justify-center py-12 bg-background">
       <div className="w-full max-w-md mx-4">
         <div className="text-center mb-8">
-          <div className="w-16 h-16 rounded-2xl bg-gradient-gold flex items-center justify-center mx-auto mb-4 shadow-gold">
+          <div className="w-16 h-16 rounded-2xl bg-primary flex items-center justify-center mx-auto mb-4">
             <LayoutDashboard className="w-8 h-8 text-primary-foreground" />
           </div>
           <h1 className="text-2xl font-bold">استعادة كلمة المرور</h1>
@@ -52,7 +52,7 @@ export default function AdminForgotPassword() {
         </div>
 
         {sent ? (
-          <div className="p-6 rounded-2xl bg-gradient-card border border-border/50 space-y-4 text-center">
+          <div className="p-6 rounded-2xl bg-card border border-border space-y-4 text-center">
             <p className="text-foreground">تم إرسال رابط إعادة التعيين إلى بريدك الإلكتروني.</p>
             <p className="text-sm text-muted-foreground">يرجى التحقق من صندوق الوارد واتباع التعليمات.</p>
             <Link to="/admin/login">
@@ -63,7 +63,7 @@ export default function AdminForgotPassword() {
             </Link>
           </div>
         ) : (
-          <form onSubmit={handleSubmit} className="p-6 rounded-2xl bg-gradient-card border border-border/50 space-y-4">
+          <form onSubmit={handleSubmit} className="p-6 rounded-2xl bg-card border border-border space-y-4">
             <div>
               <label className="text-sm font-medium mb-1 block">البريد الإلكتروني</label>
               <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="admin@khattah.com" className="bg-muted/30" dir="ltr" />

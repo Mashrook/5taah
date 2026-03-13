@@ -7,7 +7,7 @@ export default function Contact() {
     <div className="min-h-screen py-12">
       <div className="container mx-auto px-4 lg:px-8">
         <div className="text-center mb-12">
-          <h1 className="text-3xl lg:text-4xl font-bold mb-4">اتصل <span className="text-gradient-gold">بنا</span></h1>
+          <h1 className="text-3xl lg:text-4xl font-bold mb-4">اتصل <span className="text-primary">بنا</span></h1>
           <p className="text-muted-foreground max-w-xl mx-auto">نحن هنا لمساعدتك. تواصل معنا في أي وقت</p>
         </div>
 
@@ -19,7 +19,7 @@ export default function Contact() {
               { icon: Phone, title: "الهاتف", value: "+966 50 000 0000" },
               { icon: MapPin, title: "العنوان", value: "المملكة العربية السعودية" },
             ].map((item) => (
-              <div key={item.title} className="flex items-start gap-4 p-4 rounded-xl bg-gradient-card border border-border/50">
+              <div key={item.title} className="flex items-start gap-4 p-4 rounded-xl bg-card border border-border">
                 <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
                   <item.icon className="w-5 h-5 text-primary" />
                 </div>
@@ -32,7 +32,7 @@ export default function Contact() {
           </div>
 
           {/* Contact Form */}
-          <div className="p-6 rounded-2xl bg-gradient-card border border-border/50">
+          <div className="p-6 rounded-2xl bg-card border border-border">
             <h3 className="font-bold text-lg mb-6">أرسل لنا رسالة</h3>
             <div className="space-y-4">
               <Input placeholder="الاسم الكامل" className="bg-muted/30" />

@@ -167,7 +167,7 @@ export default function AdminHotelApis() {
             const allowedRoles = rolePerms[api.key] || [];
 
             return (
-              <div key={api.key} className="p-6 rounded-2xl bg-card border border-border/50 space-y-5">
+              <div key={api.key} className="p-6 rounded-2xl bg-card border border-border space-y-5">
                 {/* Header */}
                 <div className="flex items-start justify-between gap-4">
                   <div className="flex-1">
@@ -195,7 +195,7 @@ export default function AdminHotelApis() {
                 </div>
 
                 {/* Role permissions */}
-                <div className="border-t border-border/30 pt-4">
+                <div className="border-t border-border pt-4">
                   <div className="flex items-center gap-2 mb-3">
                     <ShieldCheck className="w-4 h-4 text-primary" />
                     <span className="text-sm font-semibold">الأدوار المسموح لها</span>

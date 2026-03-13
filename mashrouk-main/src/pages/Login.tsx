@@ -65,14 +65,14 @@ export default function Login() {
     <div className="min-h-screen flex items-center justify-center py-12 bg-background">
       <div className="w-full max-w-md mx-4">
         <div className="text-center mb-8">
-          <div className="w-16 h-16 rounded-2xl bg-gradient-gold flex items-center justify-center mx-auto mb-4 shadow-gold">
+          <div className="w-16 h-16 rounded-2xl bg-primary flex items-center justify-center mx-auto mb-4">
             <Plane className="w-8 h-8 text-primary-foreground" />
           </div>
           <h1 className="text-2xl font-bold text-foreground">تسجيل الدخول</h1>
           <p className="text-primary/80 text-sm mt-2">أدخل بياناتك للوصول لحسابك</p>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-6 rounded-2xl bg-card/80 backdrop-blur border border-primary/20 shadow-gold/10 shadow-lg space-y-4">
+        <form onSubmit={handleSubmit} className="p-6 rounded-2xl bg-card border border-border shadow-sm space-y-4">
           <div>
             <label className="text-sm font-medium mb-1 block">البريد الإلكتروني</label>
             <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="example@email.com" className="bg-muted/30" dir="ltr" />

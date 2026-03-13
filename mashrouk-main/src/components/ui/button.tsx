@@ -9,18 +9,17 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        default: "bg-primary text-primary-foreground hover:bg-primary/90 shadow-gold hover:shadow-gold-lg",
+        default: "bg-primary text-primary-foreground hover:bg-primary/90",
         destructive: "bg-destructive text-destructive-foreground hover:bg-destructive/90",
         outline: "border border-border bg-transparent text-foreground hover:border-primary hover:text-primary",
         secondary: "bg-secondary text-secondary-foreground hover:bg-secondary/80",
         ghost: "hover:bg-muted hover:text-foreground",
         link: "text-primary underline-offset-4 hover:underline",
-        // Custom variants for Mohamie
-        gold: "bg-gradient-gold text-primary-foreground shadow-gold hover:shadow-gold-lg hover:scale-[1.02] active:scale-[0.98]",
-        "gold-outline": "border-2 border-primary bg-transparent text-primary hover:bg-primary/10 hover:shadow-gold",
-        hero: "bg-gradient-gold text-primary-foreground shadow-gold-lg hover:shadow-glow-gold-strong hover:scale-[1.02] active:scale-[0.98] font-bold",
-        "hero-outline": "border-2 border-primary/50 bg-card/50 text-foreground backdrop-blur-sm hover:border-primary hover:bg-card/80 hover:text-primary",
-        glass: "bg-card/40 backdrop-blur-xl border border-border/50 text-foreground hover:bg-card/60 hover:border-primary/50",
+        gold: "bg-primary text-primary-foreground hover:bg-primary/90",
+        "gold-outline": "border border-primary bg-transparent text-primary hover:bg-primary/10",
+        hero: "bg-primary text-primary-foreground hover:bg-primary/90 font-bold",
+        "hero-outline": "border border-border bg-card text-foreground hover:border-primary hover:text-primary",
+        glass: "bg-card border border-border text-foreground hover:bg-muted",
         nav: "bg-transparent text-foreground/80 hover:text-primary hover:bg-transparent font-medium",
         "nav-active": "bg-muted text-primary font-semibold",
       },

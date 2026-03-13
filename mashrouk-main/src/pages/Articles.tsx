@@ -11,7 +11,7 @@ export default function Articles() {
           <h1 className="text-3xl lg:text-4xl font-bold mb-4">المقالات</h1>
           <p className="text-muted-foreground max-w-xl mx-auto">نصائح ومقالات سفر مفيدة</p>
         </div>
-        <div className="max-w-4xl mx-auto p-8 rounded-2xl bg-gradient-card border border-border/50 text-center">
+        <div className="max-w-4xl mx-auto p-8 rounded-2xl bg-card border border-border text-center">
           <p className="text-muted-foreground">المقالات - قريباً</p>
         </div>
       </div>

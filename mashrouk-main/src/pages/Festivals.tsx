@@ -172,16 +172,16 @@ export default function Festivals() {
   return (
     <div className="min-h-screen">
       {/* Hero */}
-      <section className="bg-gradient-to-b from-primary/80 via-primary/50 to-background pt-10 pb-14">
+      <section className="bg-gradient-to-b from-primary/5 to-background pt-10 pb-14">
         <div className="container mx-auto px-4 lg:px-8 text-center">
           <div className="flex items-center justify-center gap-2 mb-3">
-            <Flame className="w-6 h-6 text-primary-foreground" />
-            <p className="text-primary-foreground/70 text-sm">المهرجانات والفعاليات</p>
+            <Flame className="w-6 h-6 text-primary" />
+            <p className="text-muted-foreground text-sm">المهرجانات والفعاليات</p>
           </div>
-          <h1 className="text-3xl lg:text-5xl font-bold text-primary-foreground mb-3">
+          <h1 className="text-3xl lg:text-5xl font-bold text-foreground mb-3">
             اكتشف أجمل الفعاليات والمغامرات
           </h1>
-          <p className="text-primary-foreground/80 text-sm lg:text-base max-w-2xl mx-auto">
+          <p className="text-muted-foreground text-sm lg:text-base max-w-2xl mx-auto">
             مهرجانات ترفيهية، رحلات تسلق جبال، سفاري صحراوي، وأنشطة بحرية — تجارب لا تُنسى في المملكة
           </p>
         </div>
@@ -189,7 +189,7 @@ export default function Festivals() {
 
       {/* Search & Filters */}
       <div className="container mx-auto px-4 lg:px-8 -mt-6">
-        <div className="max-w-5xl mx-auto p-5 lg:p-7 rounded-2xl bg-card/95 backdrop-blur-xl border border-border shadow-card">
+        <div className="max-w-5xl mx-auto p-5 lg:p-7 rounded-2xl bg-card border border-border shadow-sm">
           <div className="grid md:grid-cols-3 gap-4 mb-4">
             <div className="md:col-span-2">
               <label className="text-xs text-muted-foreground block mb-1 text-right">ابحث عن فعالية</label>
@@ -227,7 +227,7 @@ export default function Festivals() {
                 className={`flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-medium transition-all ${
                   selectedCategory === cat
                     ? "bg-primary text-primary-foreground"
-                    : "bg-muted/50 text-muted-foreground hover:bg-muted border border-border/30"
+                    : "bg-muted/50 text-muted-foreground hover:bg-muted border border-border"
                 }`}
               >
                 {categoryIcons[cat]}
@@ -300,10 +300,10 @@ export default function Festivals() {
 
 function EventCard({ event, featured = false }: { event: FestivalEvent; featured?: boolean }) {
   return (
-    <div className="rounded-2xl bg-card/70 border border-border/30 overflow-hidden hover:border-primary/20 transition-all group">
+    <div className="rounded-2xl bg-card border border-border overflow-hidden hover:border-primary/20 transition-all group">
       <div className="relative h-48 overflow-hidden">
         <img src={event.image} alt={event.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-        <Badge className="absolute top-3 right-3 bg-card/80 backdrop-blur-sm text-foreground border-0 text-xs">
+        <Badge className="absolute top-3 right-3 bg-card-sm text-foreground border-0 text-xs">
           {event.category}
         </Badge>
         {featured && (
@@ -338,7 +338,7 @@ function EventCard({ event, featured = false }: { event: FestivalEvent; featured
           </span>
         </div>
 
-        <div className="flex items-center justify-between pt-4 border-t border-border/30">
+        <div className="flex items-center justify-between pt-4 border-t border-border">
           <div>
             <span className="text-lg font-bold text-primary">{event.price.toLocaleString()}</span>
             <span className="text-xs text-muted-foreground mr-1">{event.currency}</span>

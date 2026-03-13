@@ -359,7 +359,7 @@ export default function AdminAnalytics() {
         {/* KPI Cards */}
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
           {kpiCards.map((kpi) => (
-            <div key={kpi.label} className="p-6 rounded-2xl bg-gradient-card border border-border/50 hover:border-primary/30 transition-all">
+            <div key={kpi.label} className="p-6 rounded-2xl bg-card border border-border hover:border-primary/30 transition-all">
               <div className="flex items-center justify-between mb-4">
                 <div className={`w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center`}>
                   <kpi.icon className="w-6 h-6 text-primary" />
@@ -381,7 +381,7 @@ export default function AdminAnalytics() {
         {/* Booking Types (all 5 services) */}
         <div className="grid md:grid-cols-5 gap-4">
           {serviceTypeCards.map((card) => (
-            <div key={card.label} className="p-5 rounded-2xl bg-card border border-border/50 flex items-center gap-4">
+            <div key={card.label} className="p-5 rounded-2xl bg-card border border-border flex items-center gap-4">
               <div className={`w-14 h-14 rounded-xl ${card.bg} flex items-center justify-center`}>
                 <card.icon className={`w-7 h-7 ${card.color}`} />
               </div>
@@ -395,7 +395,7 @@ export default function AdminAnalytics() {
 
         {/* User Stats Row */}
         <div className="grid md:grid-cols-3 gap-4">
-          <div className="p-5 rounded-2xl bg-card border border-border/50 flex items-center gap-4">
+          <div className="p-5 rounded-2xl bg-card border border-border flex items-center gap-4">
             <div className="w-14 h-14 rounded-xl bg-blue-500/10 flex items-center justify-center">
               <Users className="w-7 h-7 text-blue-500" />
             </div>
@@ -404,7 +404,7 @@ export default function AdminAnalytics() {
               <p className="text-sm text-muted-foreground">مستخدم مسجل</p>
             </div>
           </div>
-          <div className="p-5 rounded-2xl bg-card border border-border/50 flex items-center gap-4">
+          <div className="p-5 rounded-2xl bg-card border border-border flex items-center gap-4">
             <div className="w-14 h-14 rounded-xl bg-amber-500/10 flex items-center justify-center">
               <UserCheck className="w-7 h-7 text-amber-500" />
             </div>
@@ -413,7 +413,7 @@ export default function AdminAnalytics() {
               <p className="text-sm text-muted-foreground">حجز ضيف (بدون تسجيل)</p>
             </div>
           </div>
-          <div className="p-5 rounded-2xl bg-card border border-border/50 flex items-center gap-4">
+          <div className="p-5 rounded-2xl bg-card border border-border flex items-center gap-4">
             <div className="w-14 h-14 rounded-xl bg-emerald-500/10 flex items-center justify-center">
               <Globe className="w-7 h-7 text-emerald-500" />
             </div>
@@ -427,7 +427,7 @@ export default function AdminAnalytics() {
         {/* Charts Row */}
         <div className="grid lg:grid-cols-2 gap-6">
           {/* Revenue by Month */}
-          <div className="p-6 rounded-2xl bg-card border border-border/50">
+          <div className="p-6 rounded-2xl bg-card border border-border">
             <h3 className="font-bold mb-6 flex items-center gap-2">
               <BarChart3 className="w-5 h-5 text-primary" />
               الإيرادات الشهرية
@@ -453,7 +453,7 @@ export default function AdminAnalytics() {
           </div>
 
           {/* Revenue by Type Pie */}
-          <div className="p-6 rounded-2xl bg-card border border-border/50">
+          <div className="p-6 rounded-2xl bg-card border border-border">
             <h3 className="font-bold mb-6 flex items-center gap-2">
               <PieChart className="w-5 h-5 text-primary" />
               توزيع الإيرادات حسب الخدمة
@@ -490,7 +490,7 @@ export default function AdminAnalytics() {
         </div>
 
         {/* Trend Chart */}
-        <div className="p-6 rounded-2xl bg-card border border-border/50">
+        <div className="p-6 rounded-2xl bg-card border border-border">
           <h3 className="font-bold mb-6 flex items-center gap-2">
             <Activity className="w-5 h-5 text-primary" />
             اتجاه الحجوزات (آخر 14 يوم)
@@ -535,14 +535,14 @@ export default function AdminAnalytics() {
 
         {/* Status Distribution */}
         <div className="grid lg:grid-cols-2 gap-6">
-          <div className="p-6 rounded-2xl bg-card border border-border/50">
+          <div className="p-6 rounded-2xl bg-card border border-border">
             <h3 className="font-bold mb-6 flex items-center gap-2">
               <Calendar className="w-5 h-5 text-primary" />
               توزيع الحجوزات حسب الحالة
             </h3>
             <div className="grid gap-4">
               {stats.bookingsByStatus.map((status) => (
-                <div key={status.name} className="p-4 rounded-xl bg-muted/30 border border-border/30">
+                <div key={status.name} className="p-4 rounded-xl bg-muted/30 border border-border">
                   <div className="flex items-center justify-between mb-2">
                     <span className="text-sm text-muted-foreground">{status.name}</span>
                     <div className="w-3 h-3 rounded-full" style={{ backgroundColor: status.color }} />
@@ -565,7 +565,7 @@ export default function AdminAnalytics() {
           </div>
 
           {/* Top Destinations */}
-          <div className="p-6 rounded-2xl bg-card border border-border/50">
+          <div className="p-6 rounded-2xl bg-card border border-border">
             <h3 className="font-bold mb-6 flex items-center gap-2">
               <Globe className="w-5 h-5 text-primary" />
               أكثر الوجهات حجزاً
@@ -600,7 +600,7 @@ export default function AdminAnalytics() {
         </div>
 
         {/* Bookings by Service Type Pie */}
-        <div className="p-6 rounded-2xl bg-card border border-border/50">
+        <div className="p-6 rounded-2xl bg-card border border-border">
           <h3 className="font-bold mb-6 flex items-center gap-2">
             <PieChart className="w-5 h-5 text-primary" />
             توزيع الحجوزات حسب الخدمة

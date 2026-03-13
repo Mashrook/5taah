@@ -182,7 +182,7 @@ export default function AdminDashboard() {
       {/* KPI Cards */}
       <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
         {kpiCards.map((kpi) => (
-          <div key={kpi.label} className="p-6 rounded-2xl bg-gradient-card border border-border/50 hover:border-primary/30 transition-all">
+          <div key={kpi.label} className="p-6 rounded-2xl bg-card border border-border hover:border-primary/30 transition-all">
             <div className="flex items-center justify-between mb-4">
               <div className={`w-12 h-12 rounded-xl ${kpi.bg} flex items-center justify-center`}>
                 <kpi.icon className={`w-6 h-6 ${kpi.color}`} />
@@ -206,7 +206,7 @@ export default function AdminDashboard() {
       {/* Service Breakdown + Quick Actions */}
       <div className="grid lg:grid-cols-3 gap-6">
         {/* Services */}
-        <div className="lg:col-span-2 p-6 rounded-2xl bg-card border border-border/50">
+        <div className="lg:col-span-2 p-6 rounded-2xl bg-card border border-border">
           <h2 className="font-bold mb-5 flex items-center gap-2">
             <Plane className="w-5 h-5 text-primary" />
             الحجوزات حسب الخدمة
@@ -216,7 +216,7 @@ export default function AdminDashboard() {
               const info = BOOKING_TYPE_MAP[sc.type];
               const Icon = info.icon;
               return (
-                <div key={sc.type} className="p-4 rounded-xl bg-muted/30 border border-border/30 text-center hover:border-primary/20 transition-all">
+                <div key={sc.type} className="p-4 rounded-xl bg-muted/30 border border-border text-center hover:border-primary/20 transition-all">
                   <div className={`w-10 h-10 mx-auto rounded-lg ${info.bg} flex items-center justify-center mb-2`}>
                     <Icon className={`w-5 h-5 ${info.color}`} />
                   </div>
@@ -229,7 +229,7 @@ export default function AdminDashboard() {
         </div>
 
         {/* Quick Actions */}
-        <div className="p-6 rounded-2xl bg-card border border-border/50">
+        <div className="p-6 rounded-2xl bg-card border border-border">
           <h2 className="font-bold mb-5 flex items-center gap-2">
             <ArrowUpRight className="w-5 h-5 text-primary" />
             إجراءات سريعة
@@ -239,7 +239,7 @@ export default function AdminDashboard() {
               <button
                 key={action.path}
                 onClick={() => navigate(action.path)}
-                className="w-full flex items-center gap-3 p-3 rounded-xl bg-muted/30 border border-border/30 hover:border-primary/30 hover:bg-primary/5 transition-all text-right"
+                className="w-full flex items-center gap-3 p-3 rounded-xl bg-muted/30 border border-border hover:border-primary/30 hover:bg-primary/5 transition-all text-right"
               >
                 <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
                   <action.icon className="w-4 h-4 text-primary" />
@@ -253,7 +253,7 @@ export default function AdminDashboard() {
       </div>
 
       {/* Recent Bookings */}
-      <div className="p-6 rounded-2xl bg-card border border-border/50">
+      <div className="p-6 rounded-2xl bg-card border border-border">
         <div className="flex items-center justify-between mb-5">
           <h2 className="font-bold flex items-center gap-2">
             <Clock className="w-5 h-5 text-primary" />
@@ -276,7 +276,7 @@ export default function AdminDashboard() {
               const TypeIcon = typeInfo.icon;
               const StatusIcon = statusInfo.icon;
               return (
-                <div key={b.id} className="flex items-center justify-between p-3 rounded-xl bg-muted/30 border border-border/30 hover:border-primary/20 transition-all">
+                <div key={b.id} className="flex items-center justify-between p-3 rounded-xl bg-muted/30 border border-border hover:border-primary/20 transition-all">
                   <div className="flex items-center gap-3">
                     <div className={`w-9 h-9 rounded-lg ${typeInfo.bg} flex items-center justify-center`}>
                       <TypeIcon className={`w-4 h-4 ${typeInfo.color}`} />
@@ -307,7 +307,7 @@ export default function AdminDashboard() {
           { s: "pending", count: stats.pendingBookings, icon: Clock, color: "text-amber-500", bg: "bg-amber-500/10", label: "معلقة" },
           { s: "cancelled", count: stats.cancelledBookings, icon: XCircle, color: "text-red-500", bg: "bg-red-500/10", label: "ملغية" },
         ].map((item) => (
-          <div key={item.s} className="p-5 rounded-2xl bg-card border border-border/50 flex items-center gap-4">
+          <div key={item.s} className="p-5 rounded-2xl bg-card border border-border flex items-center gap-4">
             <div className={`w-14 h-14 rounded-xl ${item.bg} flex items-center justify-center`}>
               <item.icon className={`w-7 h-7 ${item.color}`} />
             </div>

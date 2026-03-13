@@ -160,14 +160,14 @@ export default function AdminApiLogs() {
         <select
           value={typeFilter}
           onChange={(e) => { setTypeFilter(e.target.value); setPage(0); }}
-          className="px-4 py-2 rounded-xl bg-muted border border-border/50 text-foreground text-sm"
+          className="px-4 py-2 rounded-xl bg-muted border border-border text-foreground text-sm"
         >
           {LOG_TYPES.map((t) => <option key={t.value} value={t.value}>{t.label}</option>)}
         </select>
         <select
           value={actionFilter}
           onChange={(e) => { setActionFilter(e.target.value); setPage(0); }}
-          className="px-4 py-2 rounded-xl bg-muted border border-border/50 text-foreground text-sm"
+          className="px-4 py-2 rounded-xl bg-muted border border-border text-foreground text-sm"
         >
           {LOG_ACTIONS.map((a) => <option key={a.value} value={a.value}>{a.label}</option>)}
         </select>
@@ -189,7 +189,7 @@ export default function AdminApiLogs() {
             const isExpanded = expandedId === log.id;
 
             return (
-              <div key={log.id} className="rounded-xl bg-card border border-border/50 overflow-hidden">
+              <div key={log.id} className="rounded-xl bg-card border border-border overflow-hidden">
                 <button
                   onClick={() => setExpandedId(isExpanded ? null : log.id)}
                   className="w-full flex items-center gap-4 p-4 text-right hover:bg-muted/20 transition-colors"
@@ -220,7 +220,7 @@ export default function AdminApiLogs() {
                 </button>
 
                 {isExpanded && (
-                  <div className="px-4 pb-4 border-t border-border/30 space-y-3 pt-3">
+                  <div className="px-4 pb-4 border-t border-border space-y-3 pt-3">
                     {log.before && Object.keys(log.before).length > 0 && (
                       <div>
                         <p className="text-xs text-muted-foreground mb-1 font-semibold">طلب (Request)</p>

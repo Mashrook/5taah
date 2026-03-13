@@ -28,8 +28,8 @@ export default function BookingStepper({ steps, currentStep, className }: Bookin
                 <div
                   className={cn(
                     "w-10 h-10 lg:w-12 lg:h-12 rounded-full flex items-center justify-center text-sm font-bold transition-all duration-500 shrink-0",
-                    isDone && "bg-primary text-primary-foreground shadow-gold",
-                    isActive && "bg-primary/20 text-primary border-2 border-primary shadow-glow-gold animate-pulse-gold",
+                    isDone && "bg-primary text-primary-foreground",
+                    isActive && "bg-primary/20 text-primary border-2 border-primary",
                     !isDone && !isActive && "bg-muted/50 text-muted-foreground border border-border/50"
                   )}
                 >

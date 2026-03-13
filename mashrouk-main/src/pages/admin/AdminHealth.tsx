@@ -84,10 +84,10 @@ export default function AdminHealth() {
           </div>
 
           {/* Services */}
-          <div className="rounded-2xl bg-card border border-border/50 p-6">
+          <div className="rounded-2xl bg-card border border-border p-6">
             <h3 className="font-bold mb-4">الخدمات</h3>
             <div className="space-y-3">
-              <div className="flex items-center justify-between p-4 rounded-xl bg-muted/30 border border-border/30">
+              <div className="flex items-center justify-between p-4 rounded-xl bg-muted/30 border border-border">
                 <div className="flex items-center gap-3">
                   <StatusIcon status={health.services.database.status} />
                   <div>
@@ -112,7 +112,7 @@ export default function AdminHealth() {
               { label: "تنبيهات مفتوحة", value: health.stats.open_alerts },
               { label: "حوادث مفتوحة", value: health.stats.open_incidents },
             ].map((s) => (
-              <div key={s.label} className="p-4 rounded-xl bg-card border border-border/50 text-center">
+              <div key={s.label} className="p-4 rounded-xl bg-card border border-border text-center">
                 <div className="text-2xl font-bold text-primary">{s.value}</div>
                 <div className="text-xs text-muted-foreground mt-1">{s.label}</div>
               </div>

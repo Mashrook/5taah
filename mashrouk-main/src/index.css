@@ -152,13 +152,13 @@
     -webkit-text-fill-color: transparent;
     background-clip: text;
   }
-  .bg-gradient-gold { background: var(--gradient-primary); }
-  .bg-gradient-hero { background: var(--gradient-hero); }
-  .bg-gradient-card { background: linear-gradient(145deg, hsl(var(--card)) 0%, hsl(var(--muted)) 100%); }
-  .shadow-gold { box-shadow: var(--shadow-primary); }
-  .shadow-gold-lg { box-shadow: var(--shadow-primary-lg); }
-  .glow-gold { box-shadow: var(--glow-primary); }
-  .glow-gold-strong { box-shadow: var(--glow-primary-strong); }
+  .bg-gradient-gold { background: hsl(var(--primary)); }
+  .bg-gradient-hero { background: hsl(var(--background)); }
+  .bg-gradient-card { background: hsl(var(--card)); }
+  .shadow-gold { box-shadow: none; }
+  .shadow-gold-lg { box-shadow: none; }
+  .glow-gold { box-shadow: none; }
+  .glow-gold-strong { box-shadow: none; }
   .border-gold-gradient {
     border: 1px solid transparent;
     background: linear-gradient(hsl(var(--card)), hsl(var(--card))) padding-box,
@@ -174,8 +174,8 @@
   }
   
   /* Premium section spacing */
-  .section-padding { @apply py-12 lg:py-20; }
-  .section-padding-sm { @apply py-8 lg:py-12; }
+  .section-padding { @apply py-10; }
+  .section-padding-sm { @apply py-8; }
 }
 
 /* Animations */

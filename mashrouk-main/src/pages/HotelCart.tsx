@@ -86,7 +86,7 @@ export default function HotelCart() {
           </div>
 
           {items.length === 0 ? (
-            <div className="text-center py-20 rounded-3xl bg-card/50 border border-border/30">
+            <div className="text-center py-20 rounded-3xl bg-card/50 border border-border">
               <Hotel className="w-20 h-20 mx-auto mb-4 text-muted-foreground/20" />
               <p className="text-xl font-bold mb-2">السلة فارغة</p>
               <p className="text-muted-foreground mb-6">لم تقم بإضافة أي حجوزات بعد</p>
@@ -97,7 +97,7 @@ export default function HotelCart() {
               {/* Cart Items */}
               <div className="lg:col-span-2 space-y-4">
                 {items.map((item) => (
-                  <div key={item.roomId} className="rounded-2xl bg-card/70 border border-border/30 overflow-hidden hover:border-primary/20 transition-all">
+                  <div key={item.roomId} className="rounded-2xl bg-card border border-border overflow-hidden hover:border-primary/20 transition-all">
                     <div className="flex flex-col sm:flex-row">
                       <div className="sm:w-44 h-36 sm:h-auto shrink-0 overflow-hidden">
                         <img src={item.roomImage} alt={item.roomName} className="w-full h-full object-cover hover:scale-105 transition-transform duration-500" />
@@ -132,7 +132,7 @@ export default function HotelCart() {
               {/* Summary Sidebar */}
               <div className="space-y-4">
                 {/* Coupon */}
-                <div className="rounded-2xl bg-card/70 border border-border/30 p-5">
+                <div className="rounded-2xl bg-card border border-border p-5">
                   <h3 className="font-bold mb-3 flex items-center gap-2"><Tag className="w-4 h-4 text-primary" /> كوبون الخصم</h3>
                   <div className="flex gap-2">
                     <Input
@@ -149,7 +149,7 @@ export default function HotelCart() {
                 </div>
 
                 {/* Total */}
-                <div className="rounded-2xl bg-card/70 border border-border/30 p-5">
+                <div className="rounded-2xl bg-card border border-border p-5">
                   <h3 className="font-bold mb-4">ملخص الحجز</h3>
                   <div className="space-y-3 text-sm">
                     <div className="flex justify-between">
@@ -166,7 +166,7 @@ export default function HotelCart() {
                       <span>الضرائب</span>
                       <span>شاملة</span>
                     </div>
-                    <div className="border-t border-border/30 pt-3 flex justify-between text-lg font-bold">
+                    <div className="border-t border-border pt-3 flex justify-between text-lg font-bold">
                       <span>الإجمالي</span>
                       <span className="text-primary">{getTotal().toLocaleString()} ر.س</span>
                     </div>

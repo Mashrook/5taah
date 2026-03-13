@@ -193,18 +193,18 @@ export default function Transfers() {
   return (
     <div className="min-h-screen">
       {/* Hero + Search */}
-      <section className="bg-gradient-to-b from-primary/80 via-primary/50 to-background pt-8 pb-16">
+      <section className="bg-gradient-to-b from-primary/5 to-background pt-8 pb-16">
         <div className="container mx-auto px-4 lg:px-8">
           <BookingStepper steps={transferSteps} currentStep={currentStep} className="max-w-2xl mx-auto mb-8" />
 
           <div className="text-center mb-8">
-            <h1 className="text-3xl lg:text-4xl font-bold text-primary-foreground mb-2">النقل والمواصلات</h1>
-            <p className="text-primary-foreground/80 text-sm">احجز نقلك من وإلى المطار — سيارة خاصة، تاكسي، فان، ليموزين</p>
+            <h1 className="text-3xl lg:text-4xl font-bold text-foreground mb-2">النقل والمواصلات</h1>
+            <p className="text-muted-foreground text-sm">احجز نقلك من وإلى المطار — سيارة خاصة، تاكسي، فان، ليموزين</p>
           </div>
 
         {/* Step 0: Search */}
         {currentStep <= 1 && !selectedOffer && (
-          <form onSubmit={handleSearch} className="max-w-4xl mx-auto p-6 lg:p-8 rounded-2xl bg-card/95 backdrop-blur-xl border border-border shadow-card">
+          <form onSubmit={handleSearch} className="max-w-4xl mx-auto p-6 lg:p-8 rounded-2xl bg-card border border-border shadow-sm">
             <div className="grid md:grid-cols-2 gap-4 mb-4">
               <CityAutocomplete value={fromCity} onChange={setFromCity} placeholder="مطار الانطلاق (مثال: الرياض)" label="من (كود IATA)" showCode />
               <CityAutocomplete value={toCity} onChange={setToCity} placeholder="الوجهة (مثال: جدة)" label="إلى (اختياري)" showCode />
@@ -270,7 +270,7 @@ export default function Transfers() {
             <h3 className="text-xl font-bold mb-6">عروض النقل المتاحة ({offers.length} عرض)</h3>
             <div className="space-y-4">
               {offers.map((offer) => (
-                <div key={offer.id} className="flex flex-col lg:flex-row items-stretch rounded-2xl bg-card/70 border border-border/30 hover:border-primary/20 transition-all overflow-hidden group">
+                <div key={offer.id} className="flex flex-col lg:flex-row items-stretch rounded-2xl bg-card border border-border hover:border-primary/20 transition-all overflow-hidden group">
                   <div className="flex-1 p-5 lg:p-6">
                     <div className="flex items-center gap-3 mb-3">
                       <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
@@ -334,7 +334,7 @@ export default function Transfers() {
                   </div>
 
                   {/* Price + Book */}
-                  <div className="lg:border-r border-t lg:border-t-0 border-border/30 p-5 lg:p-6 flex flex-row lg:flex-col items-center justify-between lg:justify-center gap-3 lg:min-w-[180px] bg-muted/20">
+                  <div className="lg:border-r border-t lg:border-t-0 border-border p-5 lg:p-6 flex flex-row lg:flex-col items-center justify-between lg:justify-center gap-3 lg:min-w-[180px] bg-muted/20">
                     <div className="text-center">
                       <p className="text-2xl font-bold text-primary">
                         {parseFloat(offer.quotation.monetaryAmount).toLocaleString()}
@@ -357,7 +357,7 @@ export default function Transfers() {
         {/* Step 2: Passenger Details */}
         {currentStep === 2 && selectedOffer && !bookingResult && (
           <div className="max-w-2xl mx-auto">
-            <div className="p-6 rounded-2xl bg-card/70 border border-border/30 mb-6">
+            <div className="p-6 rounded-2xl bg-card border border-border mb-6">
               <h3 className="font-bold mb-3">ملخص العرض</h3>
               <div className="grid grid-cols-2 gap-3 text-sm">
                 <div><span className="text-muted-foreground">المزود:</span> <span className="font-medium">{selectedOffer.serviceProvider?.name}</span></div>
@@ -367,7 +367,7 @@ export default function Transfers() {
               </div>
             </div>
 
-            <form onSubmit={handleBook} className="p-6 rounded-2xl bg-card/70 border border-border/30 space-y-4">
+            <form onSubmit={handleBook} className="p-6 rounded-2xl bg-card border border-border space-y-4">
               <h3 className="font-bold">بيانات الراكب الرئيسي</h3>
               <div className="grid grid-cols-2 gap-4">
                 <div>
@@ -403,7 +403,7 @@ export default function Transfers() {
         {/* Step 3: Confirmation */}
         {currentStep === 3 && bookingResult && (
           <div className="max-w-2xl mx-auto text-center">
-            <div className="p-8 rounded-2xl bg-card/70 border border-border/30">
+            <div className="p-8 rounded-2xl bg-card border border-border">
               <CheckCircle className="w-16 h-16 text-primary mx-auto mb-4" />
               <h3 className="text-2xl font-bold mb-2">تم الحجز بنجاح!</h3>
               <p className="text-muted-foreground mb-6">تم تأكيد حجز النقل الخاص بك</p>
@@ -464,7 +464,7 @@ function FeaturedTransfersSection() {
       <h2 className="text-xl font-bold mb-6">خدمات نقل مميزة</h2>
       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
         {transfers.map((t) => (
-          <div key={t.id} className="rounded-2xl bg-card border border-border/50 overflow-hidden hover:border-primary/30 transition-all">
+          <div key={t.id} className="rounded-2xl bg-card border border-border overflow-hidden hover:border-primary/30 transition-all">
             {t.image_url && <img src={t.image_url} alt={t.title} className="w-full h-32 object-cover" loading="lazy" />}
             <div className="p-4">
               <h3 className="font-bold text-sm mb-1">{t.title}</h3>
@@ -475,7 +475,7 @@ function FeaturedTransfersSection() {
                 <Users className="w-3.5 h-3.5 mr-2" />
                 <span>{t.max_passengers} ركاب</span>
               </div>
-              <div className="pt-3 border-t border-border/30 flex items-center justify-between">
+              <div className="pt-3 border-t border-border flex items-center justify-between">
                 <p className="text-lg font-bold text-primary">{Number(t.price).toLocaleString()} <span className="text-xs font-normal">{t.currency}</span></p>
                 <Button variant="gold" size="sm" onClick={() => handleBook(t)}>احجز الآن</Button>
               </div>

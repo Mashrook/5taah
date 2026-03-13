@@ -128,16 +128,16 @@ export default function News() {
   return (
     <div className="min-h-screen">
       {/* Hero */}
-      <section className="bg-gradient-to-b from-primary/80 via-primary/50 to-background pt-10 pb-14">
+      <section className="bg-gradient-to-b from-primary/5 to-background pt-10 pb-14">
         <div className="container mx-auto px-4 lg:px-8 text-center">
           <div className="flex items-center justify-center gap-2 mb-3">
-            <Newspaper className="w-6 h-6 text-primary-foreground" />
-            <p className="text-primary-foreground/70 text-sm">الأخبار والمقالات</p>
+            <Newspaper className="w-6 h-6 text-primary" />
+            <p className="text-muted-foreground text-sm">الأخبار والمقالات</p>
           </div>
-          <h1 className="text-3xl lg:text-5xl font-bold text-primary-foreground mb-3">
+          <h1 className="text-3xl lg:text-5xl font-bold text-foreground mb-3">
             آخر أخبار السياحة والسفر
           </h1>
-          <p className="text-primary-foreground/80 text-sm lg:text-base max-w-2xl mx-auto">
+          <p className="text-muted-foreground text-sm lg:text-base max-w-2xl mx-auto">
             تابع أحدث الأخبار والمقالات عن السياحة في المملكة والعالم — أدلة سفر ونصائح وتغطيات حصرية
           </p>
         </div>
@@ -145,7 +145,7 @@ export default function News() {
 
       {/* Search & Categories */}
       <div className="container mx-auto px-4 lg:px-8 -mt-6">
-        <div className="max-w-4xl mx-auto p-5 rounded-2xl bg-card/95 backdrop-blur-xl border border-border shadow-card">
+        <div className="max-w-4xl mx-auto p-5 rounded-2xl bg-card border border-border shadow-sm">
           <div className="flex items-center gap-2 bg-muted/30 border border-input rounded-xl px-3 h-10 mb-4">
             <Search className="w-4 h-4 text-muted-foreground" />
             <Input
@@ -163,7 +163,7 @@ export default function News() {
                 className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
                   selectedCategory === cat
                     ? "bg-primary text-primary-foreground"
-                    : "bg-muted/50 text-muted-foreground hover:bg-muted border border-border/30"
+                    : "bg-muted/50 text-muted-foreground hover:bg-muted border border-border"
                 }`}
               >
                 {cat}
@@ -182,7 +182,7 @@ export default function News() {
           </h2>
           <div className="grid lg:grid-cols-2 gap-6">
             {featuredArticles.map((article) => (
-              <div key={article.id} className="group rounded-2xl bg-card/70 border border-border/30 overflow-hidden hover:border-primary/20 transition-all flex flex-col lg:flex-row">
+              <div key={article.id} className="group rounded-2xl bg-card border border-border overflow-hidden hover:border-primary/20 transition-all flex flex-col lg:flex-row">
                 <div className="relative lg:w-2/5 h-56 lg:h-auto overflow-hidden">
                   <img src={article.image} alt={article.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                   <Badge className="absolute top-3 right-3 bg-primary text-primary-foreground border-0 text-xs">مميز</Badge>
@@ -193,7 +193,7 @@ export default function News() {
                     <h3 className="text-lg font-bold mb-3 line-clamp-2">{article.title}</h3>
                     <p className="text-sm text-muted-foreground leading-relaxed line-clamp-3">{article.excerpt}</p>
                   </div>
-                  <div className="flex items-center justify-between mt-4 pt-4 border-t border-border/30">
+                  <div className="flex items-center justify-between mt-4 pt-4 border-t border-border">
                     <div className="flex items-center gap-4 text-xs text-muted-foreground">
                       <span className="flex items-center gap-1"><Calendar className="w-3.5 h-3.5" />{article.date}</span>
                       <span className="flex items-center gap-1"><Clock className="w-3.5 h-3.5" />{article.readTime}</span>
@@ -256,17 +256,17 @@ export default function News() {
 
 function ArticleCard({ article }: { article: Article }) {
   return (
-    <div className="group rounded-2xl bg-card/70 border border-border/30 overflow-hidden hover:border-primary/20 transition-all">
+    <div className="group rounded-2xl bg-card border border-border overflow-hidden hover:border-primary/20 transition-all">
       <div className="relative h-48 overflow-hidden">
         <img src={article.image} alt={article.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-        <Badge className="absolute top-3 right-3 bg-card/80 backdrop-blur-sm text-foreground border-0 text-xs">
+        <Badge className="absolute top-3 right-3 bg-card-sm text-foreground border-0 text-xs">
           {article.category}
         </Badge>
       </div>
       <div className="p-5">
         <h3 className="font-bold text-base mb-2 line-clamp-2">{article.title}</h3>
         <p className="text-xs text-muted-foreground leading-relaxed mb-4 line-clamp-2">{article.excerpt}</p>
-        <div className="flex items-center justify-between pt-3 border-t border-border/30">
+        <div className="flex items-center justify-between pt-3 border-t border-border">
           <div className="flex items-center gap-3 text-xs text-muted-foreground">
             <span className="flex items-center gap-1"><Calendar className="w-3.5 h-3.5" />{article.date}</span>
             <span className="flex items-center gap-1"><Clock className="w-3.5 h-3.5" />{article.readTime}</span>

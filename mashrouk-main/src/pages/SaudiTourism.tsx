@@ -136,13 +136,13 @@ export default function SaudiTourism() {
   return (
     <div className="min-h-screen">
       {/* Hero */}
-      <section className="bg-gradient-to-b from-primary/80 via-primary/50 to-background pt-10 pb-14">
+      <section className="bg-gradient-to-b from-primary/5 to-background pt-10 pb-14">
         <div className="container mx-auto px-4 lg:px-8 text-center">
-          <p className="text-primary-foreground/70 text-sm mb-2">السياحة في السعودية</p>
-          <h1 className="text-3xl lg:text-5xl font-bold text-primary-foreground mb-3">
+          <p className="text-muted-foreground text-sm mb-2">السياحة في السعودية</p>
+          <h1 className="text-3xl lg:text-5xl font-bold text-foreground mb-3">
             اكتشف جمال المملكة العربية السعودية
           </h1>
-          <p className="text-primary-foreground/80 text-sm lg:text-base max-w-2xl mx-auto">
+          <p className="text-muted-foreground text-sm lg:text-base max-w-2xl mx-auto">
             من الصحاري الذهبية إلى الجبال الخضراء، ومن الشواطئ البكر إلى المعالم التاريخية — تجارب سفر لا تُنسى
           </p>
         </div>
@@ -157,7 +157,7 @@ export default function SaudiTourism() {
             { label: "منطقة إدارية", value: "13" },
             { label: "كم ساحل", value: "3,400" },
           ].map((stat) => (
-            <div key={stat.label} className="p-4 rounded-2xl bg-card/95 backdrop-blur-xl border border-border text-center">
+            <div key={stat.label} className="p-4 rounded-2xl bg-card border border-border text-center">
               <p className="text-2xl font-bold text-primary">{stat.value}</p>
               <p className="text-xs text-muted-foreground">{stat.label}</p>
             </div>
@@ -175,7 +175,7 @@ export default function SaudiTourism() {
               className={`flex items-center gap-1.5 px-5 py-2.5 rounded-full text-sm font-medium transition-all ${
                 activeCategory === cat
                   ? "bg-primary text-primary-foreground"
-                  : "bg-card text-muted-foreground hover:bg-muted border border-border/30"
+                  : "bg-card text-muted-foreground hover:bg-muted border border-border"
               }`}
             >
               {categoryIconMap[cat]}
@@ -189,7 +189,7 @@ export default function SaudiTourism() {
       <section className="container mx-auto px-4 lg:px-8 pb-12">
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {filtered.map((dest) => (
-            <div key={dest.id} className="group rounded-2xl bg-card/70 border border-border/30 overflow-hidden hover:border-primary/20 transition-all">
+            <div key={dest.id} className="group rounded-2xl bg-card border border-border overflow-hidden hover:border-primary/20 transition-all">
               <div className="relative h-52 overflow-hidden">
                 <img src={dest.image} alt={dest.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
@@ -224,7 +224,7 @@ export default function SaudiTourism() {
                   ))}
                 </div>
 
-                <div className="flex items-center justify-between pt-3 border-t border-border/30">
+                <div className="flex items-center justify-between pt-3 border-t border-border">
                   <div className="flex items-center gap-1 text-xs text-muted-foreground">
                     <Calendar className="w-3.5 h-3.5" />
                     <span>{dest.bestTime}</span>

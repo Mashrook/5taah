@@ -155,17 +155,17 @@ export default function AdminLogin() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center py-12 bg-gradient-hero">
+    <div className="min-h-screen flex items-center justify-center py-12 bg-background">
       <div className="w-full max-w-md mx-4">
         <div className="text-center mb-8">
-          <div className="w-16 h-16 rounded-2xl bg-gradient-gold flex items-center justify-center mx-auto mb-4 shadow-gold">
+          <div className="w-16 h-16 rounded-2xl bg-primary flex items-center justify-center mx-auto mb-4">
             <LayoutDashboard className="w-8 h-8 text-primary-foreground" />
           </div>
           <h1 className="text-2xl font-bold">لوحة التحكم</h1>
           <p className="text-muted-foreground text-sm mt-2">دخول المديرين فقط</p>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-6 rounded-2xl bg-gradient-card border border-border/50 space-y-4">
+        <form onSubmit={handleSubmit} className="p-6 rounded-2xl bg-card border border-border space-y-4">
           {locked && (
             <div className="flex items-center gap-3 p-4 rounded-xl bg-destructive/10 border border-destructive/30">
               <ShieldAlert className="w-5 h-5 text-destructive shrink-0" />

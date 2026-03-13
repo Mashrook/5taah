@@ -402,15 +402,15 @@ export default function Flights() {
         {step === "search" && (
           <>
             {/* Hero + Search */}
-            <section className="bg-gradient-to-b from-primary/80 via-primary/50 to-background pt-8 pb-16">
+            <section className="bg-gradient-to-b from-primary/5 to-background pt-8 pb-16">
               <div className="container mx-auto px-4 lg:px-8">
                 <div className="text-center mb-8">
-                  <h1 className="text-3xl lg:text-4xl font-bold text-primary-foreground mb-2">احجز رحلتك القادمة</h1>
-                  <p className="text-primary-foreground/80 text-sm">أفضل أسعار تذاكر الطيران مع خدمات إضافية مميزة</p>
+                  <h1 className="text-3xl lg:text-4xl font-bold text-foreground mb-2">احجز رحلتك القادمة</h1>
+                  <p className="text-muted-foreground text-sm">أفضل أسعار تذاكر الطيران مع خدمات إضافية مميزة</p>
                 </div>
 
                 {/* Search Card */}
-                <form onSubmit={handleSearch} className="max-w-5xl mx-auto bg-card/95 backdrop-blur-xl rounded-2xl border border-border p-6 lg:p-8 shadow-card">
+                <form onSubmit={handleSearch} className="max-w-5xl mx-auto bg-card rounded-2xl border border-border p-6 lg:p-8 shadow-sm">
                   <div className="flex gap-2 justify-end mb-6">
                     <button type="button" onClick={() => setTripType("oneway")}
                       className={`flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-medium transition-colors ${tripType === "oneway" ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"}`}>
@@ -571,7 +571,7 @@ export default function Flights() {
                                 </div>
                               </div>
                               {offer.itineraries[1] && (
-                                <div className="mt-3 pt-3 border-t border-border/30">
+                                <div className="mt-3 pt-3 border-t border-border">
                                   <p className="text-xs text-muted-foreground mb-1">العودة</p>
                                   <div className="flex items-center gap-3 text-sm">
                                     <span className="font-medium">{offer.itineraries[1].segments[0].departure.iataCode}</span>
@@ -643,7 +643,7 @@ export default function Flights() {
             </section>
 
             {/* Airlines */}
-            <section className="section-padding-sm bg-muted/20 border-t border-border/30">
+            <section className="section-padding-sm bg-muted/20 border-t border-border">
               <div className="container mx-auto px-4 lg:px-8">
                 <div className="max-w-5xl mx-auto">
                   <h2 className="text-2xl font-bold text-foreground text-right mb-6">أشهر شركات الطيران</h2>
@@ -797,7 +797,7 @@ export default function Flights() {
                   </h3>
                   <div className="space-y-4">
                     {(travelers.filter(Boolean) as TravelerData[]).map((t, i) => (
-                      <div key={i} className={`${i > 0 ? "pt-4 border-t border-border/30" : ""}`}>
+                      <div key={i} className={`${i > 0 ? "pt-4 border-t border-border" : ""}`}>
                         {passengers > 1 && <p className="text-xs font-semibold text-primary mb-2">مسافر {i + 1}</p>}
                         <div className="grid grid-cols-2 gap-3 text-sm">
                           {[
@@ -931,12 +931,12 @@ function FeaturedFlightsSection() {
           <h2 className="text-2xl font-bold text-foreground text-right mb-6">رحلات مميزة</h2>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
             {flights.map((f) => (
-              <div key={f.id} className="rounded-2xl bg-card border border-border/50 p-5 hover:border-primary/30 transition-all">
+              <div key={f.id} className="rounded-2xl bg-card border border-border p-5 hover:border-primary/30 transition-all">
                 {f.image_url && <img src={f.image_url} alt={f.airline} className="w-full h-32 object-cover rounded-xl mb-3" loading="lazy" />}
                 <h3 className="font-bold text-sm mb-1">{f.airline} {f.flight_number && `- ${f.flight_number}`}</h3>
                 <p className="text-sm text-muted-foreground mb-2">{f.origin} → {f.destination}</p>
                 {f.cabin_class && <span className="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-full">{f.cabin_class}</span>}
-                <div className="flex items-end justify-between mt-3 pt-3 border-t border-border/30">
+                <div className="flex items-end justify-between mt-3 pt-3 border-t border-border">
                   <p className="text-lg font-bold text-primary">{Number(f.price).toLocaleString()} <span className="text-xs font-normal">{f.currency}</span></p>
                 </div>
               </div>

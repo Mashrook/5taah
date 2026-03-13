@@ -138,7 +138,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
       {/* Sidebar */}
       <aside
         className={cn(
-          "bg-card/60 backdrop-blur-xl border-l border-border/50 flex flex-col fixed top-0 right-0 bottom-0 overflow-y-auto transition-all duration-300 z-40",
+          "bg-card border-l border-border flex flex-col fixed top-0 right-0 bottom-0 overflow-y-auto transition-all duration-300 z-40",
           collapsed ? "w-[68px]" : "w-64"
         )}
       >

@@ -146,7 +146,7 @@ export default function CarBooking() {
 
         <div className="max-w-2xl mx-auto">
           {/* Car Summary */}
-          <div className="rounded-2xl bg-card/70 border border-border/30 p-5 mb-6">
+          <div className="rounded-2xl bg-card border border-border p-5 mb-6">
             <div className="flex items-start gap-4">
               <div className="w-14 h-14 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
                 <Car className="w-7 h-7 text-primary" />

@@ -23,7 +23,7 @@ export default function Settings() {
 
         <div className="space-y-4">
           {/* Language */}
-          <div className="p-5 rounded-2xl bg-card border border-border/50">
+          <div className="p-5 rounded-2xl bg-card border border-border">
             <div className="flex items-center gap-4">
               <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
                 <Globe className="w-5 h-5 text-primary" />
@@ -37,7 +37,7 @@ export default function Settings() {
           </div>
 
           {/* Theme */}
-          <div className="p-5 rounded-2xl bg-card border border-border/50">
+          <div className="p-5 rounded-2xl bg-card border border-border">
             <div className="flex items-center gap-4">
               <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
                 <Palette className="w-5 h-5 text-primary" />
@@ -51,7 +51,7 @@ export default function Settings() {
           </div>
 
           {/* Clear Cache */}
-          <div className="p-5 rounded-2xl bg-card border border-border/50">
+          <div className="p-5 rounded-2xl bg-card border border-border">
             <div className="flex items-center gap-4">
               <div className="w-10 h-10 rounded-xl bg-destructive/10 flex items-center justify-center">
                 <Trash2 className="w-5 h-5 text-destructive" />
@@ -65,7 +65,7 @@ export default function Settings() {
           </div>
 
           {/* Version */}
-          <div className="p-5 rounded-2xl bg-card border border-border/50">
+          <div className="p-5 rounded-2xl bg-card border border-border">
             <div className="flex items-center gap-4">
               <div className="w-10 h-10 rounded-xl bg-muted flex items-center justify-center">
                 <Info className="w-5 h-5 text-muted-foreground" />

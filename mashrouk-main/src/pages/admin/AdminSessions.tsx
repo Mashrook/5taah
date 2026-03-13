@@ -100,7 +100,7 @@ export default function AdminSessions() {
       ) : (
         <div className="space-y-3">
           {sessions.map((s) => (
-            <div key={s.id} className="flex items-center gap-4 p-4 rounded-xl bg-card border border-border/50">
+            <div key={s.id} className="flex items-center gap-4 p-4 rounded-xl bg-card border border-border">
               <div className={`w-3 h-3 rounded-full shrink-0 ${s.is_active ? "bg-green-500" : "bg-muted-foreground"}`} />
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 mb-1">

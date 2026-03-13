@@ -108,7 +108,7 @@ export default function AdminRetention() {
         <>
           <div className="space-y-4 mb-6">
             {policies.map((p) => (
-              <div key={p.id} className="rounded-xl bg-card border border-border/50 p-5">
+              <div key={p.id} className="rounded-xl bg-card border border-border p-5">
                 <div className="flex items-center justify-between gap-4">
                   <div className="flex-1">
                     <h4 className="font-semibold text-sm mb-1">{p.description_ar || p.entity_type}</h4>

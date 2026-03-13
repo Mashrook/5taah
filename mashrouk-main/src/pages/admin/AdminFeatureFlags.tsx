@@ -127,7 +127,7 @@ export default function AdminFeatureFlags() {
             ) : (
               <div className="space-y-3 mb-6">
                 {flags.map((flag) => (
-                  <div key={flag.id} className="flex items-center justify-between p-4 rounded-xl bg-card border border-border/50">
+                  <div key={flag.id} className="flex items-center justify-between p-4 rounded-xl bg-card border border-border">
                     <div>
                       <p className="font-medium text-foreground">{getFlagLabel(flag.flag_key)}</p>
                       <p className="text-xs text-muted-foreground" dir="ltr">{flag.flag_key}</p>
@@ -143,7 +143,7 @@ export default function AdminFeatureFlags() {
               </div>
             )}
 
-            <div className="p-4 rounded-xl bg-card border border-border/50">
+            <div className="p-4 rounded-xl bg-card border border-border">
               <h3 className="font-bold text-sm mb-3">إضافة ميزة مخصصة</h3>
               <div className="flex gap-3">
                 <Input

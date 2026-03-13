@@ -52,7 +52,7 @@ export default function ResetPassword() {
   if (!ready) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
-        <div className="text-center p-6 rounded-2xl bg-card/80 backdrop-blur border border-primary/20 shadow-lg">
+        <div className="text-center p-6 rounded-2xl bg-card border border-border shadow-sm">
           <h1 className="text-2xl font-bold mb-2">رابط غير صالح</h1>
           <p className="text-muted-foreground text-sm">يرجى طلب رابط جديد لإعادة تعيين كلمة المرور.</p>
           <Button variant="gold" className="mt-6" onClick={() => navigate("/forgot-password")}>طلب رابط جديد</Button>
@@ -65,12 +65,12 @@ export default function ResetPassword() {
     <div className="min-h-screen flex items-center justify-center py-12 bg-background">
       <div className="w-full max-w-md mx-4">
         <div className="text-center mb-8">
-          <div className="w-16 h-16 rounded-2xl bg-gradient-gold flex items-center justify-center mx-auto mb-4 shadow-gold">
+          <div className="w-16 h-16 rounded-2xl bg-primary flex items-center justify-center mx-auto mb-4">
             <Plane className="w-8 h-8 text-primary-foreground" />
           </div>
           <h1 className="text-2xl font-bold text-foreground">تعيين كلمة مرور جديدة</h1>
         </div>
-        <form onSubmit={handleSubmit} className="p-6 rounded-2xl bg-card/80 backdrop-blur border border-primary/20 shadow-lg space-y-4">
+        <form onSubmit={handleSubmit} className="p-6 rounded-2xl bg-card border border-border shadow-sm space-y-4">
           <div>
             <label className="text-sm font-medium mb-1 block">كلمة المرور الجديدة</label>
             <div className="relative">

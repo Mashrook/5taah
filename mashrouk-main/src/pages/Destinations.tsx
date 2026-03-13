@@ -114,7 +114,7 @@ const destinations: Destination[] = [
 
 function DestinationCard({ dest }: { dest: Destination }) {
   return (
-    <div className="group rounded-2xl overflow-hidden bg-card border border-border/30 hover:border-primary/30 transition-all hover:shadow-lg">
+    <div className="group rounded-2xl overflow-hidden bg-card border border-border hover:border-primary/30 transition-all hover:shadow-lg">
       {/* Image */}
       <div className="relative h-48 overflow-hidden">
         <img
@@ -153,7 +153,7 @@ function DestinationCard({ dest }: { dest: Destination }) {
           </span>
         </div>
 
-        <div className="flex items-center justify-between pt-3 border-t border-border/30">
+        <div className="flex items-center justify-between pt-3 border-t border-border">
           <div>
             <span className="text-xs text-muted-foreground">يبدأ من</span>
             <p className="text-lg font-bold text-primary">{dest.price.toLocaleString()} <span className="text-xs font-normal text-muted-foreground">ر.س</span></p>
@@ -177,11 +177,11 @@ export default function Destinations() {
   return (
     <div className="min-h-screen">
       {/* Hero */}
-      <section className="bg-gradient-to-b from-primary/80 via-primary/50 to-background pt-10 pb-16">
+      <section className="bg-gradient-to-b from-primary/5 to-background pt-10 pb-16">
         <div className="container mx-auto px-4 lg:px-8">
           <div className="text-center mb-8">
-            <h1 className="text-3xl lg:text-4xl font-bold text-primary-foreground mb-2">استكشف الوجهات</h1>
-            <p className="text-primary-foreground/80 text-sm">اكتشف أفضل الوجهات حسب اهتماماتك واحجز رحلتك بسهولة</p>
+            <h1 className="text-3xl lg:text-4xl font-bold text-foreground mb-2">استكشف الوجهات</h1>
+            <p className="text-muted-foreground text-sm">اكتشف أفضل الوجهات حسب اهتماماتك واحجز رحلتك بسهولة</p>
           </div>
 
           {/* Region Tabs */}
@@ -193,7 +193,7 @@ export default function Destinations() {
                 className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
                   activeRegion === tab.id
                     ? "bg-primary text-primary-foreground"
-                    : "bg-card/60 text-muted-foreground hover:bg-card/80 border border-border/30"
+                    : "bg-card/60 text-muted-foreground hover:bg-card/80 border border-border"
                 }`}
               >
                 {tab.label}
@@ -207,7 +207,7 @@ export default function Destinations() {
               <Link
                 key={city}
                 to={`/flights?to=${city}`}
-                className="flex items-center gap-1.5 text-sm text-primary-foreground/70 hover:text-primary-foreground transition-colors"
+                className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-primary transition-colors"
               >
                 <Plane className="w-3.5 h-3.5" />
                 {city}
@@ -217,7 +217,7 @@ export default function Destinations() {
 
           {/* Show All */}
           <div className="text-center">
-            <Button variant="outline" size="sm" className="bg-card/40 border-border/30 text-primary-foreground hover:bg-card/60">
+            <Button variant="outline" size="sm" className="bg-card border-border text-foreground hover:bg-muted">
               <Globe className="w-4 h-4 ml-1.5" />
               عرض الكل
             </Button>
@@ -232,7 +232,7 @@ export default function Destinations() {
           <div className="flex flex-wrap justify-center items-center gap-6 lg:gap-10">
             {airlines.map((airline) => (
               <div key={airline.name} className="flex flex-col items-center gap-2 group cursor-pointer">
-                <div className="w-14 h-14 rounded-xl bg-card border border-border/30 flex items-center justify-center p-2 group-hover:border-primary/30 transition-all">
+                <div className="w-14 h-14 rounded-xl bg-card border border-border flex items-center justify-center p-2 group-hover:border-primary/30 transition-all">
                   <img src={airline.logo} alt={airline.name} className="w-10 h-10 object-contain" />
                 </div>
                 <span className="text-xs text-muted-foreground group-hover:text-foreground transition-colors">{airline.name}</span>
@@ -284,7 +284,7 @@ export default function Destinations() {
             ].map((item) => (
               <div
                 key={item.title}
-                className="p-6 rounded-2xl bg-card border border-border/30 text-center hover:border-primary/20 transition-all"
+                className="p-6 rounded-2xl bg-card border border-border text-center hover:border-primary/20 transition-all"
               >
                 <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mx-auto mb-4">
                   <item.icon className="w-6 h-6 text-primary" />
@@ -299,21 +299,21 @@ export default function Destinations() {
       </section>
 
       {/* Newsletter */}
-      <section className="py-10 bg-primary/90">
+      <section className="py-10 bg-primary">
         <div className="container mx-auto px-4 lg:px-8">
           <div className="max-w-2xl mx-auto text-center">
             <h3 className="text-xl font-bold text-primary-foreground mb-2">اشترك في نشرتنا البريدية</h3>
-            <p className="text-primary-foreground/70 text-sm mb-5">احصل على أفضل العروض والتخفيضات المميزة</p>
+            <p className="text-primary-foreground/80 text-sm mb-5">احصل على أفضل العروض والتخفيضات المميزة</p>
             <div className="flex gap-2 max-w-md mx-auto">
               <Input
                 type="email"
                 placeholder="بريدك الإلكتروني"
                 value={emailSub}
                 onChange={(e) => setEmailSub(e.target.value)}
-                className="bg-white/10 border-white/20 text-primary-foreground placeholder:text-primary-foreground/50"
+                className="bg-white/20 border-white/30 text-primary-foreground placeholder:text-primary-foreground/50"
                 dir="ltr"
               />
-              <Button variant="gold">اشترك الآن</Button>
+              <Button className="bg-white text-primary hover:bg-white/90">اشترك الآن</Button>
             </div>
           </div>
         </div>

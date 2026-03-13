@@ -27,7 +27,7 @@ export default function Notifications() {
         {loading ? (
           <p className="text-muted-foreground">جاري التحميل...</p>
         ) : notifications.length === 0 ? (
-          <div className="p-12 rounded-2xl bg-card border border-border/50 text-center">
+          <div className="p-12 rounded-2xl bg-card border border-border text-center">
             <Bell className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
             <p className="text-muted-foreground">لا توجد إشعارات</p>
           </div>

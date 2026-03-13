@@ -96,7 +96,7 @@ export default function AdminTenantSettings() {
         {tenant && (
           <div className="space-y-6">
             {/* General Settings */}
-            <div className="p-6 rounded-2xl bg-card border border-border/50">
+            <div className="p-6 rounded-2xl bg-card border border-border">
               <h3 className="font-bold mb-4">الإعدادات العامة</h3>
               <div className="grid md:grid-cols-2 gap-4">
                 <div>
@@ -131,12 +131,12 @@ export default function AdminTenantSettings() {
             </div>
 
             {/* Domains */}
-            <div className="p-6 rounded-2xl bg-card border border-border/50">
+            <div className="p-6 rounded-2xl bg-card border border-border">
               <h3 className="font-bold mb-4 flex items-center gap-2"><Globe className="w-5 h-5 text-primary" /> النطاقات</h3>
               {domains.length > 0 && (
                 <div className="space-y-2 mb-4">
                   {domains.map((d) => (
-                    <div key={d.id} className="flex items-center justify-between p-3 rounded-lg bg-muted/30 border border-border/30">
+                    <div key={d.id} className="flex items-center justify-between p-3 rounded-lg bg-muted/30 border border-border">
                       <div>
                         <span className="font-medium text-sm" dir="ltr">{d.domain}</span>
                         {d.is_primary && <span className="text-xs text-primary mr-2">(رئيسي)</span>}
@@ -156,14 +156,14 @@ export default function AdminTenantSettings() {
             </div>
 
             {/* Members */}
-            <div className="p-6 rounded-2xl bg-card border border-border/50">
+            <div className="p-6 rounded-2xl bg-card border border-border">
               <h3 className="font-bold mb-4 flex items-center gap-2"><Users className="w-5 h-5 text-primary" /> الأعضاء</h3>
               {members.length === 0 ? (
                 <p className="text-sm text-muted-foreground">لا يوجد أعضاء</p>
               ) : (
                 <div className="space-y-2">
                   {members.map((m) => (
-                    <div key={m.id} className="flex items-center justify-between p-3 rounded-lg bg-muted/30 border border-border/30">
+                    <div key={m.id} className="flex items-center justify-between p-3 rounded-lg bg-muted/30 border border-border">
                       <div>
                         <span className="text-sm font-medium">{m.user_id.substring(0, 8)}...</span>
                         <span className="text-xs text-primary mr-2">{m.role}</span>

@@ -87,7 +87,7 @@ export default function AdminSecurity() {
 
       <div className="space-y-6">
         {/* 2FA Section */}
-        <div className="rounded-2xl bg-card border border-border/50 p-6">
+        <div className="rounded-2xl bg-card border border-border p-6">
           <div className="flex items-center gap-3 mb-4">
             <Smartphone className="w-5 h-5 text-primary" />
             <h2 className="font-bold text-lg">المصادقة الثنائية (2FA)</h2>
@@ -99,7 +99,7 @@ export default function AdminSecurity() {
           {loading ? (
             <Loader2 className="w-6 h-6 animate-spin text-primary" />
           ) : (
-            <div className="flex items-center justify-between p-4 rounded-xl bg-muted/30 border border-border/30">
+            <div className="flex items-center justify-between p-4 rounded-xl bg-muted/30 border border-border">
               <div className="flex items-center gap-3">
                 <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${twoFA?.is_enabled ? "bg-green-500/10" : "bg-muted"}`}>
                   <KeyRound className={`w-5 h-5 ${twoFA?.is_enabled ? "text-green-500" : "text-muted-foreground"}`} />
@@ -134,27 +134,27 @@ export default function AdminSecurity() {
         </div>
 
         {/* Brute Force Info */}
-        <div className="rounded-2xl bg-card border border-border/50 p-6">
+        <div className="rounded-2xl bg-card border border-border p-6">
           <div className="flex items-center gap-3 mb-4">
             <Lock className="w-5 h-5 text-primary" />
             <h2 className="font-bold text-lg">حماية تسجيل الدخول</h2>
           </div>
           <div className="space-y-3">
-            <div className="flex items-center justify-between p-4 rounded-xl bg-muted/30 border border-border/30">
+            <div className="flex items-center justify-between p-4 rounded-xl bg-muted/30 border border-border">
               <div>
                 <p className="font-medium text-sm">قفل الحساب بعد محاولات فاشلة</p>
                 <p className="text-xs text-muted-foreground">يتم قفل تسجيل الدخول بعد 5 محاولات فاشلة لمدة 15 دقيقة</p>
               </div>
               <span className="text-xs px-3 py-1 rounded-full bg-green-500/10 text-green-500 font-medium">مفعّل</span>
             </div>
-            <div className="flex items-center justify-between p-4 rounded-xl bg-muted/30 border border-border/30">
+            <div className="flex items-center justify-between p-4 rounded-xl bg-muted/30 border border-border">
               <div>
                 <p className="font-medium text-sm">تسجيل محاولات الدخول</p>
                 <p className="text-xs text-muted-foreground">يتم حفظ جميع محاولات الدخول الناجحة والفاشلة</p>
               </div>
               <span className="text-xs px-3 py-1 rounded-full bg-green-500/10 text-green-500 font-medium">مفعّل</span>
             </div>
-            <div className="flex items-center justify-between p-4 rounded-xl bg-muted/30 border border-border/30">
+            <div className="flex items-center justify-between p-4 rounded-xl bg-muted/30 border border-border">
               <div>
                 <p className="font-medium text-sm">تسجيل جلسات المشرفين</p>
                 <p className="text-xs text-muted-foreground">كل تسجيل دخول ينشئ جلسة قابلة للمراقبة والإنهاء</p>

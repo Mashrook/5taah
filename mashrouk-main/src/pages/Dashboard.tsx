@@ -71,7 +71,7 @@ export default function Dashboard() {
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
           {dashboardCards.map((card) => (
             <Link key={card.href} to={card.href}>
-              <div className="group p-6 rounded-2xl bg-gradient-card border border-border/50 hover:border-primary/30 transition-all">
+              <div className="group p-6 rounded-2xl bg-card border border-border hover:border-primary/30 transition-all">
                 <div className="flex items-start justify-between mb-4">
                   <div className="w-12 h-12 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
                     <card.icon className="w-6 h-6 text-primary" />
@@ -88,7 +88,7 @@ export default function Dashboard() {
         </div>
 
         {/* Recent Bookings */}
-        <div className="p-6 rounded-2xl bg-gradient-card border border-border/50">
+        <div className="p-6 rounded-2xl bg-card border border-border">
           <h2 className="font-bold text-lg mb-4">آخر الحجوزات</h2>
           {loadingBookings ? (
             <p className="text-muted-foreground text-sm">جاري التحميل...</p>
@@ -99,7 +99,7 @@ export default function Dashboard() {
               {bookings.slice(0, 5).map((booking) => {
                 const Icon = bookingTypeIcons[booking.booking_type] || CalendarDays;
                 return (
-                  <div key={booking.id} className="flex items-center gap-4 p-3 rounded-xl bg-muted/30 border border-border/30">
+                  <div key={booking.id} className="flex items-center gap-4 p-3 rounded-xl bg-muted/30 border border-border">
                     <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
                       <Icon className="w-5 h-5 text-primary" />
                     </div>

@@ -62,9 +62,9 @@ export default function AdminResetPassword() {
 
   if (!isRecovery) {
     return (
-      <div className="min-h-screen flex items-center justify-center py-12 bg-gradient-hero">
+      <div className="min-h-screen flex items-center justify-center py-12 bg-background">
         <div className="w-full max-w-md mx-4 text-center">
-          <div className="w-16 h-16 rounded-2xl bg-gradient-gold flex items-center justify-center mx-auto mb-4 shadow-gold">
+          <div className="w-16 h-16 rounded-2xl bg-primary flex items-center justify-center mx-auto mb-4">
             <LayoutDashboard className="w-8 h-8 text-primary-foreground" />
           </div>
           <h1 className="text-2xl font-bold mb-2">رابط غير صالح</h1>
@@ -78,17 +78,17 @@ export default function AdminResetPassword() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center py-12 bg-gradient-hero">
+    <div className="min-h-screen flex items-center justify-center py-12 bg-background">
       <div className="w-full max-w-md mx-4">
         <div className="text-center mb-8">
-          <div className="w-16 h-16 rounded-2xl bg-gradient-gold flex items-center justify-center mx-auto mb-4 shadow-gold">
+          <div className="w-16 h-16 rounded-2xl bg-primary flex items-center justify-center mx-auto mb-4">
             <LayoutDashboard className="w-8 h-8 text-primary-foreground" />
           </div>
           <h1 className="text-2xl font-bold">تعيين كلمة مرور جديدة</h1>
           <p className="text-muted-foreground text-sm mt-2">أدخل كلمة المرور الجديدة</p>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-6 rounded-2xl bg-gradient-card border border-border/50 space-y-4">
+        <form onSubmit={handleSubmit} className="p-6 rounded-2xl bg-card border border-border space-y-4">
           <div>
             <label className="text-sm font-medium mb-1 block">كلمة المرور الجديدة</label>
             <div className="relative">

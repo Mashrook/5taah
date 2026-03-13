@@ -164,7 +164,7 @@ export default function AdminReports() {
           {/* Stats */}
           <div className="grid md:grid-cols-3 gap-4 mb-8">
             {statCards.map((s) => (
-              <div key={s.label} className="p-6 rounded-2xl bg-card border border-border/50">
+              <div key={s.label} className="p-6 rounded-2xl bg-card border border-border">
                 <s.icon className={`w-6 h-6 ${s.color} mb-3`} />
                 <div className="text-2xl font-bold mb-1">{s.value}</div>
                 <div className="text-sm text-muted-foreground">{s.label}</div>
@@ -173,11 +173,11 @@ export default function AdminReports() {
           </div>
 
           {/* Booking Types */}
-          <div className="rounded-2xl bg-card border border-border/50 p-6 mb-8">
+          <div className="rounded-2xl bg-card border border-border p-6 mb-8">
             <h3 className="font-bold mb-4">حسب النوع</h3>
             <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-3">
               {Object.entries(stats.byType).map(([type, count]) => (
-                <div key={type} className="flex items-center justify-between p-3 rounded-xl bg-muted/30 border border-border/30">
+                <div key={type} className="flex items-center justify-between p-3 rounded-xl bg-muted/30 border border-border">
                   <span className="text-sm font-medium">{type}</span>
                   <span className="text-sm text-primary font-bold">{count}</span>
                 </div>
@@ -189,18 +189,18 @@ export default function AdminReports() {
           </div>
 
           {/* Status breakdown */}
-          <div className="rounded-2xl bg-card border border-border/50 p-6 mb-8">
+          <div className="rounded-2xl bg-card border border-border p-6 mb-8">
             <h3 className="font-bold mb-4">حسب الحالة</h3>
             <div className="grid sm:grid-cols-3 gap-3">
-              <div className="p-4 rounded-xl bg-muted/30 border border-border/30 text-center">
+              <div className="p-4 rounded-xl bg-muted/30 border border-border text-center">
                 <div className="text-xl font-bold text-yellow-500">{stats.pending}</div>
                 <div className="text-xs text-muted-foreground mt-1">قيد الانتظار</div>
               </div>
-              <div className="p-4 rounded-xl bg-muted/30 border border-border/30 text-center">
+              <div className="p-4 rounded-xl bg-muted/30 border border-border text-center">
                 <div className="text-xl font-bold text-green-500">{stats.confirmed}</div>
                 <div className="text-xs text-muted-foreground mt-1">مؤكدة</div>
               </div>
-              <div className="p-4 rounded-xl bg-muted/30 border border-border/30 text-center">
+              <div className="p-4 rounded-xl bg-muted/30 border border-border text-center">
                 <div className="text-xl font-bold text-destructive">{stats.cancelled}</div>
                 <div className="text-xs text-muted-foreground mt-1">ملغاة</div>
               </div>
@@ -209,7 +209,7 @@ export default function AdminReports() {
 
           {/* Export Section */}
           <PermissionGate permission="reports.export">
-            <div className="rounded-2xl bg-card border border-border/50 p-6">
+            <div className="rounded-2xl bg-card border border-border p-6">
               <h3 className="font-bold mb-4">تصدير البيانات</h3>
               <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-3">
                 <Button variant="outline" className="justify-start gap-2" onClick={exportBookingsCSV}>

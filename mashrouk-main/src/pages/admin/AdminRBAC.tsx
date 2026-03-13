@@ -257,7 +257,7 @@ export default function AdminRBAC() {
       {activeTab === "roles" && (
         <div>
           {/* Permissions matrix */}
-          <div className="rounded-2xl bg-card border border-border/50 overflow-hidden">
+          <div className="rounded-2xl bg-card border border-border overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
@@ -311,14 +311,14 @@ export default function AdminRBAC() {
       {activeTab === "admins" && (
         <div>
           {/* Admin users list */}
-          <div className="rounded-2xl bg-card border border-border/50 p-6 mb-6">
+          <div className="rounded-2xl bg-card border border-border p-6 mb-6">
             <h3 className="font-bold mb-4">المشرفين الحاليين</h3>
             {adminUsers.length === 0 ? (
               <p className="text-muted-foreground text-sm">لا يوجد مشرفين</p>
             ) : (
               <div className="space-y-3">
                 {adminUsers.map((a, i) => (
-                  <div key={`${a.user_id}-${a.role}-${i}`} className="flex items-center gap-4 p-4 rounded-xl bg-muted/30 border border-border/30">
+                  <div key={`${a.user_id}-${a.role}-${i}`} className="flex items-center gap-4 p-4 rounded-xl bg-muted/30 border border-border">
                     <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
                       <Users className="w-5 h-5 text-primary" />
                     </div>
@@ -342,7 +342,7 @@ export default function AdminRBAC() {
 
           {/* Add admin */}
           <PermissionGate permission="admin_users.manage">
-            <div className="rounded-2xl bg-card border border-border/50 p-6">
+            <div className="rounded-2xl bg-card border border-border p-6">
               <h3 className="font-bold mb-4">تعيين مشرف جديد</h3>
               <div className="flex flex-col sm:flex-row gap-3">
                 <input
@@ -350,13 +350,13 @@ export default function AdminRBAC() {
                   placeholder="معرف المستخدم (UUID)"
                   value={newAdminEmail}
                   onChange={(e) => setNewAdminEmail(e.target.value)}
-                  className="flex-1 px-4 py-2 rounded-xl bg-muted border border-border/50 text-foreground text-sm placeholder:text-muted-foreground focus:outline-none focus:border-primary/50"
+                  className="flex-1 px-4 py-2 rounded-xl bg-muted border border-border text-foreground text-sm placeholder:text-muted-foreground focus:outline-none focus:border-primary/50"
                 />
                 <select
                   value={newAdminRole}
                   onChange={(e) => setNewAdminRole(e.target.value)}
                   title="اختيار الدور"
-                  className="px-4 py-2 rounded-xl bg-muted border border-border/50 text-foreground text-sm focus:outline-none focus:border-primary/50"
+                  className="px-4 py-2 rounded-xl bg-muted border border-border text-foreground text-sm focus:outline-none focus:border-primary/50"
                 >
                   {ROLES.map((r) => (
                     <option key={r} value={r}>{ROLE_LABELS[r]}</option>

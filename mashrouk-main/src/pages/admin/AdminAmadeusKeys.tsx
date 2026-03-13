@@ -126,7 +126,7 @@ export default function AdminAmadeusKeys() {
           const isSavingThis = saving === def.name;
 
           return (
-            <div key={def.name} className="p-6 rounded-2xl bg-card border border-border/50 space-y-3">
+            <div key={def.name} className="p-6 rounded-2xl bg-card border border-border space-y-3">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="font-bold text-base">{def.label}</p>

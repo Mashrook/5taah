@@ -76,7 +76,7 @@ function ProgramCard({ program, onApply }: { program: StudyProgram; onApply: (p:
   const img = program.image_url || cityImages[program.city] || londonImg;
 
   return (
-    <div className="group rounded-2xl overflow-hidden bg-card border border-border/30 hover:border-primary/30 transition-all hover:shadow-lg">
+    <div className="group rounded-2xl overflow-hidden bg-card border border-border hover:border-primary/30 transition-all hover:shadow-lg">
       <div className="relative h-44 overflow-hidden">
         <img src={img} alt={program.city} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
@@ -102,7 +102,7 @@ function ProgramCard({ program, onApply }: { program: StudyProgram; onApply: (p:
           <Clock className="w-3.5 h-3.5" />
           <span>{program.duration}</span>
         </div>
-        <div className="flex items-center justify-between pt-3 border-t border-border/30">
+        <div className="flex items-center justify-between pt-3 border-t border-border">
           <div>
             <span className="text-xs text-muted-foreground">يبدأ من</span>
             <p className="text-lg font-bold text-primary">{program.price.toLocaleString()} <span className="text-xs font-normal text-muted-foreground">ر.س</span></p>
@@ -179,7 +179,7 @@ function ApplicationForm({ program, open, onOpenChange }: { program: StudyProgra
         ) : (
           <form onSubmit={handleSubmit} className="space-y-4">
             {program && (
-              <div className="p-3 rounded-xl bg-muted/30 border border-border/30 text-right">
+              <div className="p-3 rounded-xl bg-muted/30 border border-border text-right">
                 <p className="text-sm font-bold">{program.title} — {program.city}</p>
                 <p className="text-xs text-muted-foreground">{program.duration} • {program.price.toLocaleString()} ر.س</p>
               </div>
@@ -265,14 +265,14 @@ export default function StudyAbroad() {
   return (
     <div className="min-h-screen">
       {/* Hero */}
-      <section className="bg-gradient-to-b from-primary/80 via-primary/50 to-background pt-10 pb-16">
+      <section className="bg-gradient-to-b from-primary/5 to-background pt-10 pb-16">
         <div className="container mx-auto px-4 lg:px-8 text-center">
-          <div className="inline-flex items-center gap-2 bg-primary-foreground/10 backdrop-blur px-4 py-1.5 rounded-full mb-4">
-            <GraduationCap className="w-4 h-4 text-primary-foreground" />
-            <span className="text-sm text-primary-foreground/90">الدراسة بالخارج مع خته</span>
+          <div className="inline-flex items-center gap-2 bg-primary/10 px-4 py-1.5 rounded-full mb-4">
+            <GraduationCap className="w-4 h-4 text-primary" />
+            <span className="text-sm text-foreground/80">الدراسة بالخارج مع خته</span>
           </div>
-          <h1 className="text-3xl lg:text-5xl font-bold text-primary-foreground mb-3">استثمر في مستقبل أبنائك بثقة</h1>
-          <p className="text-primary-foreground/80 text-sm lg:text-base max-w-2xl mx-auto mb-6">
+          <h1 className="text-3xl lg:text-5xl font-bold text-foreground mb-3">استثمر في مستقبل أبنائك بثقة</h1>
+          <p className="text-muted-foreground text-sm lg:text-base max-w-2xl mx-auto mb-6">
             وفّر لهم فرصة دراسية في أفضل المعاهد والجامعات العالمية — مع السكن والدعم والمتابعة المتكاملة.
           </p>
           <div className="flex justify-center gap-3">
@@ -287,7 +287,7 @@ export default function StudyAbroad() {
       {/* Filters */}
       <section className="py-8">
         <div className="container mx-auto px-4 lg:px-8">
-          <div className="max-w-4xl mx-auto p-5 rounded-2xl bg-card/95 border border-border/30 shadow-card">
+          <div className="max-w-4xl mx-auto p-5 rounded-2xl bg-card/95 border border-border shadow-sm">
             <h2 className="text-lg font-bold text-center mb-4">ابحث عن برنامجك المثالي</h2>
             <div className="grid sm:grid-cols-3 gap-3">
               <div>
@@ -365,7 +365,7 @@ export default function StudyAbroad() {
                 {studyCountries.map((c) => (
                   <div
                     key={c.name}
-                    className="p-4 rounded-xl bg-card border border-border/30 hover:border-primary/20 transition-all cursor-pointer"
+                    className="p-4 rounded-xl bg-card border border-border hover:border-primary/20 transition-all cursor-pointer"
                     onClick={() => setCountryFilter(c.name === countryFilter ? "all" : c.name)}
                   >
                     <div className="flex items-center gap-3 mb-1.5">
@@ -388,7 +388,7 @@ export default function StudyAbroad() {
               </p>
               <div className="space-y-2.5 mb-6">
                 {topUniversities.map((uni, i) => (
-                  <div key={uni} className="flex items-center gap-3 p-3 rounded-xl bg-card border border-border/30">
+                  <div key={uni} className="flex items-center gap-3 p-3 rounded-xl bg-card border border-border">
                     <span className="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center text-xs font-bold text-primary shrink-0">{i + 1}</span>
                     <span className="text-sm font-medium" dir="ltr">{uni}</span>
                   </div>

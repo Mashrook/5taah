@@ -50,13 +50,13 @@ export default function Tours() {
   return (
     <div className="min-h-screen">
       {/* Hero */}
-      <section className="bg-gradient-to-b from-primary/80 via-primary/50 to-background pt-10 pb-14">
+      <section className="bg-gradient-to-b from-primary/5 to-background pt-10 pb-14">
         <div className="container mx-auto px-4 lg:px-8 text-center">
-          <p className="text-primary-foreground/70 text-sm mb-2">مواسم خته المميزة</p>
-          <h1 className="text-3xl lg:text-5xl font-bold text-primary-foreground mb-3">
+          <p className="text-muted-foreground text-sm mb-2">مواسم خته المميزة</p>
+          <h1 className="text-3xl lg:text-5xl font-bold text-foreground mb-3">
             سافر في الوقت المناسب بأفضل قيمة
           </h1>
-          <p className="text-primary-foreground/80 text-sm lg:text-base max-w-2xl mx-auto">
+          <p className="text-muted-foreground text-sm lg:text-base max-w-2xl mx-auto">
             برامج رمضان والحج والإجازة الصيفية وموسم الشتاء — باقات متكاملة للإقامة والنقل والخدمات تناسب العائلة الخليجية
           </p>
         </div>
@@ -72,7 +72,7 @@ export default function Tours() {
             </h2>
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
               {dbTours.map((tour) => (
-                <div key={tour.id} className="rounded-2xl bg-card/70 border border-border/30 overflow-hidden hover:border-primary/20 transition-all group">
+                <div key={tour.id} className="rounded-2xl bg-card border border-border overflow-hidden hover:border-primary/20 transition-all group">
                   <div className="relative h-48 overflow-hidden">
                     {tour.image_url ? (
                       <img src={tour.image_url} alt={tour.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy" />
@@ -82,7 +82,7 @@ export default function Tours() {
                       </div>
                     )}
                     {tour.category && (
-                      <Badge className="absolute top-3 right-3 bg-card/80 backdrop-blur-sm text-foreground border-0 text-xs">{tour.category}</Badge>
+                      <Badge className="absolute top-3 right-3 bg-card-sm text-foreground border-0 text-xs">{tour.category}</Badge>
                     )}
                   </div>
                   <div className="p-5">
@@ -94,7 +94,7 @@ export default function Tours() {
                       )}
                       <span className="flex items-center gap-1"><MapPin className="w-3.5 h-3.5" />{tour.city}</span>
                     </div>
-                    <div className="flex items-center justify-between pt-4 border-t border-border/30">
+                    <div className="flex items-center justify-between pt-4 border-t border-border">
                       <div>
                         <span className="text-lg font-bold text-primary">{Number(tour.price).toLocaleString()}</span>
                         <span className="text-xs text-muted-foreground mr-1">{tour.currency}</span>
@@ -123,7 +123,7 @@ export default function Tours() {
       <div className="container mx-auto px-4 lg:px-8 -mt-4">
         {/* Top Grid: Why Choose Us + First Two Programs */}
         <div className="grid lg:grid-cols-2 gap-6 max-w-6xl mx-auto mb-8">
-          <div className="rounded-2xl bg-card/70 border border-border/30 p-6 lg:p-8 flex flex-col justify-between order-2 lg:order-1">
+          <div className="rounded-2xl bg-card border border-border p-6 lg:p-8 flex flex-col justify-between order-2 lg:order-1">
             <div>
               <h2 className="text-xl font-bold mb-5 flex items-center gap-2">
                 <ShieldCheck className="w-6 h-6 text-primary" />
@@ -187,10 +187,10 @@ function ProgramCard({ program }: { program: typeof staticPrograms[0] }) {
   };
 
   return (
-    <div className="rounded-2xl bg-card/70 border border-border/30 overflow-hidden hover:border-primary/20 transition-all group lg:h-[420px]">
+    <div className="rounded-2xl bg-card border border-border overflow-hidden hover:border-primary/20 transition-all group lg:h-[420px]">
       <div className="relative h-48 overflow-hidden">
         <img src={program.image} alt={program.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-        <Badge className="absolute top-3 right-3 bg-card/80 backdrop-blur-sm text-foreground border-0 text-xs">{program.transport}</Badge>
+        <Badge className="absolute top-3 right-3 bg-card-sm text-foreground border-0 text-xs">{program.transport}</Badge>
       </div>
       <div className="p-5">
         <div className="flex items-center gap-1.5 mb-2">
@@ -204,7 +204,7 @@ function ProgramCard({ program }: { program: typeof staticPrograms[0] }) {
           <span className="flex items-center gap-1"><Calendar className="w-3.5 h-3.5" />{program.duration}</span>
           <span className="flex items-center gap-1"><Hotel className="w-3.5 h-3.5" />{program.hotel}</span>
         </div>
-        <div className="flex items-center justify-between pt-4 border-t border-border/30">
+        <div className="flex items-center justify-between pt-4 border-t border-border">
           <div>
             <span className="text-lg font-bold text-primary">{program.price.toLocaleString()}</span>
             <span className="text-xs text-muted-foreground mr-1">ر.س</span>

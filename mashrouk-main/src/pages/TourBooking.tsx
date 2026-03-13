@@ -140,7 +140,7 @@ export default function TourBooking() {
 
         <div className="max-w-2xl mx-auto">
           {/* Tour Summary */}
-          <div className="rounded-2xl bg-card/70 border border-border/30 p-5 mb-6">
+          <div className="rounded-2xl bg-card border border-border p-5 mb-6">
             <div className="flex items-start gap-4">
               <div className="w-14 h-14 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
                 <Sparkles className="w-7 h-7 text-primary" />
@@ -217,7 +217,7 @@ export default function TourBooking() {
                 <h3 className="font-bold mb-4 flex items-center gap-2 justify-end">بيانات المسافرين ({travelersCount}) <Users className="w-4 h-4 text-primary" /></h3>
                 <div className="space-y-4">
                   {filledTravelers.map((t, i) => (
-                    <div key={i} className={`${i > 0 ? "pt-4 border-t border-border/30" : ""}`}>
+                    <div key={i} className={`${i > 0 ? "pt-4 border-t border-border" : ""}`}>
                       {travelersCount > 1 && <p className="text-xs font-semibold text-primary mb-2">مسافر {i + 1}</p>}
                       <div className="grid grid-cols-2 gap-3 text-sm">
                         {[

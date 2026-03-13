@@ -83,7 +83,7 @@ export default function HotelDetails() {
   return (
     <div className="min-h-screen pb-12">
       {/* Breadcrumb */}
-      <div className="bg-muted/30 border-b border-border/30 py-3">
+      <div className="bg-muted/30 border-b border-border py-3">
         <div className="container mx-auto px-4 lg:px-8">
           <nav className="flex items-center gap-2 text-sm text-muted-foreground">
             <Link to="/" className="hover:text-primary transition-colors">الرئيسية</Link>
@@ -101,7 +101,7 @@ export default function HotelDetails() {
           {/* Main large image */}
           <div className="col-span-2 row-span-2 relative cursor-pointer" onClick={() => setActiveImage(0)}>
             <img src={hotel.images[0]} alt={hotel.name} className="w-full h-full object-cover" />
-            <div className="absolute bottom-3 left-3 flex items-center gap-1 bg-card/80 backdrop-blur px-3 py-1.5 rounded-lg text-xs">
+            <div className="absolute bottom-3 left-3 flex items-center gap-1 bg-card px-3 py-1.5 rounded-lg text-xs">
               <ImageIcon className="w-3.5 h-3.5" />
               <span>{hotel.images.length} صور</span>
             </div>
@@ -154,22 +154,22 @@ export default function HotelDetails() {
 
             {/* Quick Info Cards */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
-              <div className="rounded-xl bg-card border border-border/50 p-3 text-center">
+              <div className="rounded-xl bg-card border border-border p-3 text-center">
                 <Clock className="w-5 h-5 text-primary mx-auto mb-1.5" />
                 <p className="text-[10px] text-muted-foreground">تسجيل الدخول</p>
                 <p className="font-bold text-sm">PM {hotel.checkIn}</p>
               </div>
-              <div className="rounded-xl bg-card border border-border/50 p-3 text-center">
+              <div className="rounded-xl bg-card border border-border p-3 text-center">
                 <Clock className="w-5 h-5 text-primary mx-auto mb-1.5" />
                 <p className="text-[10px] text-muted-foreground">تسجيل الخروج</p>
                 <p className="font-bold text-sm">PM {hotel.checkOut}</p>
               </div>
-              <div className="rounded-xl bg-card border border-border/50 p-3 text-center">
+              <div className="rounded-xl bg-card border border-border p-3 text-center">
                 <Phone className="w-5 h-5 text-primary mx-auto mb-1.5" />
                 <p className="text-[10px] text-muted-foreground">هاتف</p>
                 <p className="font-bold text-sm" dir="ltr">+966 12 XXX XXXX</p>
               </div>
-              <div className="rounded-xl bg-card border border-border/50 p-3 text-center">
+              <div className="rounded-xl bg-card border border-border p-3 text-center">
                 <MapPin className="w-5 h-5 text-primary mx-auto mb-1.5" />
                 <p className="text-[10px] text-muted-foreground">الموقع</p>
                 <p className="font-bold text-sm">{hotel.city}</p>
@@ -239,7 +239,7 @@ export default function HotelDetails() {
           </h2>
           <div className="grid grid-cols-3 md:grid-cols-6 gap-3">
             {hotel.amenities.map((a) => (
-              <div key={a.label} className="rounded-xl bg-card border border-border/50 p-3 text-center hover:border-primary/30 transition-colors">
+              <div key={a.label} className="rounded-xl bg-card border border-border p-3 text-center hover:border-primary/30 transition-colors">
                 <span className="text-primary block mx-auto mb-1.5">{amenityIcons[a.icon] || <Sparkles className="w-5 h-5 mx-auto" />}</span>
                 <span className="text-xs text-muted-foreground">{a.label}</span>
               </div>
@@ -253,11 +253,11 @@ export default function HotelDetails() {
             <MapPin className="w-5 h-5 text-primary" />
             المعالم القريبة
           </h2>
-          <div className="rounded-2xl bg-card border border-border/50 overflow-hidden">
+          <div className="rounded-2xl bg-card border border-border overflow-hidden">
             {hotel.landmarks.map((l, i) => {
               const parts = l.split(" - ");
               return (
-                <div key={i} className={`flex items-center justify-between px-5 py-3.5 ${i < hotel.landmarks.length - 1 ? "border-b border-border/30" : ""}`}>
+                <div key={i} className={`flex items-center justify-between px-5 py-3.5 ${i < hotel.landmarks.length - 1 ? "border-b border-border" : ""}`}>
                   <div className="flex items-center gap-2.5">
                     <MapPin className="w-4 h-4 text-primary shrink-0" />
                     <span className="text-sm">{parts[0]}</span>
@@ -278,9 +278,9 @@ export default function HotelDetails() {
           <p className="text-xs text-muted-foreground mb-4">الأسعار المعروضة لليلة الواحدة وقد تشمل الضرائب والرسوم</p>
 
           {/* Rooms Table */}
-          <div className="rounded-2xl bg-card border border-border/50 overflow-hidden">
+          <div className="rounded-2xl bg-card border border-border overflow-hidden">
             {/* Table Header */}
-            <div className="hidden md:grid md:grid-cols-5 gap-4 px-5 py-3 bg-muted/30 border-b border-border/30 text-xs font-bold text-muted-foreground">
+            <div className="hidden md:grid md:grid-cols-5 gap-4 px-5 py-3 bg-muted/30 border-b border-border text-xs font-bold text-muted-foreground">
               <span>نوع الغرفة</span>
               <span className="text-center">السعة</span>
               <span className="text-center">السعر / ليلة</span>
@@ -293,7 +293,7 @@ export default function HotelDetails() {
               const total = room.pricePerNight * nights;
               const inCart = cartItems.some((i) => i.roomId === room.id);
               return (
-                <div key={room.id} className={`border-b border-border/30 last:border-b-0 ${inCart ? "bg-primary/5" : ""}`}>
+                <div key={room.id} className={`border-b border-border last:border-b-0 ${inCart ? "bg-primary/5" : ""}`}>
                   <div className="flex flex-col md:grid md:grid-cols-5 gap-4 p-5 items-center">
                     {/* Room Info */}
                     <div className="w-full">

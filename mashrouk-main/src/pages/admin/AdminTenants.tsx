@@ -97,7 +97,7 @@ export default function AdminTenants() {
         </div>
 
         {showCreate && (
-          <div className="p-6 mb-6 rounded-2xl bg-card border border-border/50 space-y-4">
+          <div className="p-6 mb-6 rounded-2xl bg-card border border-border space-y-4">
             <h3 className="font-bold">مستأجر جديد</h3>
             <div className="grid md:grid-cols-2 gap-4">
               <Input placeholder="اسم المستأجر" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
@@ -127,7 +127,7 @@ export default function AdminTenants() {
         ) : (
           <div className="space-y-3">
             {tenants.map((t) => (
-              <div key={t.id} className="flex items-center justify-between p-4 rounded-xl bg-card border border-border/50">
+              <div key={t.id} className="flex items-center justify-between p-4 rounded-xl bg-card border border-border">
                 <div className="flex items-center gap-4">
                   <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
                     <Building2 className="w-5 h-5 text-primary" />
@@ -157,7 +157,7 @@ export default function AdminTenants() {
         {/* Tenant Detail Sheet */}
         {selectedTenant && (
           <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center" onClick={() => setSelectedTenant(null)}>
-            <div className="bg-card p-8 rounded-2xl border border-border/50 max-w-lg w-full mx-4" onClick={(e) => e.stopPropagation()}>
+            <div className="bg-card p-8 rounded-2xl border border-border max-w-lg w-full mx-4" onClick={(e) => e.stopPropagation()}>
               <h3 className="text-xl font-bold mb-4">{selectedTenant.name}</h3>
               <div className="space-y-3 text-sm">
                 <div className="flex justify-between"><span className="text-muted-foreground">Slug:</span><span dir="ltr">{selectedTenant.slug}</span></div>

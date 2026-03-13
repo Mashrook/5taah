@@ -3,9 +3,9 @@ export default function Privacy() {
     <div className="min-h-screen py-12">
       <div className="container mx-auto px-4 lg:px-8">
         <div className="max-w-3xl mx-auto">
-          <h1 className="text-3xl lg:text-4xl font-bold mb-8">سياسة <span className="text-gradient-gold">الخصوصية</span></h1>
-          <div className="prose prose-invert max-w-none space-y-6">
-            <div className="p-6 rounded-2xl bg-gradient-card border border-border/50 space-y-4">
+          <h1 className="text-3xl lg:text-4xl font-bold mb-8">سياسة <span className="text-primary">الخصوصية</span></h1>
+          <div className="prose max-w-none space-y-6">
+            <div className="p-6 rounded-2xl bg-card border border-border space-y-4">
               <h2 className="text-xl font-bold">جمع المعلومات</h2>
               <p className="text-muted-foreground leading-relaxed">نقوم بجمع المعلومات الضرورية فقط لتقديم خدماتنا بأفضل شكل ممكن. تشمل هذه المعلومات البيانات الشخصية مثل الاسم والبريد الإلكتروني ورقم الهاتف.</p>
               <h2 className="text-xl font-bold mt-6">استخدام المعلومات</h2>

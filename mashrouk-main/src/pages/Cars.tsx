@@ -86,14 +86,14 @@ export default function Cars() {
   return (
     <div className="min-h-screen">
       {/* Hero + Search */}
-      <section className="bg-gradient-to-b from-primary/80 via-primary/50 to-background pt-8 pb-16">
+      <section className="bg-gradient-to-b from-primary/5 to-background pt-8 pb-16">
         <div className="container mx-auto px-4 lg:px-8">
           <div className="text-center mb-8">
-            <h1 className="text-3xl lg:text-4xl font-bold text-primary-foreground mb-2">تأجير السيارات</h1>
-            <p className="text-primary-foreground/80 text-sm">استأجر سيارتك المفضلة بأفضل الأسعار في جميع مدن المملكة</p>
+            <h1 className="text-3xl lg:text-4xl font-bold text-foreground mb-2">تأجير السيارات</h1>
+            <p className="text-muted-foreground text-sm">استأجر سيارتك المفضلة بأفضل الأسعار في جميع مدن المملكة</p>
           </div>
 
-          <div className="max-w-4xl mx-auto p-6 rounded-2xl bg-card/95 backdrop-blur-xl border border-border shadow-card">
+          <div className="max-w-4xl mx-auto p-6 rounded-2xl bg-card border border-border shadow-sm">
             <div className="grid md:grid-cols-3 gap-4 mb-4">
               <CityAutocomplete value={city} onChange={setCity} placeholder="مدينة الاستلام" label="مدينة الاستلام" />
               <div>
@@ -126,7 +126,7 @@ export default function Cars() {
             <h2 className="text-xl font-bold mb-6">السيارات المتاحة ({displayCars.length})</h2>
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
               {displayCars.map((car) => (
-                <div key={car.id} className="group rounded-2xl bg-card border border-border/50 overflow-hidden hover:border-primary/30 hover:shadow-card-hover transition-all duration-300">
+                <div key={car.id} className="group rounded-2xl bg-card border border-border overflow-hidden hover:shadow-lg transition-all duration-300">
                   <div className="relative h-48 overflow-hidden">
                     <img
                       src={car.image_url || fallbackImages[car.category] || economyImg}
@@ -143,7 +143,7 @@ export default function Cars() {
                       {car.city && <span className="flex items-center gap-1"><MapPin className="w-3.5 h-3.5" />{car.city}</span>}
                     </div>
                     {car.description && <p className="text-xs text-muted-foreground mb-3 line-clamp-2">{car.description}</p>}
-                    <div className="flex items-end justify-between pt-3 border-t border-border/30">
+                    <div className="flex items-end justify-between pt-3 border-t border-border">
                       <div>
                         <p className="text-xs text-muted-foreground">يبدأ من</p>
                         <p className="text-2xl font-bold text-primary">{Number(car.price_per_day).toLocaleString()} <span className="text-sm font-normal">ر.س / يوم</span></p>
@@ -176,7 +176,7 @@ export default function Cars() {
           ) : (
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
               {staticCarCategories.map((car, i) => (
-                <div key={i} className="group rounded-2xl bg-card border border-border/50 overflow-hidden hover:border-primary/30 hover:shadow-card-hover transition-all duration-300">
+                <div key={i} className="group rounded-2xl bg-card border border-border overflow-hidden hover:shadow-lg transition-all duration-300">
                   <div className="relative h-48 overflow-hidden">
                     <img src={car.image} alt={car.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy" />
                     <Badge className="absolute top-3 right-3 bg-primary text-primary-foreground">{car.name}</Badge>
@@ -188,7 +188,7 @@ export default function Cars() {
                       <span className="flex items-center gap-1"><Settings2 className="w-4 h-4" />{car.transmission}</span>
                     </div>
                     <p className="text-xs text-muted-foreground mb-3">{car.models.join(" • ")}</p>
-                    <div className="flex items-end justify-between pt-3 border-t border-border/30">
+                    <div className="flex items-end justify-between pt-3 border-t border-border">
                       <div>
                         <p className="text-xs text-muted-foreground">يبدأ من</p>
                         <p className="text-2xl font-bold text-primary">{car.price} <span className="text-sm font-normal">ر.س / يوم</span></p>

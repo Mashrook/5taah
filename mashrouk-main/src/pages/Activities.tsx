@@ -200,13 +200,13 @@ export default function Activities() {
   return (
     <div className="min-h-screen">
       {/* Hero */}
-      <section className="bg-gradient-to-b from-primary/80 via-primary/50 to-background pt-10 pb-14">
+      <section className="bg-gradient-to-b from-primary/5 to-background pt-10 pb-14">
         <div className="container mx-auto px-4 lg:px-8 text-center">
-          <p className="text-primary-foreground/70 text-sm mb-2">الأنشطة والجولات</p>
-          <h1 className="text-3xl lg:text-5xl font-bold text-primary-foreground mb-3">
+          <p className="text-muted-foreground text-sm mb-2">الأنشطة والجولات</p>
+          <h1 className="text-3xl lg:text-5xl font-bold text-foreground mb-3">
             احجز جولتك المفضلة بسهولة
           </h1>
-          <p className="text-primary-foreground/80 text-sm lg:text-base max-w-xl mx-auto">
+          <p className="text-muted-foreground text-sm lg:text-base max-w-xl mx-auto">
             اكتشف أجمل التجارب السياحية واحجزها مباشرة من منصة خته
           </p>
         </div>
@@ -214,7 +214,7 @@ export default function Activities() {
 
       {/* Search Form */}
       <div className="container mx-auto px-4 lg:px-8 -mt-6">
-        <div className="max-w-5xl mx-auto p-5 lg:p-7 rounded-2xl bg-card/95 backdrop-blur-xl border border-border shadow-card">
+        <div className="max-w-5xl mx-auto p-5 lg:p-7 rounded-2xl bg-card border border-border shadow-sm">
           <div className="grid md:grid-cols-4 gap-4 mb-4">
             <CityAutocomplete value={destination} onChange={setDestination} placeholder="اختر المدينة" label="المدينة" />
             <div>
@@ -258,7 +258,7 @@ export default function Activities() {
           </div>
 
           {showAdvanced && (
-            <div className="grid md:grid-cols-3 gap-4 mt-4 pt-4 border-t border-border/30">
+            <div className="grid md:grid-cols-3 gap-4 mt-4 pt-4 border-t border-border">
               <div>
                 <label className="text-xs text-muted-foreground block mb-1">السعر الأدنى</label>
                 <Input type="number" value={priceMin} onChange={(e) => setPriceMin(e.target.value)} placeholder="0" className="bg-muted/30" dir="ltr" />
@@ -345,11 +345,11 @@ export default function Activities() {
 
 function TourCard({ tour, guests, tourDate, onBook }: { tour: Tour; guests: number; tourDate: string; onBook: (t: Tour) => void }) {
   return (
-    <div className="rounded-2xl bg-card/70 border border-border/30 overflow-hidden hover:border-primary/20 transition-all group">
+    <div className="rounded-2xl bg-card border border-border overflow-hidden hover:border-primary/20 transition-all group">
       {/* Image */}
       <div className="relative h-48 overflow-hidden">
         <img src={tour.image} alt={tour.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-        <Badge className="absolute top-3 right-3 bg-card/80 backdrop-blur-sm text-foreground border-0 text-xs">
+        <Badge className="absolute top-3 right-3 bg-card-sm text-foreground border-0 text-xs">
           {tour.category}
         </Badge>
       </div>
@@ -379,7 +379,7 @@ function TourCard({ tour, guests, tourDate, onBook }: { tour: Tour; guests: numb
         </div>
 
         {/* Price + Actions */}
-        <div className="flex items-center justify-between pt-4 border-t border-border/30">
+        <div className="flex items-center justify-between pt-4 border-t border-border">
           <div>
             <span className="text-lg font-bold text-primary">{tour.price.toLocaleString()}</span>
             <span className="text-xs text-muted-foreground mr-1">{tour.currency}</span>

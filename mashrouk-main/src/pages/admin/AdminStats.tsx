@@ -209,7 +209,7 @@ export default function AdminStats() {
       {/* Charts Row 1 */}
       <div className="grid lg:grid-cols-2 gap-6 mb-6">
         {/* Bookings + Revenue by month */}
-        <div className="p-6 rounded-2xl bg-card border border-border/50">
+        <div className="p-6 rounded-2xl bg-card border border-border">
           <h3 className="font-bold mb-4 text-sm">الحجوزات والإيرادات الشهرية</h3>
           {chartData.length === 0 ? (
             <div className="flex items-center justify-center h-48 text-muted-foreground text-sm">لا توجد بيانات</div>
@@ -235,7 +235,7 @@ export default function AdminStats() {
         </div>
 
         {/* By type pie */}
-        <div className="p-6 rounded-2xl bg-card border border-border/50">
+        <div className="p-6 rounded-2xl bg-card border border-border">
           <h3 className="font-bold mb-4 text-sm">الحجوزات حسب النوع</h3>
           {pieData.length === 0 ? (
             <div className="flex items-center justify-center h-48 text-muted-foreground text-sm">لا توجد بيانات</div>
@@ -255,7 +255,7 @@ export default function AdminStats() {
       {/* Charts Row 2 - Top Routes & Airlines */}
       <div className="grid lg:grid-cols-2 gap-6 mb-6">
         {/* Top Routes */}
-        <div className="p-6 rounded-2xl bg-card border border-border/50">
+        <div className="p-6 rounded-2xl bg-card border border-border">
           <h3 className="font-bold mb-4 text-sm flex items-center gap-2 justify-end">
             أكثر المسارات طلباً <Route className="w-4 h-4 text-primary" />
           </h3>
@@ -279,7 +279,7 @@ export default function AdminStats() {
         </div>
 
         {/* Top Airlines */}
-        <div className="p-6 rounded-2xl bg-card border border-border/50">
+        <div className="p-6 rounded-2xl bg-card border border-border">
           <h3 className="font-bold mb-4 text-sm flex items-center gap-2 justify-end">
             أكثر شركات الطيران <Plane className="w-4 h-4 text-primary" />
           </h3>
@@ -303,7 +303,7 @@ export default function AdminStats() {
       <div className="grid lg:grid-cols-2 gap-6 mb-6">
 
         {/* Status */}
-        <div className="p-6 rounded-2xl bg-card border border-border/50">
+        <div className="p-6 rounded-2xl bg-card border border-border">
           <h3 className="font-bold mb-4 text-sm">حالة الحجوزات</h3>
           <div className="space-y-3">
             {[
@@ -325,7 +325,7 @@ export default function AdminStats() {
         </div>
 
         {/* Services Breakdown */}
-        <div className="p-6 rounded-2xl bg-card border border-border/50">
+        <div className="p-6 rounded-2xl bg-card border border-border">
           <h3 className="font-bold mb-4 text-sm">حجوزات حسب الخدمة</h3>
           <div className="space-y-3">
             {Object.entries(stats.byType).map(([type, count], i) => {
@@ -349,7 +349,7 @@ export default function AdminStats() {
           </div>
 
           {/* Amadeus API Health */}
-          <div className="mt-6 pt-4 border-t border-border/30">
+          <div className="mt-6 pt-4 border-t border-border">
             <h4 className="text-sm font-semibold mb-3 flex items-center gap-2 justify-end">
               صحة Amadeus API <Timer className="w-4 h-4 text-primary" />
             </h4>
@@ -370,7 +370,7 @@ export default function AdminStats() {
       {/* API Provider Analytics */}
       <div className="grid lg:grid-cols-2 gap-6">
         {/* Amadeus vs Travelpayouts */}
-        <div className="p-6 rounded-2xl bg-card border border-border/50">
+        <div className="p-6 rounded-2xl bg-card border border-border">
           <h3 className="font-bold mb-4 text-sm flex items-center gap-2 justify-end">
             مقارنة مزودي API <Target className="w-4 h-4 text-primary" />
           </h3>
@@ -399,7 +399,7 @@ export default function AdminStats() {
         </div>
 
         {/* Search type breakdown */}
-        <div className="p-6 rounded-2xl bg-card border border-border/50">
+        <div className="p-6 rounded-2xl bg-card border border-border">
           <h3 className="font-bold mb-4 text-sm flex items-center gap-2 justify-end">
             عمليات البحث حسب النوع <BarChart3 className="w-4 h-4 text-primary" />
           </h3>

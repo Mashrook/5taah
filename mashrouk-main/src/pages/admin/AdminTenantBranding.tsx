@@ -99,7 +99,7 @@ export default function AdminTenantBranding() {
 
         {selectedTenantId && (
           <div className="space-y-6">
-            <div className="p-6 rounded-2xl bg-card border border-border/50">
+            <div className="p-6 rounded-2xl bg-card border border-border">
               <h3 className="font-bold mb-4">الشعار والأيقونة</h3>
               <div className="grid md:grid-cols-2 gap-4">
                 <div>
@@ -113,7 +113,7 @@ export default function AdminTenantBranding() {
               </div>
             </div>
 
-            <div className="p-6 rounded-2xl bg-card border border-border/50">
+            <div className="p-6 rounded-2xl bg-card border border-border">
               <h3 className="font-bold mb-4">الألوان</h3>
               <div className="grid md:grid-cols-3 gap-4">
                 <div>
@@ -140,7 +140,7 @@ export default function AdminTenantBranding() {
               </div>
             </div>
 
-            <div className="p-6 rounded-2xl bg-card border border-border/50">
+            <div className="p-6 rounded-2xl bg-card border border-border">
               <h3 className="font-bold mb-4">الخطوط</h3>
               <div className="grid md:grid-cols-2 gap-4">
                 <div>
@@ -154,7 +154,7 @@ export default function AdminTenantBranding() {
               </div>
             </div>
 
-            <div className="p-6 rounded-2xl bg-card border border-border/50">
+            <div className="p-6 rounded-2xl bg-card border border-border">
               <h3 className="font-bold mb-4">الدعم والتواصل</h3>
               <div className="grid md:grid-cols-2 gap-4">
                 <div>
@@ -172,7 +172,7 @@ export default function AdminTenantBranding() {
               </div>
             </div>
 
-            <div className="p-6 rounded-2xl bg-card border border-border/50">
+            <div className="p-6 rounded-2xl bg-card border border-border">
               <h3 className="font-bold mb-4">CSS مخصص</h3>
               <Textarea
                 value={form.custom_css}

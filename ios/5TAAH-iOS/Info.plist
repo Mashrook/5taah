@@ -1,0 +1,19 @@
+<key>NSAppTransportSecurity</key>
+<dict>
+    <key>NSAllowsArbitraryLoads</key>
+    <false/>
+    <key>NSExceptionDomains</key>
+    <dict>
+        <key>5taah-production.up.railway.app</key>
+        <dict>
+            <key>NSExceptionAllowsInsecureHTTPLoads</key>
+            <false/>
+            <key>NSIncludesSubdomains</key>
+            <true/>
+        </dict>
+    </dict>
+</dict>
+<key>NSCameraUsageDescription</key>
+<string>نحتاج الوصول للكاميرا لتحميل المستندات</string>
+<key>NSPhotoLibraryUsageDescription</key>
+<string>نحتاج الوصول للصور لتحميل المستندات</string>

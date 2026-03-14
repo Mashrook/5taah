@@ -1,0 +1,23 @@
+# CocoaPods
+webviewgoldios-149nulled/XcodeSourceCode/Pods/
+
+# Binary frameworks (install via CocoaPods/SPM)
+webviewgoldios-149nulled/XcodeSourceCode/FBAudienceNetwork.framework/
+webviewgoldios-149nulled/XcodeSourceCode/OneSignal.framework/
+
+# Large placeholder assets
+5TAAH-iOS/Assets.xcassets/LaunchScreen/
+
+# Xcode build artifacts
+*.xcuserdata
+*.xccheckout
+*.xcscmblueprint
+DerivedData/
+build/
+*.ipa
+*.dSYM.zip
+*.dSYM
+
+# OS files
+.DS_Store
+Thumbs.db

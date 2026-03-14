@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB"
+          version="3.0"
+          toolsVersion="21701"
+          targetRuntime="AppleCocoa"
+          propertyAccessControl="none"
+          useAutolayout="YES"
+          launchScreen="YES"
+          useTraitCollections="YES"
+          useSafeAreas="YES"
+          colorMatched="YES"
+          initialViewController="01J-lp-oVM">
+    <device id="retina6_12" orientation="portrait" appearance="light"/>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="21679"/>
+        apability name="Safe area layout guides" minToolsVersion="9.0"/>
+        apability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <scenes>
+        <scene sceneID="EHf-IW-A2E">
+            <objects>
+                <viewController id="01J-lp-oVM" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="Ze5-6b-2t3">
+                        <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <!-- خلفية برتقالية -->
+                            <view contentMode="scaleToFill"
+                                  translatesAutoresizingMaskIntoConstraints="NO"
+                                  id="bg-view">
+                                <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
+                                lor key="backgroundColor" red="1" green="0.4" blue="0.13" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                            </view>
+                            <!-- صورة الشعار في المنتصف -->
+                            <imageView clipsSubviews="YES"
+                                       userInteractionEnabled="NO"
+                                       contentMode="scaleAspectFit"
+                                       translatesAutoresizingMaskIntoConstraints="NO"
+                                       image="AppIcon"
+                                       id="logo-view">
+                                <rect key="frame" x="146.5" y="346" width="100" height="100"/>
+                            </imageView>
+                            <!-- اسم التطبيق -->
+                            abel opaque="NO"
+                                   userInteractionEnabled="NO"
+                                   contentMode="left"
+                                   horizontalHuggingPriority="251"
+                                   verticalHuggingPriority="251"
+                                   text="خته للسفريات"
+                                   textAlignment="center"
+                                   lineBreakMode="middleTruncation"
+                                   translatesAutoresizingMaskIntoConstraints="NO"
+                                   id="label-name">
+                                <rect key="frame" x="96.5" y="466" width="200" height="40"/>
+                                <fontDescription key="fontDescription" type="boldSystem" pointSize="28"/>
+                                lor key="textColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <!-- نص فرعي -->
+                            abel opaque="NO"
+                                   userInteractionEnabled="NO"
+                                   contentMode="left"
+                                   horizontalHuggingPriority="251"
+                                   verticalHuggingPriority="251"
+                                   text="حجز الطيران والفنادق"
+                                   textAlignment="center"
+                                   lineBreakMode="middleTruncation"
+                                   translatesAutoresizingMaskIntoConstraints="NO"
+                                   id="label-subtitle">
+                                <rect key="frame" x="96.5" y="514" width="200" height="28"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                lor key="textColor" red="1" green="1" blue="1" alpha="0.85" colorSpace="custom" customColorSpace="sRGB"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                        </subviews>
+                        <viewLayoutGuide key="safeArea" id="Bcu-3y-fUS"/>
+                        lor key="backgroundColor" red="1" green="0.4" blue="0.13" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                        straints>
+                            <!-- خلفية ممتدة بالكامل -->
+                            straint firstItem="bg-view" firstAttribute="top" secondItem="Ze5-6b-2t3" secondAttribute="top" id="c1"/>
+                            straint firstItem="bg-view" firstAttribute="bottom" secondItem="Ze5-6b-2t3" secondAttribute="bottom" id="c2"/>
+                            straint firstItem="bg-view" firstAttribute="leading" secondItem="Ze5-6b-2t3" secondAttribute="leading" id="c3"/>
+                            straint firstItem="bg-view" firstAttribute="trailing" secondItem="Ze5-6b-2t3" secondAttribute="trailing" id="c4"/>
+                            <!-- الشعار في المنتصف -->
+                            straint firstItem="logo-view" firstAttribute="centerX" secondItem="Ze5-6b-2t3" secondAttribute="centerX" id="c5"/>
+                            straint firstItem="logo-view" firstAttribute="centerY" secondItem="Ze5-6b-2t3" secondAttribute="centerY" constant="-50" id="c6"/>
+                            straint firstItem="logo-view" firstAttribute="width" constant="100" id="c7"/>
+                            straint firstItem="logo-view" firstAttribute="height" constant="100" id="c8"/>
+                            <!-- اسم التطبيق -->
+                            straint firstItem="label-name" firstAttribute="centerX" secondItem="Ze5-6b-2t3" secondAttribute="centerX" id="c9"/>
+                            straint firstItem="label-name" firstAttribute="top" secondItem="logo-view" secondAttribute="bottom" constant="20" id="c10"/>
+                            straint firstItem="label-name" firstAttribute="width" constant="250" id="c11"/>
+                            <!-- النص الفرعي -->
+                            straint firstItem="label-subtitle" firstAttribute="centerX" secondItem="Ze5-6b-2t3" secondAttribute="centerX" id="c12"/>
+                            straint firstItem="label-subtitle" firstAttribute="top" secondItem="label-name" secondAttribute="bottom" constant="8" id="c13"/>
+                            straint firstItem="label-subtitle" firstAttribute="width" constant="250" id="c14"/>
+                        </constraints>
+                    </view>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="iYj-Kq-Ea1" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="53" y="375"/>
+        </scene>
+    </scenes>
+</document>

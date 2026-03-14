@@ -1,0 +1,66 @@
+{
+  "applinks": {
+    "details": [
+      {
+        "appIDs": [
+          "P2SHV4K77Q.com.5atth.ios"
+        ],
+        "components": [
+          {
+            "/": "/flights",
+            "comment": "Matches flights page"
+          },
+          {
+            "/": "/flights/*",
+            "comment": "Matches flights subpages"
+          },
+          {
+            "/": "/hotels",
+            "comment": "Matches hotels page"
+          },
+          {
+            "/": "/hotels/*",
+            "comment": "Matches hotels subpages"
+          },
+          {
+            "/": "/cars",
+            "comment": "Matches cars page"
+          },
+          {
+            "/": "/cars/*",
+            "comment": "Matches cars subpages"
+          },
+          {
+            "/": "/tours",
+            "comment": "Matches tours page"
+          },
+          {
+            "/": "/tours/*",
+            "comment": "Matches tours subpages"
+          },
+          {
+            "/": "/offers",
+            "comment": "Matches offers page"
+          },
+          {
+            "/": "/offers/*",
+            "comment": "Matches offers subpages"
+          },
+          {
+            "/": "/dashboard",
+            "comment": "Matches dashboard"
+          },
+          {
+            "/": "/dashboard/*",
+            "comment": "Matches dashboard subpages"
+          }
+        ]
+      }
+    ]
+  },
+  "webcredentials": {
+    "apps": [
+      "P2SHV4K77Q.com.5atth.ios"
+    ]
+  }
+}

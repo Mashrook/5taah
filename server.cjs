@@ -41,6 +41,16 @@ const server = http.createServer((req, res) => {
     return;
   }
 
+  // Serve apple-app-site-association as application/json (no extension file)
+  if (url.pathname === "/.well-known/apple-app-site-association") {
+    const aasaPath = path.join(DIST, ".well-known", "apple-app-site-association");
+    if (fs.existsSync(aasaPath)) {
+      res.writeHead(200, { "Content-Type": "application/json" });
+      fs.createReadStream(aasaPath).pipe(res);
+      return;
+    }
+  }
+
   // Try serving the exact file
   fs.stat(filePath, (err, stats) => {
     if (!err && stats.isFile()) {

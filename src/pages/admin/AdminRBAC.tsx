@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import type { Database } from "@/integrations/supabase/types";
 import { useAuthStore } from "@/stores/authStore";
 import { useToast } from "@/hooks/use-toast";
 import { logAudit } from "@/lib/auditLog";
@@ -28,8 +29,12 @@ interface AdminUser {
   email: string | null;
 }
 
-const ROLES = ["admin", "editor", "support"] as const;
+type AppRole = Database["public"]["Enums"]["app_role"];
+const ROLES: AppRole[] = ["admin", "manager", "agent", "customer", "editor", "support"];
 const ROLE_LABELS: Record<string, string> = {
+  manager: "مدير تشغيل",
+  agent: "وكيل",
+  customer: "عميل",
   super_admin: "مدير النظام",
   admin: "مدير",
   editor: "محرر",
@@ -63,7 +68,7 @@ export default function AdminRBAC() {
 
   // New admin assignment
   const [newAdminEmail, setNewAdminEmail] = useState("");
-  const [newAdminRole, setNewAdminRole] = useState<string>("editor");
+  const [newAdminRole, setNewAdminRole] = useState<AppRole>("manager");
 
   useEffect(() => {
     fetchAll();
@@ -141,7 +146,7 @@ export default function AdminRBAC() {
         await supabase.from("role_permissions").delete().eq("role", role);
       }
       // Insert new
-      const inserts: { role: "admin" | "super_admin" | "editor" | "support"; permission_id: string }[] = [];
+      const inserts: { role: AppRole; permission_id: string }[] = [];
       for (const role of ROLES) {
         rolePerms[role]?.forEach((permId) => {
           inserts.push({ role, permission_id: permId });
@@ -180,7 +185,7 @@ export default function AdminRBAC() {
   const assignRoleById = async (userId: string, role: string) => {
     if (!isSuperAdmin) return;
     try {
-      const { error } = await supabase.from("user_roles").insert({ user_id: userId, role: role as "admin" | "super_admin" | "editor" | "support" });
+      const { error } = await supabase.from("user_roles").insert({ user_id: userId, role: role as AppRole });
       if (error) {
         if (error.code === "23505") {
           toast({ title: "موجود", description: "هذا الدور مُعيّن مسبقاً لهذا المستخدم" });
@@ -202,7 +207,7 @@ export default function AdminRBAC() {
       return;
     }
     try {
-      await supabase.from("user_roles").delete().eq("user_id", userId).eq("role", role as "admin" | "super_admin" | "editor" | "support");
+      await supabase.from("user_roles").delete().eq("user_id", userId).eq("role", role as AppRole);
       await logAudit({ action: "role_remove", entity_type: "user_role", entity_id: userId, before: { role } });
       toast({ title: "تم", description: "تم إزالة الدور" });
       fetchAll();
@@ -354,7 +359,7 @@ export default function AdminRBAC() {
                 />
                 <select
                   value={newAdminRole}
-                  onChange={(e) => setNewAdminRole(e.target.value)}
+                  onChange={(e) => setNewAdminRole(e.target.value as AppRole)}
                   title="اختيار الدور"
                   className="px-4 py-2 rounded-xl bg-muted border border-border text-foreground text-sm focus:outline-none focus:border-primary/50"
                 >

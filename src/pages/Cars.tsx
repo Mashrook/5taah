@@ -1,11 +1,12 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { Car, Star, MapPin, Users, Fuel, Settings2, Search, Loader2 } from "lucide-react";
+import { Car, MapPin, Users, Fuel, Settings2, Search, Loader2, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import CityAutocomplete from "@/components/search/CityAutocomplete";
 import DatePickerInput from "@/components/ui/date-picker-input";
 import { supabase } from "@/integrations/supabase/client";
+import { getCarDeeplink } from "@/lib/travelpayoutsClient";
 
 import economyImg from "@/assets/cars/economy-car.jpg";
 import midsizeImg from "@/assets/cars/midsize-car.jpg";
@@ -53,6 +54,8 @@ export default function Cars() {
   const [returnDate, setReturnDate] = useState(urlParams.get("return") || "");
   const [dbCars, setDbCars] = useState<DbCar[]>([]);
   const [loading, setLoading] = useState(true);
+  const [partnerLink, setPartnerLink] = useState("");
+  const [partnerLoading, setPartnerLoading] = useState(false);
 
   useEffect(() => {
     supabase.from("cars").select("*").eq("is_active", true).order("sort_order")
@@ -61,6 +64,35 @@ export default function Cars() {
         setLoading(false);
       });
   }, []);
+
+  useEffect(() => {
+    let isCancelled = false;
+    if (!city || !pickupDate) {
+      setPartnerLink("");
+      setPartnerLoading(false);
+      return;
+    }
+
+    setPartnerLoading(true);
+    getCarDeeplink({
+      city,
+      pickup: pickupDate,
+      ...(returnDate ? { dropoff: returnDate } : {}),
+    })
+      .then((link) => {
+        if (!isCancelled) setPartnerLink(link);
+      })
+      .catch(() => {
+        if (!isCancelled) setPartnerLink("");
+      })
+      .finally(() => {
+        if (!isCancelled) setPartnerLoading(false);
+      });
+
+    return () => {
+      isCancelled = true;
+    };
+  }, [city, pickupDate, returnDate]);
 
   const handleSearch = () => {
     if (city && pickupDate) {
@@ -101,6 +133,26 @@ export default function Cars() {
               <Search className="w-5 h-5 ml-2" />
               بحث عن السيارات
             </Button>
+            {(partnerLoading || partnerLink) && (
+              <div className="mt-3 text-center">
+                {partnerLoading ? (
+                  <span className="inline-flex items-center gap-1.5 text-xs text-muted-foreground">
+                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                    جاري تجهيز رابط Travelpayouts...
+                  </span>
+                ) : (
+                  <a
+                    href={partnerLink}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1.5 text-xs text-primary hover:underline"
+                  >
+                    <ExternalLink className="w-3.5 h-3.5" />
+                    استعراض خيارات إضافية عبر Travelpayouts
+                  </a>
+                )}
+              </div>
+            )}
           </div>
         </div>
       </section>

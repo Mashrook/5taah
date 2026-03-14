@@ -1,4 +1,5 @@
 import { supabase } from "@/integrations/supabase/client";
+import { logApiSearch } from "@/lib/apiSearchLogger";
 
 const FUNCTION_NAME = "amadeus";
 
@@ -185,6 +186,7 @@ const defaultHeaders = {
 // ─── Flight API ───
 
 export async function searchFlights(params: FlightSearchParams) {
+  const startedAt = performance.now();
   const qs = new URLSearchParams({
     action: "search",
     origin: params.origin,
@@ -202,10 +204,26 @@ export async function searchFlights(params: FlightSearchParams) {
 
   if (!res.ok) {
     const err = await res.json().catch(() => ({ error: "Search failed" }));
+    await logApiSearch({
+      provider: "amadeus",
+      searchType: "flight",
+      searchParams: params as Record<string, unknown>,
+      resultsCount: 0,
+      responseTimeMs: performance.now() - startedAt,
+      errorMessage: err.error || "Search failed",
+    });
     throw new Error(err.error || "فشل البحث عن الرحلات");
   }
 
-  return await res.json();
+  const data = await res.json();
+  await logApiSearch({
+    provider: "amadeus",
+    searchType: "flight",
+    searchParams: params as Record<string, unknown>,
+    resultsCount: Array.isArray(data?.data) ? data.data.length : 0,
+    responseTimeMs: performance.now() - startedAt,
+  });
+  return data;
 }
 
 export async function priceFlightOffer(flightOffer: AmadeusFlightOffer) {
@@ -244,6 +262,7 @@ export async function bookFlight(flightOffer: AmadeusFlightOffer, travelers: unk
 // ─── Hotel API ───
 
 export async function searchHotelsByCity(cityCode: string, radius?: number): Promise<{ data: AmadeusHotelListItem[] }> {
+  const startedAt = performance.now();
   const url = buildUrl("hotel-list", {
     cityCode,
     ...(radius ? { radius: String(radius) } : {}),
@@ -252,10 +271,26 @@ export async function searchHotelsByCity(cityCode: string, radius?: number): Pro
 
   if (!res.ok) {
     const err = await res.json().catch(() => ({ error: "Hotel search failed" }));
+    await logApiSearch({
+      provider: "amadeus",
+      searchType: "hotel",
+      searchParams: { cityCode, radius: radius || null },
+      resultsCount: 0,
+      responseTimeMs: performance.now() - startedAt,
+      errorMessage: err.error || "Hotel search failed",
+    });
     throw new Error(err.error || "فشل البحث عن الفنادق");
   }
 
-  return await res.json();
+  const data = await res.json();
+  await logApiSearch({
+    provider: "amadeus",
+    searchType: "hotel",
+    searchParams: { cityCode, radius: radius || null },
+    resultsCount: Array.isArray(data?.data) ? data.data.length : 0,
+    responseTimeMs: performance.now() - startedAt,
+  });
+  return data;
 }
 
 export async function getHotelOffers(params: {
@@ -265,6 +300,7 @@ export async function getHotelOffers(params: {
   adults: number;
   roomQuantity?: number;
 }): Promise<{ data: AmadeusHotelOffer[] }> {
+  const startedAt = performance.now();
   const url = buildUrl("hotel-offers", {
     hotelIds: params.hotelIds.join(","),
     checkInDate: params.checkInDate,
@@ -276,10 +312,38 @@ export async function getHotelOffers(params: {
 
   if (!res.ok) {
     const err = await res.json().catch(() => ({ error: "Hotel offers failed" }));
+    await logApiSearch({
+      provider: "amadeus",
+      searchType: "hotel",
+      searchParams: {
+        hotelIdsCount: params.hotelIds.length,
+        checkInDate: params.checkInDate,
+        checkOutDate: params.checkOutDate,
+        adults: params.adults,
+        roomQuantity: params.roomQuantity || 1,
+      },
+      resultsCount: 0,
+      responseTimeMs: performance.now() - startedAt,
+      errorMessage: err.error || "Hotel offers failed",
+    });
     throw new Error(err.error || "فشل جلب عروض الفنادق");
   }
 
-  return await res.json();
+  const data = await res.json();
+  await logApiSearch({
+    provider: "amadeus",
+    searchType: "hotel",
+    searchParams: {
+      hotelIdsCount: params.hotelIds.length,
+      checkInDate: params.checkInDate,
+      checkOutDate: params.checkOutDate,
+      adults: params.adults,
+      roomQuantity: params.roomQuantity || 1,
+    },
+    resultsCount: Array.isArray(data?.data) ? data.data.length : 0,
+    responseTimeMs: performance.now() - startedAt,
+  });
+  return data;
 }
 
 export async function getHotelOfferDetailsApi(offerId: string): Promise<{ data: AmadeusHotelOffer }> {
@@ -414,6 +478,7 @@ export interface TransferBookingPayment {
 // ─── Transfer API ───
 
 export async function searchTransfers(params: TransferSearchParams): Promise<{ data: TransferOffer[] }> {
+  const startedAt = performance.now();
   const url = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/${FUNCTION_NAME}?action=transfer-search`;
   const res = await fetch(url, {
     method: "POST",
@@ -423,10 +488,26 @@ export async function searchTransfers(params: TransferSearchParams): Promise<{ d
 
   if (!res.ok) {
     const err = await res.json().catch(() => ({ error: "Transfer search failed" }));
+    await logApiSearch({
+      provider: "amadeus",
+      searchType: "transfer",
+      searchParams: params as Record<string, unknown>,
+      resultsCount: 0,
+      responseTimeMs: performance.now() - startedAt,
+      errorMessage: err.error || "Transfer search failed",
+    });
     throw new Error(err.error || "فشل البحث عن التحويلات");
   }
 
-  return await res.json();
+  const data = await res.json();
+  await logApiSearch({
+    provider: "amadeus",
+    searchType: "transfer",
+    searchParams: params as Record<string, unknown>,
+    resultsCount: Array.isArray(data?.data) ? data.data.length : 0,
+    responseTimeMs: performance.now() - startedAt,
+  });
+  return data;
 }
 
 export async function bookTransfer(params: {

@@ -13,6 +13,12 @@ const footerLinks = {
     { href: "/transfers", label: "خدمة التنقلات" },
     { href: "/study-abroad", label: "الدراسة بالخارج" },
   ],
+  integrations: [
+    { href: "/flights?engine=amadeus", label: "بحث Amadeus" },
+    { href: "/hotels?engine=amadeus", label: "فنادق Amadeus" },
+    { href: "/cars?engine=travelpayouts", label: "سيارات Travelpayouts" },
+    { href: "/activities?engine=travelpayouts", label: "جولات Travelpayouts" },
+  ],
   explore: [
     { href: "/offers", label: "العروض" },
     { href: "/destinations", label: "الوجهات" },
@@ -80,6 +86,17 @@ export default function Footer() {
             <h4 className="text-foreground font-bold mb-6">خدماتنا</h4>
             <ul className="space-y-3">
               {footerLinks.services.map((link) => (
+                <li key={link.href}>
+                  <Link to={link.href} className="text-muted-foreground hover:text-primary transition-colors text-sm">{link.label}</Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <div>
+            <h4 className="text-foreground font-bold mb-6">محركات البحث</h4>
+            <ul className="space-y-3">
+              {footerLinks.integrations.map((link) => (
                 <li key={link.href}>
                   <Link to={link.href} className="text-muted-foreground hover:text-primary transition-colors text-sm">{link.label}</Link>
                 </li>

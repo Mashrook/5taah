@@ -30,6 +30,8 @@ const moreLinks = [
   { href: "/news", label: "الأخبار", icon: Newspaper },
   { href: "/destinations", label: "الوجهات", icon: Globe },
   { href: "/articles", label: "مقالات", icon: BookOpen },
+  { href: "/flights?engine=amadeus", label: "بحث Amadeus", icon: Plane },
+  { href: "/activities?engine=travelpayouts", label: "بحث Travelpayouts", icon: Map },
   { href: "/about", label: "من نحن", icon: null },
   { href: "/contact", label: "اتصل بنا", icon: null },
 ];
@@ -39,6 +41,8 @@ const quickSearchItems = [
   { label: "حجز فنادق", href: "/hotels", icon: Hotel },
   { label: "تأجير سيارات", href: "/cars", icon: Car },
   { label: "جولات سياحية", href: "/activities", icon: Map },
+  { label: "بحث Amadeus", href: "/flights?engine=amadeus", icon: Plane },
+  { label: "بحث Travelpayouts", href: "/activities?engine=travelpayouts", icon: Globe },
   { label: "نقل المطار", href: "/transfers", icon: ArrowRightLeft },
   { label: "العروض الحالية", href: "/offers", icon: Tag },
   { label: "مواسم السعودية", href: "/tours", icon: Globe },

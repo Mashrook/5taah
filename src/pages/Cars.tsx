@@ -1,12 +1,11 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { Car, Star, MapPin, Users, Fuel, Settings2, Search, Loader2, ExternalLink } from "lucide-react";
+import { Car, Star, MapPin, Users, Fuel, Settings2, Search, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import CityAutocomplete from "@/components/search/CityAutocomplete";
 import DatePickerInput from "@/components/ui/date-picker-input";
 import { supabase } from "@/integrations/supabase/client";
-import { getCarDeeplink } from "@/lib/travelpayoutsClient";
 
 import economyImg from "@/assets/cars/economy-car.jpg";
 import midsizeImg from "@/assets/cars/midsize-car.jpg";
@@ -54,7 +53,6 @@ export default function Cars() {
   const [returnDate, setReturnDate] = useState(urlParams.get("return") || "");
   const [dbCars, setDbCars] = useState<DbCar[]>([]);
   const [loading, setLoading] = useState(true);
-  const [partnerLink, setPartnerLink] = useState("");
 
   useEffect(() => {
     supabase.from("cars").select("*").eq("is_active", true).order("sort_order")
@@ -64,20 +62,14 @@ export default function Cars() {
       });
   }, []);
 
-  // Generate Travelpayouts partner link when search params are available
-  useEffect(() => {
-    if (city && pickupDate) {
-      getCarDeeplink({ city, pickup: pickupDate, dropoff: returnDate || undefined })
-        .then(setPartnerLink)
-        .catch(() => setPartnerLink(""));
-    }
-  }, [city, pickupDate, returnDate]);
-
   const handleSearch = () => {
     if (city && pickupDate) {
-      getCarDeeplink({ city, pickup: pickupDate, dropoff: returnDate || undefined })
-        .then(setPartnerLink)
-        .catch(() => setPartnerLink(""));
+      const params = new URLSearchParams({
+        city,
+        pickup: pickupDate,
+        ...(returnDate ? { return: returnDate } : {}),
+      });
+      navigate(`/cars?${params.toString()}`);
     }
   };
 
@@ -109,12 +101,6 @@ export default function Cars() {
               <Search className="w-5 h-5 ml-2" />
               بحث عن السيارات
             </Button>
-            {partnerLink && (
-              <a href={partnerLink} target="_blank" rel="noopener noreferrer" className="mt-3 flex items-center justify-center gap-2 text-sm text-primary hover:underline">
-                <ExternalLink className="w-4 h-4" />
-                قارن الأسعار على مواقع التأجير العالمية
-              </a>
-            )}
           </div>
         </div>
       </section>

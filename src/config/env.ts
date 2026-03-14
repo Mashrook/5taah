@@ -9,20 +9,8 @@ export const ENV = {
   SUPABASE_KEY: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY || '',
   SUPABASE_PROJECT_ID: import.meta.env.VITE_SUPABASE_PROJECT_ID || '',
   
-  // ✅ Moyasar Payment Configuration
-  MOYASAR_PUBLISHABLE_KEY: import.meta.env.MOYASAR_PUBLISHABLE_KEY || '',
-  MOYASAR_SECRET_KEY: import.meta.env.MOYASAR_SECRET_KEY || '',
-  
-  // ✅ API URLs
-  API_AMADEUS_URL: import.meta.env.API_Amadeus_URL || '',
-  API_MOYASAR_URL: import.meta.env.API_Moyasar_URL || '',
-  
-  // ✅ Amadeus Configuration
-  AMADEUS_CLIENT_ID: import.meta.env.AMADEUS_CLIENT_ID || '',
-  AMADEUS_CLIENT_SECRET: import.meta.env.AMADEUS_CLIENT_SECRET || '',
-  
-  // ✅ Travelpayouts Configuration
-  TRAVELPAYOUTS_TOKEN: import.meta.env.API_token_Travelpayouts || '',
+  // ✅ Moyasar Payment Configuration (publishable key only - secrets stay server-side)
+  MOYASAR_PUBLISHABLE_KEY: import.meta.env.VITE_MOYASAR_PUBLISHABLE_KEY || '',
 } as const;
 
 /**

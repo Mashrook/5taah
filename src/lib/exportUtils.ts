@@ -2,6 +2,10 @@
  * Export utilities for CSV and PDF generation
  */
 
+function escapeHtml(str: string): string {
+  return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+}
+
 export function exportToCSV(data: Record<string, unknown>[], filename: string, headers?: Record<string, string>) {
   if (data.length === 0) return;
 
@@ -41,7 +45,7 @@ export function exportToPDF(title: string, data: Record<string, unknown>[], head
 <html dir="rtl" lang="ar">
 <head>
   <meta charset="utf-8">
-  <title>${title}</title>
+  <title>${escapeHtml(title)}</title>
   <style>
     body { font-family: 'Segoe UI', Tahoma, sans-serif; padding: 40px; direction: rtl; background: #0a0a0a; color: #e5e5e5; }
     h1 { color: #d4a843; font-size: 24px; margin-bottom: 8px; }
@@ -54,15 +58,15 @@ export function exportToPDF(title: string, data: Record<string, unknown>[], head
   </style>
 </head>
 <body>
-  <h1>${title}</h1>
+  <h1>${escapeHtml(title)}</h1>
   <div class="meta">تاريخ التصدير: ${new Date().toLocaleDateString("ar-SA")} | خته</div>
   <table>
-    <thead><tr>${headerLabels.map((h) => `<th>${h}</th>`).join("")}</tr></thead>
+    <thead><tr>${headerLabels.map((h) => `<th>${escapeHtml(h)}</th>`).join("")}</tr></thead>
     <tbody>
       ${data.map((row) => `<tr>${keys.map((k) => {
         const val = row[k];
         const str = val === null || val === undefined ? "" : typeof val === "object" ? JSON.stringify(val) : String(val);
-        return `<td>${str}</td>`;
+        return `<td>${escapeHtml(str)}</td>`;
       }).join("")}</tr>`).join("")}
     </tbody>
   </table>

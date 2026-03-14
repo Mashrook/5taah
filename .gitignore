@@ -32,6 +32,9 @@ supabase/.temp/
 MohCom/
 mashrouk-main/
 
+# Large archive files
+*.zip
+
 
 bun.lock
 bun.lockb

@@ -11,7 +11,7 @@ const registerSchema = z.object({
   name: z.string().trim().min(2, "الاسم يجب أن يكون حرفين على الأقل").max(100),
   email: z.string().trim().email("بريد إلكتروني غير صالح").max(255),
   phone: z.string().optional(),
-  password: z.string().min(6, "كلمة المرور يجب أن تكون 6 أحرف على الأقل"),
+  password: z.string().min(8, "كلمة المرور يجب أن تكون 8 أحرف على الأقل").regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/, "يجب أن تحتوي على حرف كبير وصغير ورقم"),
 });
 
 export default function Register() {

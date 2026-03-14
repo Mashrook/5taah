@@ -9,7 +9,7 @@ import { z } from "zod";
 
 const loginSchema = z.object({
   email: z.string().trim().email("بريد إلكتروني غير صالح").max(255),
-  password: z.string().min(6, "كلمة المرور يجب أن تكون 6 أحرف على الأقل"),
+  password: z.string().min(8, "كلمة المرور يجب أن تكون 8 أحرف على الأقل"),
 });
 
 export default function Login() {

@@ -15,7 +15,6 @@ serve(async (req) => {
     const signature = req.headers.get("x-moyasar-signature");
     const webhookSecret = Deno.env.get("MOYASAR_WEBHOOK_SECRET");
     
-    // ✅ التحقق من التوقيع (أمان)
     if (!signature || !webhookSecret) {
       return new Response(JSON.stringify({ error: "Unauthorized" }), {
         status: 401,
@@ -23,7 +22,31 @@ serve(async (req) => {
       });
     }
 
-    const payload = await req.json();
+    const rawBody = await req.text();
+
+    // HMAC-SHA256 signature verification
+    const encoder = new TextEncoder();
+    const key = await crypto.subtle.importKey(
+      "raw",
+      encoder.encode(webhookSecret),
+      { name: "HMAC", hash: "SHA-256" },
+      false,
+      ["sign"],
+    );
+    const sig = await crypto.subtle.sign("HMAC", key, encoder.encode(rawBody));
+    const expectedSig = Array.from(new Uint8Array(sig))
+      .map((b) => b.toString(16).padStart(2, "0"))
+      .join("");
+
+    if (signature !== expectedSig) {
+      console.error("❌ Invalid webhook signature");
+      return new Response(JSON.stringify({ error: "Invalid signature" }), {
+        status: 401,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    const payload = JSON.parse(rawBody);
     const event = payload.type; // "payment.paid" or "payment.failed"
     const payment = payload.data;
 
@@ -35,6 +58,21 @@ serve(async (req) => {
     const supabase = createClient(supabaseUrl, supabaseKey);
 
     if (event === "payment.paid") {
+      // Idempotency: skip if already processed
+      const { data: existing } = await supabase
+        .from("bookings")
+        .select("id")
+        .eq("payment_id", payment.id)
+        .eq("payment_status", "paid")
+        .maybeSingle();
+
+      if (existing) {
+        console.log("⏭️ Payment already processed:", payment.id);
+        return new Response(JSON.stringify({ received: true, skipped: true }), {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
       // ✅ تحديث حالة الحجز
       const { error } = await supabase
         .from("bookings")

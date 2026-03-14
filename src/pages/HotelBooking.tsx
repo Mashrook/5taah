@@ -7,9 +7,8 @@ import {
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { useHotelCartStore } from "@/stores/hotelCartStore";
-import { useAuthStore } from "@/stores/authStore";
 import { useTenantStore } from "@/stores/tenantStore";
-import { supabase } from "@/integrations/supabase/client";
+import { createPaymentSession } from "@/lib/paymentSessionClient";
 import {
   getCityName,
   getNightsCount,
@@ -23,7 +22,6 @@ type BookingStep = "traveler" | "review" | "payment";
 export default function HotelBooking() {
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { isAuthenticated, user } = useAuthStore();
   const { tenant } = useTenantStore();
   const {
     selectedOffer,
@@ -84,35 +82,28 @@ export default function HotelBooking() {
     if (!paymentSessionId) {
       setPaymentPreparing(true);
       try {
-        const { data, error } = await supabase
-          .from("payment_sessions")
-          .insert({
-            flow: "hotel",
-            amount: totalPrice,
-            currency: currency || "SAR",
-            status: "initiated",
-            payment_provider: "moyasar",
-            user_id: isAuthenticated && user ? user.id : null,
-            tenant_id: tenant?.id || null,
-            details_json: {
-              hotel_id: selectedOffer.hotel.hotelId,
-              hotel_name: selectedOffer.hotel.name,
-              city_code: selectedOffer.hotel.cityCode,
-              offer_id: selectedOfferId,
-              check_in: offer.checkInDate,
-              check_out: offer.checkOutDate,
-              nights,
-              room_description: roomDesc,
-              adults_count: adultsCount,
-              travelers: filledTravelers,
-              price: offer.price,
-            },
-          } as Record<string, unknown>)
-          .select("id")
-          .single();
-
-        if (error) throw error;
-        setPaymentSessionId((data as { id: string }).id);
+        const created = await createPaymentSession({
+          flow: "hotel",
+          amount: totalPrice,
+          currency: currency || "SAR",
+          payment_provider: "moyasar",
+          tenant_id: tenant?.id || null,
+          travelers_count: adultsCount,
+          details_json: {
+            hotel_id: selectedOffer.hotel.hotelId,
+            hotel_name: selectedOffer.hotel.name,
+            city_code: selectedOffer.hotel.cityCode,
+            offer_id: selectedOfferId,
+            check_in: offer.checkInDate,
+            check_out: offer.checkOutDate,
+            nights,
+            room_description: roomDesc,
+            adults_count: adultsCount,
+            travelers: filledTravelers,
+            price: offer.price,
+          },
+        });
+        setPaymentSessionId(created.id);
       } catch (err: unknown) {
         toast({ title: "خطأ", description: err instanceof Error ? err.message : "تعذر تجهيز الدفع", variant: "destructive" });
         return;

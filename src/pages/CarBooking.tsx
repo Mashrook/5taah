@@ -6,11 +6,10 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-import { useAuthStore } from "@/stores/authStore";
 import { useTenantStore } from "@/stores/tenantStore";
-import { supabase } from "@/integrations/supabase/client";
 import TravelerForm, { type TravelerData } from "@/components/booking/TravelerForm";
 import MoyasarPayment from "@/components/payment/MoyasarPayment";
+import { createPaymentSession } from "@/lib/paymentSessionClient";
 
 type BookingStep = "traveler" | "review" | "payment";
 
@@ -18,7 +17,6 @@ export default function CarBooking() {
   const navigate = useNavigate();
   const [params] = useSearchParams();
   const { toast } = useToast();
-  const { isAuthenticated, user } = useAuthStore();
   const { tenant } = useTenantStore();
 
   // Read car info from query params (set when user clicks "احجز الآن")
@@ -75,34 +73,26 @@ export default function CarBooking() {
     if (!paymentSessionId) {
       setPaymentPreparing(true);
       try {
-        const { data, error } = await supabase
-          .from("payment_sessions")
-          .insert({
-            flow: "car",
-            amount: totalPrice,
-            currency: carCurrency,
-            status: "initiated",
-            payment_provider: "moyasar",
-            user_id: isAuthenticated && user ? user.id : null,
-            tenant_id: tenant?.id || null,
-            travelers_count: travelersCount,
-            details_json: {
-              car_id: carId,
-              car_name: carName,
-              car_category: carCategory,
-              city: carCity,
-              pickup_date: pickupDate,
-              return_date: returnDate,
-              days,
-              price_per_day: carPrice,
-              travelers: filledTravelers,
-            },
-          } as Record<string, unknown>)
-          .select("id")
-          .single();
-
-        if (error) throw error;
-        setPaymentSessionId((data as { id: string }).id);
+        const created = await createPaymentSession({
+          flow: "car",
+          amount: totalPrice,
+          currency: carCurrency,
+          payment_provider: "moyasar",
+          tenant_id: tenant?.id || null,
+          travelers_count: travelersCount,
+          details_json: {
+            car_id: carId,
+            car_name: carName,
+            car_category: carCategory,
+            city: carCity,
+            pickup_date: pickupDate,
+            return_date: returnDate,
+            days,
+            price_per_day: carPrice,
+            travelers: filledTravelers,
+          },
+        });
+        setPaymentSessionId(created.id);
       } catch (err: unknown) {
         const message = err instanceof Error ? err.message : "تعذر تجهيز الدفع";
         toast({ title: "خطأ", description: message, variant: "destructive" });

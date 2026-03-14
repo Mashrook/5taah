@@ -6,11 +6,10 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-import { useAuthStore } from "@/stores/authStore";
 import { useTenantStore } from "@/stores/tenantStore";
-import { supabase } from "@/integrations/supabase/client";
 import TravelerForm, { type TravelerData } from "@/components/booking/TravelerForm";
 import MoyasarPayment from "@/components/payment/MoyasarPayment";
+import { createPaymentSession } from "@/lib/paymentSessionClient";
 
 type BookingStep = "traveler" | "review" | "payment";
 
@@ -18,7 +17,6 @@ export default function TransferBooking() {
   const navigate = useNavigate();
   const [params] = useSearchParams();
   const { toast } = useToast();
-  const { isAuthenticated, user } = useAuthStore();
   const { tenant } = useTenantStore();
 
   const title = params.get("title") || "";
@@ -71,32 +69,25 @@ export default function TransferBooking() {
     if (!paymentSessionId) {
       setPaymentPreparing(true);
       try {
-        const { data, error } = await supabase
-          .from("payment_sessions")
-          .insert({
-            flow: "transfer",
-            amount: price,
-            currency,
-            status: "initiated",
-            payment_provider: "moyasar",
-            user_id: isAuthenticated && user ? user.id : null,
-            tenant_id: tenant?.id || null,
-            details_json: {
-              transfer_id: transferId,
-              title,
-              origin,
-              destination,
-              vehicle_type: vehicleType,
-              trip_date: tripDate,
-              passengers_count: passengersCount,
-              travelers: filledTravelers,
-            },
-          } as Record<string, unknown>)
-          .select("id")
-          .single();
-
-        if (error) throw error;
-        setPaymentSessionId((data as { id: string }).id);
+        const created = await createPaymentSession({
+          flow: "transfer",
+          amount: price,
+          currency,
+          payment_provider: "moyasar",
+          tenant_id: tenant?.id || null,
+          travelers_count: passengersCount,
+          details_json: {
+            transfer_id: transferId,
+            title,
+            origin,
+            destination,
+            vehicle_type: vehicleType,
+            trip_date: tripDate,
+            passengers_count: passengersCount,
+            travelers: filledTravelers,
+          },
+        });
+        setPaymentSessionId(created.id);
       } catch (err: unknown) {
         toast({ title: "خطأ", description: err.message || "تعذر تجهيز الدفع", variant: "destructive" });
         return;

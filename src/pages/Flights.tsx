@@ -24,11 +24,11 @@ import {
   Check,
   ExternalLink,
 } from "lucide-react";
-import { useAuthStore } from "@/stores/authStore";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
 import { useTenantStore } from "@/stores/tenantStore";
+import { createPaymentSession } from "@/lib/paymentSessionClient";
 import CityAutocomplete from "@/components/search/CityAutocomplete";
 import DatePickerInput from "@/components/ui/date-picker-input";
 import TravelerForm, { type TravelerData } from "@/components/booking/TravelerForm";
@@ -166,7 +166,6 @@ export default function Flights() {
   const [paymentSessionId, setPaymentSessionId] = useState<string | null>(null);
   const [paymentPreparing, setPaymentPreparing] = useState(false);
 
-  const { isAuthenticated, user } = useAuthStore();
   const { tenant } = useTenantStore();
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -305,28 +304,21 @@ export default function Flights() {
         const amadeusTravelers = filledTravelers.map((t, i) => buildAmadeusTraveler(t, String(i + 1)));
         const totalPrice = parseFloat(pricedOffer.price.grandTotal) * passengers;
 
-        const { data, error } = await supabase
-          .from("payment_sessions")
-          .insert(({
-            flow: "flight",
-            amount: totalPrice,
-            currency: pricedOffer.price.currency || "SAR",
-            status: "initiated",
-            payment_provider: "moyasar",
-            user_id: isAuthenticated && user ? user.id : null,
-            tenant_id: tenant?.id || null,
-            details_json: {
-              pricedOffer,
-              passengers,
-              travelers: filledTravelers,
-              amadeusTravelers,
-            },
-          } as Record<string, unknown>))
-          .select("id")
-          .single();
-
-        if (error) throw error;
-        setPaymentSessionId((data as { id: string }).id);
+        const created = await createPaymentSession({
+          flow: "flight",
+          amount: totalPrice,
+          currency: pricedOffer.price.currency || "SAR",
+          payment_provider: "moyasar",
+          tenant_id: tenant?.id || null,
+          travelers_count: passengers,
+          details_json: {
+            pricedOffer,
+            passengers,
+            travelers: filledTravelers,
+            amadeusTravelers,
+          },
+        });
+        setPaymentSessionId(created.id);
       } catch (err: unknown) {
         const message = err instanceof Error ? err.message : "تعذر تجهيز الدفع";
         toast({ title: "خطأ", description: message, variant: "destructive" });

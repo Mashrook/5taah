@@ -6,11 +6,10 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-import { useAuthStore } from "@/stores/authStore";
 import { useTenantStore } from "@/stores/tenantStore";
-import { supabase } from "@/integrations/supabase/client";
 import TravelerForm, { type TravelerData } from "@/components/booking/TravelerForm";
 import MoyasarPayment from "@/components/payment/MoyasarPayment";
+import { createPaymentSession } from "@/lib/paymentSessionClient";
 
 type BookingStep = "traveler" | "review" | "payment";
 
@@ -18,7 +17,6 @@ export default function TourBooking() {
   const navigate = useNavigate();
   const [params] = useSearchParams();
   const { toast } = useToast();
-  const { isAuthenticated, user } = useAuthStore();
   const { tenant } = useTenantStore();
 
   const tourTitle = params.get("title") || "";
@@ -70,32 +68,25 @@ export default function TourBooking() {
     if (!paymentSessionId) {
       setPaymentPreparing(true);
       try {
-        const { data, error } = await supabase
-          .from("payment_sessions")
-          .insert({
-            flow: "tour",
-            amount: totalPrice,
-            currency: tourCurrency,
-            status: "initiated",
-            payment_provider: "moyasar",
-            user_id: isAuthenticated && user ? user.id : null,
-            tenant_id: tenant?.id || null,
-            details_json: {
-              tour_id: tourId,
-              tour_title: tourTitle,
-              city: tourCity,
-              duration: tourDuration,
-              category: tourCategory,
-              price_per_person: tourPrice,
-              travelers_count: travelersCount,
-              travelers: filledTravelers,
-            },
-          } as Record<string, unknown>)
-          .select("id")
-          .single();
-
-        if (error) throw error;
-        setPaymentSessionId((data as { id: string }).id);
+        const created = await createPaymentSession({
+          flow: "tour",
+          amount: totalPrice,
+          currency: tourCurrency,
+          payment_provider: "moyasar",
+          tenant_id: tenant?.id || null,
+          travelers_count: travelersCount,
+          details_json: {
+            tour_id: tourId,
+            tour_title: tourTitle,
+            city: tourCity,
+            duration: tourDuration,
+            category: tourCategory,
+            price_per_person: tourPrice,
+            travelers_count: travelersCount,
+            travelers: filledTravelers,
+          },
+        });
+        setPaymentSessionId(created.id);
       } catch (err: unknown) {
         toast({ title: "خطأ", description: err.message || "تعذر تجهيز الدفع", variant: "destructive" });
         return;

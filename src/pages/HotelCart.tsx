@@ -1,74 +1,84 @@
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ShoppingCart, Trash2, Calendar, Moon, Users, Tag, CreditCard, ChevronLeft, Hotel } from "lucide-react";
+import { ShoppingCart, Trash2, Calendar, Moon, Users, Tag, CreditCard, ChevronLeft, Hotel, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { useHotelCartStore } from "@/stores/hotelCartStore";
-import { useAuthStore } from "@/stores/authStore";
 import { useTenantStore } from "@/stores/tenantStore";
-import { supabase } from "@/integrations/supabase/client";
 import BookingStepper from "@/components/ui/BookingStepper";
+import MoyasarPayment from "@/components/payment/MoyasarPayment";
+import { createPaymentSession } from "@/lib/paymentSessionClient";
 
-const bookingSteps = [
-  { label: "اختيار الغرفة" },
-  { label: "مراجعة السلة" },
-  { label: "الدفع" },
-  { label: "التأكيد" },
-];
+const bookingSteps = [{ label: "اختيار الغرفة" }, { label: "مراجعة السلة" }, { label: "الدفع" }, { label: "التأكيد" }];
+
+type CartStep = "review" | "payment";
 
 export default function HotelCart() {
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { isAuthenticated, user } = useAuthStore();
   const { tenant } = useTenantStore();
   const { items, coupon, discount, removeItem, setCoupon, applyCoupon, getSubtotal, getTotal, clearCart } = useHotelCartStore();
 
+  const [step, setStep] = useState<CartStep>("review");
+  const [paymentSessionId, setPaymentSessionId] = useState<string | null>(null);
+  const [paymentPreparing, setPaymentPreparing] = useState(false);
+
   const handleCheckout = async () => {
-    if (!isAuthenticated || !user) {
-      toast({ title: "يرجى تسجيل الدخول", description: "سجّل دخولك لإتمام الحجز", variant: "destructive" });
-      navigate("/login");
+    if (items.length === 0) {
+      toast({ title: "السلة فارغة", description: "أضف غرفة واحدة على الأقل قبل الدفع", variant: "destructive" });
       return;
     }
 
-    try {
-      for (const item of items) {
-        const { error } = await supabase.from("bookings").insert({
-          user_id: user.id,
-          booking_type: "hotel",
-          total_price: item.totalPrice,
+    if (!paymentSessionId) {
+      setPaymentPreparing(true);
+      try {
+        const created = await createPaymentSession({
+          flow: "hotel",
+          amount: getTotal(),
           currency: "SAR",
-          status: "pending",
-          payment_status: "unpaid",
+          payment_provider: "moyasar",
           tenant_id: tenant?.id || null,
+          travelers_count: items.reduce((sum, item) => sum + Math.max(item.guests || 1, 1), 0),
           details_json: {
-            hotel_name: item.hotelName,
-            room_name: item.roomName,
-            check_in: item.checkIn,
-            check_out: item.checkOut,
-            nights: item.nights,
-            price_per_night: item.pricePerNight,
-            guests: item.guests,
+            source: "hotel_cart",
+            coupon,
+            discount,
+            subtotal: getSubtotal(),
+            total: getTotal(),
+            items: items.map((item) => ({
+              hotel_id: item.hotelId,
+              hotel_name: item.hotelName,
+              room_id: item.roomId,
+              room_name: item.roomName,
+              check_in: item.checkIn,
+              check_out: item.checkOut,
+              nights: item.nights,
+              guests: item.guests,
+              price_per_night: item.pricePerNight,
+              total_price: item.totalPrice,
+            })),
           },
         });
-        if (error) throw error;
+        setPaymentSessionId(created.id);
+      } catch (err: unknown) {
+        const message = err instanceof Error ? err.message : "تعذر تجهيز الدفع";
+        toast({ title: "خطأ", description: message, variant: "destructive" });
+        return;
+      } finally {
+        setPaymentPreparing(false);
       }
-      toast({ title: "تم الحجز بنجاح! 🏨", description: `${items.length} حجز تم إنشاؤه` });
-      clearCart();
-      navigate("/dashboard/bookings");
-    } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : "تعذر إتمام الحجز";
-      toast({ title: "خطأ", description: message, variant: "destructive" });
     }
+
+    setStep("payment");
   };
 
   return (
     <div className="min-h-screen section-padding">
       <div className="container mx-auto px-4 lg:px-8">
-        {/* Stepper */}
-        <BookingStepper steps={bookingSteps} currentStep={1} className="max-w-2xl mx-auto mb-12" />
+        <BookingStepper steps={bookingSteps} currentStep={step === "review" ? 1 : 2} className="max-w-2xl mx-auto mb-12" />
 
         <div className="max-w-4xl mx-auto">
-          {/* Header */}
           <div className="flex items-center justify-between mb-8">
             <div className="flex items-center gap-3">
               <div className="w-12 h-12 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center">
@@ -90,11 +100,28 @@ export default function HotelCart() {
               <Hotel className="w-20 h-20 mx-auto mb-4 text-muted-foreground/20" />
               <p className="text-xl font-bold mb-2">السلة فارغة</p>
               <p className="text-muted-foreground mb-6">لم تقم بإضافة أي حجوزات بعد</p>
-              <Button variant="gold" size="lg" onClick={() => navigate("/hotels")}>تصفح الفنادق</Button>
+              <Button variant="gold" size="lg" onClick={() => navigate("/hotels")}>
+                تصفح الفنادق
+              </Button>
+            </div>
+          ) : step === "payment" && paymentSessionId ? (
+            <div className="max-w-2xl mx-auto space-y-4">
+              <div className="rounded-2xl bg-card border border-border p-5">
+                <h3 className="font-bold mb-2">الدفع</h3>
+                <p className="text-sm text-muted-foreground mb-4">أكمل الدفع لتأكيد حجوزات الفنادق.</p>
+                <MoyasarPayment
+                  amount={getTotal()}
+                  description={`Hotel cart (${items.length} items)`}
+                  callbackUrl={`${window.location.origin}/hotels/payment-callback?session=${paymentSessionId}`}
+                  methods={["creditcard", "applepay", "samsungpay"]}
+                />
+              </div>
+              <Button variant="outline" className="w-full" onClick={() => setStep("review")}>
+                رجوع لمراجعة السلة
+              </Button>
             </div>
           ) : (
             <div className="grid lg:grid-cols-3 gap-6">
-              {/* Cart Items */}
               <div className="lg:col-span-2 space-y-4">
                 {items.map((item) => (
                   <div key={item.roomId} className="rounded-2xl bg-card border border-border overflow-hidden hover:border-primary/20 transition-all">
@@ -108,20 +135,35 @@ export default function HotelCart() {
                             <h3 className="font-bold text-lg">{item.hotelName}</h3>
                             <p className="text-sm text-muted-foreground">{item.roomName}</p>
                           </div>
-                          <Button variant="ghost" size="icon-sm" onClick={() => removeItem(item.roomId)} className="text-destructive hover:text-destructive/80 hover:bg-destructive/10">
+                          <Button
+                            variant="ghost"
+                            size="icon-sm"
+                            onClick={() => removeItem(item.roomId)}
+                            className="text-destructive hover:text-destructive/80 hover:bg-destructive/10"
+                          >
                             <Trash2 className="w-4 h-4" />
                           </Button>
                         </div>
                         <div className="flex flex-wrap gap-3 text-sm text-muted-foreground mb-4">
-                          <span className="flex items-center gap-1.5 bg-muted/30 px-2.5 py-1 rounded-lg"><Calendar className="w-3.5 h-3.5" /> {item.checkIn}</span>
-                          <span className="flex items-center gap-1.5 bg-muted/30 px-2.5 py-1 rounded-lg"><Calendar className="w-3.5 h-3.5" /> {item.checkOut}</span>
-                          <span className="flex items-center gap-1.5 bg-muted/30 px-2.5 py-1 rounded-lg"><Moon className="w-3.5 h-3.5" /> {item.nights} {item.nights > 1 ? "ليالي" : "ليلة"}</span>
-                          <span className="flex items-center gap-1.5 bg-muted/30 px-2.5 py-1 rounded-lg"><Users className="w-3.5 h-3.5" /> {item.guests}</span>
+                          <span className="flex items-center gap-1.5 bg-muted/30 px-2.5 py-1 rounded-lg">
+                            <Calendar className="w-3.5 h-3.5" /> {item.checkIn}
+                          </span>
+                          <span className="flex items-center gap-1.5 bg-muted/30 px-2.5 py-1 rounded-lg">
+                            <Calendar className="w-3.5 h-3.5" /> {item.checkOut}
+                          </span>
+                          <span className="flex items-center gap-1.5 bg-muted/30 px-2.5 py-1 rounded-lg">
+                            <Moon className="w-3.5 h-3.5" /> {item.nights} {item.nights > 1 ? "ليالي" : "ليلة"}
+                          </span>
+                          <span className="flex items-center gap-1.5 bg-muted/30 px-2.5 py-1 rounded-lg">
+                            <Users className="w-3.5 h-3.5" /> {item.guests}
+                          </span>
                         </div>
                         <div className="flex items-baseline gap-2">
                           <span className="text-xl font-bold text-primary">{item.totalPrice.toLocaleString()}</span>
                           <span className="text-sm text-muted-foreground">ر.س</span>
-                          <span className="text-xs text-muted-foreground mr-1">({item.pricePerNight.toLocaleString()} × {item.nights})</span>
+                          <span className="text-xs text-muted-foreground mr-1">
+                            ({item.pricePerNight.toLocaleString()} × {item.nights})
+                          </span>
                         </div>
                       </div>
                     </div>
@@ -129,26 +171,20 @@ export default function HotelCart() {
                 ))}
               </div>
 
-              {/* Summary Sidebar */}
               <div className="space-y-4">
-                {/* Coupon */}
                 <div className="rounded-2xl bg-card border border-border p-5">
-                  <h3 className="font-bold mb-3 flex items-center gap-2"><Tag className="w-4 h-4 text-primary" /> كوبون الخصم</h3>
+                  <h3 className="font-bold mb-3 flex items-center gap-2">
+                    <Tag className="w-4 h-4 text-primary" /> كوبون الخصم
+                  </h3>
                   <div className="flex gap-2">
-                    <Input
-                      placeholder="أدخل الكوبون"
-                      value={coupon}
-                      onChange={(e) => setCoupon(e.target.value)}
-                      className="bg-muted/20"
-                    />
-                    <Button variant="outline" onClick={applyCoupon} className="shrink-0">تطبيق</Button>
+                    <Input placeholder="أدخل الكوبون" value={coupon} onChange={(e) => setCoupon(e.target.value)} className="bg-muted/20" />
+                    <Button variant="outline" onClick={applyCoupon} className="shrink-0">
+                      تطبيق
+                    </Button>
                   </div>
-                  {discount > 0 && (
-                    <p className="text-sm text-emerald-400 mt-2">✓ خصم {discount}% مطبق</p>
-                  )}
+                  {discount > 0 && <p className="text-sm text-emerald-400 mt-2">✓ خصم {discount}% مطبق</p>}
                 </div>
 
-                {/* Total */}
                 <div className="rounded-2xl bg-card border border-border p-5">
                   <h3 className="font-bold mb-4">ملخص الحجز</h3>
                   <div className="space-y-3 text-sm">
@@ -171,11 +207,30 @@ export default function HotelCart() {
                       <span className="text-primary">{getTotal().toLocaleString()} ر.س</span>
                     </div>
                   </div>
-                  <Button variant="gold" size="lg" className="w-full mt-5 gap-2" onClick={handleCheckout}>
-                    <CreditCard className="w-5 h-5" />
-                    المتابعة للدفع
+                  <Button variant="gold" size="lg" className="w-full mt-5 gap-2" onClick={handleCheckout} disabled={paymentPreparing}>
+                    {paymentPreparing ? (
+                      <>
+                        <Loader2 className="w-5 h-5 animate-spin" />
+                        تجهيز الدفع...
+                      </>
+                    ) : (
+                      <>
+                        <CreditCard className="w-5 h-5" />
+                        المتابعة للدفع
+                      </>
+                    )}
                   </Button>
                   <p className="text-xs text-muted-foreground text-center mt-3">🔒 الدفع آمن ومشفّر</p>
+                  <button
+                    type="button"
+                    className="text-xs text-muted-foreground hover:text-foreground mt-2 w-full"
+                    onClick={() => {
+                      clearCart();
+                      toast({ title: "تم مسح السلة" });
+                    }}
+                  >
+                    مسح السلة
+                  </button>
                 </div>
               </div>
             </div>

@@ -1,9 +1,10 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-import { Hotel, RefreshCw, Info, CheckCircle2, XCircle, Users, ShieldCheck } from "lucide-react";
+import { useTenantStore } from "@/stores/tenantStore";
+import { Hotel, RefreshCw, CheckCircle2, XCircle, Users, ShieldCheck, AlertTriangle } from "lucide-react";
 
 const HOTEL_APIS = [
   {
@@ -40,85 +41,136 @@ interface ApiFlag {
   id: string;
   flag_key: string;
   is_enabled: boolean;
-  metadata: any;
+  metadata: Record<string, unknown> | null;
 }
 
 export default function AdminHotelApis() {
-  const [tenants, setTenants] = useState<any[]>([]);
+  const [tenants, setTenants] = useState<Array<{ id: string; name: string; slug: string }>>([]);
   const [selectedTenant, setSelectedTenant] = useState("");
   const [flags, setFlags] = useState<ApiFlag[]>([]);
   const [rolePerms, setRolePerms] = useState<Record<string, string[]>>({});
   const [loading, setLoading] = useState(false);
+  const [loadingTenants, setLoadingTenants] = useState(false);
+  const { tenant: currentTenant } = useTenantStore();
   const { toast } = useToast();
 
-  useEffect(() => {
-    supabase.from("tenants").select("id, name, slug").order("name").then(({ data }) => {
-      setTenants(data || []);
-      if (data && data.length > 0) setSelectedTenant(data[0].id);
-    });
-  }, []);
+  const selectedTenantObj = useMemo(() => tenants.find((t) => t.id === selectedTenant), [tenants, selectedTenant]);
+
+  const loadTenants = async () => {
+    setLoadingTenants(true);
+    const { data, error } = await supabase.from("tenants").select("id, name, slug").order("name");
+    setLoadingTenants(false);
+
+    if (error) {
+      if (currentTenant?.id) {
+        setTenants([{ id: currentTenant.id, name: currentTenant.name || "Tenant", slug: currentTenant.slug || "tenant" }]);
+        setSelectedTenant(currentTenant.id);
+        return;
+      }
+      toast({ title: "خطأ", description: "تعذر تحميل المستأجرين", variant: "destructive" });
+      return;
+    }
+
+    const list = (data || []) as Array<{ id: string; name: string; slug: string }>;
+    setTenants(list);
+
+    if (list.length > 0) {
+      const fallback = list.find((t) => t.id === currentTenant?.id) || list[0];
+      setSelectedTenant((prev) => prev || fallback.id);
+    }
+  };
 
   const fetchFlags = async (tenantId: string) => {
     if (!tenantId) return;
     setLoading(true);
-    const { data } = await supabase
+    const { data, error } = await supabase
       .from("feature_flags")
-      .select("*")
+      .select("id, flag_key, is_enabled, metadata")
       .eq("tenant_id", tenantId)
       .in("flag_key", HOTEL_APIS.map((a) => a.key));
-    setFlags((data || []) as ApiFlag[]);
-
-    // parse role permissions from metadata
-    const rp: Record<string, string[]> = {};
-    (data || []).forEach((f: any) => {
-      rp[f.flag_key] = f.metadata?.allowed_roles || [];
-    });
-    setRolePerms(rp);
     setLoading(false);
+
+    if (error) {
+      setFlags([]);
+      setRolePerms({});
+      toast({ title: "خطأ", description: "تعذر تحميل إعدادات Hotel APIs", variant: "destructive" });
+      return;
+    }
+
+    const parsed = (data || []) as ApiFlag[];
+    setFlags(parsed);
+
+    const perms: Record<string, string[]> = {};
+    parsed.forEach((f) => {
+      const metadata = (f.metadata || {}) as Record<string, unknown>;
+      perms[f.flag_key] = Array.isArray(metadata.allowed_roles) ? (metadata.allowed_roles as string[]) : [];
+    });
+    setRolePerms(perms);
   };
 
-  useEffect(() => { fetchFlags(selectedTenant); }, [selectedTenant]);
+  useEffect(() => {
+    loadTenants();
+  }, []);
+
+  useEffect(() => {
+    if (selectedTenant) fetchFlags(selectedTenant);
+  }, [selectedTenant]);
 
   const getFlag = (key: string) => flags.find((f) => f.flag_key === key);
 
   const toggleApi = async (apiKey: string, currentEnabled: boolean) => {
-    if (!selectedTenant) return;
-    const existing = getFlag(apiKey);
-    if (existing) {
-      await supabase.from("feature_flags")
-        .update({ is_enabled: !currentEnabled })
-        .eq("id", existing.id);
-    } else {
-      await supabase.from("feature_flags").insert({
-        tenant_id: selectedTenant,
-        flag_key: apiKey,
-        is_enabled: true,
-        metadata: { allowed_roles: ["admin", "manager", "agent", "customer"] },
-      });
+    if (!selectedTenant) {
+      toast({ title: "تنبيه", description: "اختر مستأجرًا أولًا", variant: "destructive" });
+      return;
     }
-    fetchFlags(selectedTenant);
+
+    const existing = getFlag(apiKey);
+    const payload = existing
+      ? supabase.from("feature_flags").update({ is_enabled: !currentEnabled }).eq("id", existing.id)
+      : supabase.from("feature_flags").insert({
+          tenant_id: selectedTenant,
+          flag_key: apiKey,
+          is_enabled: true,
+          metadata: { allowed_roles: ["admin", "manager", "agent", "customer"] },
+        });
+
+    const { error } = await payload;
+    if (error) {
+      toast({ title: "خطأ", description: error.message || "تعذر تحديث حالة الـ API", variant: "destructive" });
+      return;
+    }
+
+    await fetchFlags(selectedTenant);
     toast({ title: !currentEnabled ? "تم تفعيل الـ API" : "تم تعطيل الـ API" });
   };
 
   const toggleRolePermission = async (apiKey: string, role: string) => {
+    if (!selectedTenant) {
+      toast({ title: "تنبيه", description: "اختر مستأجرًا أولًا", variant: "destructive" });
+      return;
+    }
+
     const existing = getFlag(apiKey);
     const currentRoles = rolePerms[apiKey] || [];
-    const newRoles = currentRoles.includes(role)
-      ? currentRoles.filter((r) => r !== role)
-      : [...currentRoles, role];
+    const newRoles = currentRoles.includes(role) ? currentRoles.filter((r) => r !== role) : [...currentRoles, role];
 
-    if (existing) {
-      await supabase.from("feature_flags").update({
-        metadata: { ...(existing.metadata || {}), allowed_roles: newRoles },
-      }).eq("id", existing.id);
-    } else {
-      await supabase.from("feature_flags").insert({
-        tenant_id: selectedTenant,
-        flag_key: apiKey,
-        is_enabled: false,
-        metadata: { allowed_roles: newRoles },
-      });
+    const { error } = existing
+      ? await supabase
+          .from("feature_flags")
+          .update({ metadata: { ...(existing.metadata || {}), allowed_roles: newRoles } })
+          .eq("id", existing.id)
+      : await supabase.from("feature_flags").insert({
+          tenant_id: selectedTenant,
+          flag_key: apiKey,
+          is_enabled: false,
+          metadata: { allowed_roles: newRoles },
+        });
+
+    if (error) {
+      toast({ title: "خطأ", description: error.message || "تعذر تحديث الصلاحيات", variant: "destructive" });
+      return;
     }
+
     setRolePerms((p) => ({ ...p, [apiKey]: newRoles }));
     toast({ title: "تم تحديث الصلاحيات" });
   };
@@ -130,30 +182,38 @@ export default function AdminHotelApis() {
           <h1 className="text-2xl font-bold flex items-center gap-3">
             <Hotel className="w-7 h-7 text-primary" /> إدارة Hotel APIs
           </h1>
-          <p className="text-muted-foreground text-sm mt-1">
-            تفعيل / تعطيل Hotel APIs وتحديد الأدوار المسموح لها
-          </p>
+          <p className="text-muted-foreground text-sm mt-1">تفعيل / تعطيل Hotel APIs وتحديد الأدوار المسموح لها</p>
         </div>
-        <Button variant="outline" size="sm" onClick={() => fetchFlags(selectedTenant)} disabled={loading}>
+        <Button variant="outline" size="sm" onClick={() => fetchFlags(selectedTenant)} disabled={loading || !selectedTenant}>
           <RefreshCw className={`w-4 h-4 ml-2 ${loading ? "animate-spin" : ""}`} />
           تحديث
         </Button>
       </div>
 
-      {/* Tenant selector */}
       <div className="flex items-center gap-4 mb-8">
         <label className="text-sm font-medium text-muted-foreground">المستأجر:</label>
-        <select
-          className="flex h-10 max-w-xs rounded-xl border border-input bg-background px-3 py-2 text-sm"
-          value={selectedTenant}
-          onChange={(e) => setSelectedTenant(e.target.value)}
-        >
-          <option value="">اختر مستأجر...</option>
+        <select className="flex h-10 max-w-xs rounded-xl border border-input bg-background px-3 py-2 text-sm" value={selectedTenant} onChange={(e) => setSelectedTenant(e.target.value)} disabled={loadingTenants}>
+          <option value="">{loadingTenants ? "جارٍ التحميل..." : "اختر مستأجر..."}</option>
           {tenants.map((t) => (
-            <option key={t.id} value={t.id}>{t.name} ({t.slug})</option>
+            <option key={t.id} value={t.id}>
+              {t.name} ({t.slug})
+            </option>
           ))}
         </select>
       </div>
+
+      {!selectedTenant && (
+        <div className="mb-6 p-4 rounded-xl border border-amber-500/30 bg-amber-500/10 text-amber-500 text-sm flex items-center gap-2">
+          <AlertTriangle className="w-4 h-4" />
+          لا يمكن التفعيل قبل اختيار مستأجر.
+        </div>
+      )}
+
+      {selectedTenantObj && (
+        <div className="mb-4 text-sm text-muted-foreground">
+          المستأجر الحالي: <span className="font-medium text-foreground">{selectedTenantObj.name}</span>
+        </div>
+      )}
 
       {loading ? (
         <div className="flex justify-center py-20">
@@ -168,7 +228,6 @@ export default function AdminHotelApis() {
 
             return (
               <div key={api.key} className="p-6 rounded-2xl bg-card border border-border space-y-5">
-                {/* Header */}
                 <div className="flex items-start justify-between gap-4">
                   <div className="flex-1">
                     <div className="flex items-center gap-3 mb-1">
@@ -178,23 +237,19 @@ export default function AdminHotelApis() {
                       </span>
                     </div>
                     <p className="text-sm text-muted-foreground">{api.desc}</p>
-                    <p className="text-xs font-mono text-primary/70 mt-1" dir="ltr">{api.endpoint}</p>
+                    <p className="text-xs font-mono text-primary/70 mt-1" dir="ltr">
+                      {api.endpoint}
+                    </p>
                   </div>
                   <div className="flex items-center gap-3 shrink-0">
-                    <span className={`text-xs flex items-center gap-1.5 px-2 py-1 rounded-full ${
-                      enabled ? "bg-green-500/10 text-green-400" : "bg-destructive/10 text-destructive"
-                    }`}>
+                    <span className={`text-xs flex items-center gap-1.5 px-2 py-1 rounded-full ${enabled ? "bg-green-500/10 text-green-400" : "bg-destructive/10 text-destructive"}`}>
                       {enabled ? <CheckCircle2 className="w-3.5 h-3.5" /> : <XCircle className="w-3.5 h-3.5" />}
                       {enabled ? "مفعّل" : "معطّل"}
                     </span>
-                    <Switch
-                      checked={enabled}
-                      onCheckedChange={() => toggleApi(api.key, enabled)}
-                    />
+                    <Switch checked={enabled} onCheckedChange={() => toggleApi(api.key, enabled)} disabled={!selectedTenant} />
                   </div>
                 </div>
 
-                {/* Role permissions */}
                 <div className="border-t border-border pt-4">
                   <div className="flex items-center gap-2 mb-3">
                     <ShieldCheck className="w-4 h-4 text-primary" />
@@ -207,10 +262,9 @@ export default function AdminHotelApis() {
                         <button
                           key={r.role}
                           onClick={() => toggleRolePermission(api.key, r.role)}
+                          disabled={!selectedTenant}
                           className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium border transition-all ${
-                            allowed
-                              ? `${r.color} border-current`
-                              : "bg-muted/30 text-muted-foreground border-border/50 hover:bg-muted/50"
+                            allowed ? `${r.color} border-current` : "bg-muted/30 text-muted-foreground border-border/50 hover:bg-muted/50"
                           }`}
                         >
                           <Users className="w-3 h-3" />

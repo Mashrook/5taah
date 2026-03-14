@@ -14,16 +14,15 @@ export default function HotelPaymentCallback() {
   useEffect(() => {
     const verify = async () => {
       const sessionId = params.get("session");
-      const paymentId = params.get("id");
+      const paymentId = params.get("id") || params.get("payment_id");
       const paymentStatus = params.get("status");
 
-      if (!sessionId) {
+      if (!sessionId || !paymentId) {
         setStatus("failed");
-        setMessage("معرّف الجلسة مفقود");
+        setMessage("معرّف الجلسة أو الدفع مفقود");
         return;
       }
-
-      if (paymentStatus !== "paid") {
+      if (paymentStatus && paymentStatus !== "paid") {
         setStatus("failed");
         setMessage("لم يتم الدفع بنجاح. يمكنك المحاولة مرة أخرى.");
         return;
@@ -31,52 +30,19 @@ export default function HotelPaymentCallback() {
 
       try {
         const { data, error } = await supabase.functions.invoke("moyasar-verify", {
-          body: { session_id: sessionId, payment_id: paymentId, flow: "hotel" },
+          body: { session_id: sessionId, payment_id: paymentId },
         });
-
         if (error) throw error;
-
-        if (data?.success) {
-          // Create booking record
-          try {
-            const session = data.session;
-            const details = session?.details_json || {};
-            const travelers = details.travelers || [];
-            const firstTraveler = travelers[0];
-
-            const { data: booking } = await supabase
-              .from("bookings")
-              .insert({
-                flow: "hotel",
-                status: "confirmed",
-                amount: session?.amount || 0,
-                currency: session?.currency || "SAR",
-                guest_name: firstTraveler ? `${firstTraveler.firstName} ${firstTraveler.lastName}` : null,
-                guest_phone: firstTraveler?.phone || null,
-                guest_email: firstTraveler?.email || null,
-                user_id: session?.user_id || null,
-                tenant_id: session?.tenant_id || null,
-                payment_session_id: sessionId,
-                payment_id: paymentId,
-                details_json: details,
-                travelers_json: travelers,
-              } as Record<string, unknown>)
-              .select("booking_ref")
-              .single();
-
-            if (booking) {
-              setBookingRef((booking as { booking_ref: string }).booking_ref);
-            }
-          } catch {
-            // Booking record creation failed but payment succeeded
-          }
-
-          setStatus("success");
-          setMessage("تم تأكيد حجز الفندق بنجاح!");
-        } else {
+        if (!data?.success) {
           setStatus("failed");
           setMessage(data?.error || "تعذر التحقق من الدفع");
+          return;
         }
+        if (typeof data.reference === "string" && data.reference) {
+          setBookingRef(data.reference);
+        }
+        setStatus("success");
+        setMessage("تم تأكيد حجز الفندق بنجاح!");
       } catch (err: unknown) {
         setStatus("failed");
         setMessage(err instanceof Error ? err.message : "حدث خطأ أثناء التحقق");
@@ -91,8 +57,8 @@ export default function HotelPaymentCallback() {
         {status === "verifying" && (
           <>
             <Loader2 className="w-16 h-16 text-primary animate-spin mx-auto" />
-            <h2 className="text-xl font-bold">جاري التحقق من الدفع...</h2>
-            <p className="text-muted-foreground text-sm">يرجى الانتظار بينما نتحقق من عملية الدفع</p>
+            <h2 className="text-xl font-bold">جارٍ التحقق من الدفع...</h2>
+            <p className="text-muted-foreground text-sm">يرجى الانتظار بينما نتحقق من العملية</p>
           </>
         )}
 
@@ -106,7 +72,9 @@ export default function HotelPaymentCallback() {
             {bookingRef && (
               <div className="bg-muted/30 rounded-xl p-4">
                 <p className="text-sm text-muted-foreground">رقم الحجز</p>
-                <p className="font-bold text-primary text-lg" dir="ltr">{bookingRef}</p>
+                <p className="font-bold text-primary text-lg" dir="ltr">
+                  {bookingRef}
+                </p>
               </div>
             )}
             <div className="flex gap-3">

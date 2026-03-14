@@ -21,11 +21,12 @@ import {
 
 type LogStatus = "success" | "error" | "pending";
 type LogAction = "search" | "book" | "error";
+type LogSource = "api_search_logs" | "bookings" | "audit_logs";
 
 interface ApiSearchRow {
   id: string;
-  provider: string;
-  search_type: string;
+  provider: string | null;
+  search_type: string | null;
   search_params: Record<string, unknown> | null;
   results_count: number | null;
   response_time_ms: number | null;
@@ -34,13 +35,11 @@ interface ApiSearchRow {
 
 interface BookingRow {
   id: string;
-  flow: string;
-  status: string;
-  amount: number | null;
+  booking_type: string | null;
+  status: string | null;
+  payment_status: string | null;
+  total_price: number | null;
   currency: string | null;
-  api_provider: string | null;
-  api_offer_id: string | null;
-  api_confirmation_id: string | null;
   details_json: Record<string, unknown> | null;
   created_at: string;
 }
@@ -58,7 +57,7 @@ interface AuditRow {
 
 interface UnifiedApiLog {
   id: string;
-  source: "api_search_logs" | "bookings" | "audit_logs";
+  source: LogSource;
   action: LogAction;
   type: string;
   provider: string;
@@ -99,20 +98,27 @@ const STATUS_STYLES: Record<LogStatus, string> = {
   pending: "bg-yellow-500/10 text-yellow-400",
 };
 
-function statusFromBookingStatus(status: string): LogStatus {
-  if (["confirmed", "paid", "completed", "success"].includes(status)) return "success";
-  if (["failed", "cancelled", "refunded", "error"].includes(status)) return "error";
+function asObject(value: unknown): Record<string, unknown> {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return {};
+  return value as Record<string, unknown>;
+}
+
+function statusFromBookingStatus(status: string, paymentStatus: string): LogStatus {
+  const s = String(status || "").toLowerCase();
+  const p = String(paymentStatus || "").toLowerCase();
+  if (["failed", "cancelled", "refunded", "error"].includes(s) || ["failed", "refunded"].includes(p)) return "error";
+  if (["confirmed", "completed", "success"].includes(s) && p === "paid") return "success";
   return "pending";
 }
 
 function isErrorAudit(row: AuditRow): boolean {
   const action = (row.action || "").toLowerCase();
   const entityType = (row.entity_type || "").toLowerCase();
-  const afterError = typeof row.after?.error === "string" && row.after.error.length > 0;
-  return action.includes("error") || entityType.includes("error") || afterError;
+  const after = asObject(row.after);
+  return action.includes("error") || entityType.includes("error") || typeof after.error === "string";
 }
 
-function getTypeIcon(log: UnifiedApiLog): ReactNode {
+function iconFor(log: UnifiedApiLog): ReactNode {
   if (log.type.includes("flight")) return <Plane className="w-4 h-4 text-blue-400" />;
   if (log.type.includes("hotel")) return <Hotel className="w-4 h-4 text-emerald-400" />;
   if (log.type.includes("car")) return <Car className="w-4 h-4 text-orange-400" />;
@@ -136,7 +142,7 @@ export default function AdminApiLogs() {
   const fetchLogs = async () => {
     setLoading(true);
     try {
-      const [searchRes, bookingRes, auditRes] = await Promise.all([
+      const [searchRes, bookingRes, auditRes] = await Promise.allSettled([
         supabase
           .from("api_search_logs")
           .select("id, provider, search_type, search_params, results_count, response_time_ms, created_at")
@@ -144,7 +150,7 @@ export default function AdminApiLogs() {
           .limit(800),
         supabase
           .from("bookings")
-          .select("id, flow, status, amount, currency, api_provider, api_offer_id, api_confirmation_id, details_json, created_at")
+          .select("id, booking_type, status, payment_status, total_price, currency, details_json, created_at")
           .order("created_at", { ascending: false })
           .limit(500),
         supabase
@@ -154,76 +160,92 @@ export default function AdminApiLogs() {
           .limit(400),
       ]);
 
-      if (searchRes.error) throw searchRes.error;
-      if (bookingRes.error) throw bookingRes.error;
-      if (auditRes.error) throw auditRes.error;
+      let allFailed = true;
+      const merged: UnifiedApiLog[] = [];
 
-      const searchLogs: UnifiedApiLog[] = ((searchRes.data || []) as ApiSearchRow[]).map((l) => {
-        const status = l.search_params?.status === "error"
-          ? "error"
-          : (l.results_count || 0) > 0
-          ? "success"
-          : "pending";
-        return {
-          id: `search_${l.id}`,
-          source: "api_search_logs",
-          action: status === "error" ? "error" : "search",
-          type: `${l.search_type}_search`,
-          provider: l.provider || "unknown",
-          status,
-          createdAt: l.created_at,
-          request: l.search_params || {},
-          response: {
-            results_count: l.results_count || 0,
-            response_time_ms: l.response_time_ms || 0,
-          },
-        };
-      });
+      if (searchRes.status === "fulfilled" && !searchRes.value.error) {
+        allFailed = false;
+        const rows = (searchRes.value.data || []) as ApiSearchRow[];
+        merged.push(
+          ...rows.map((row) => {
+            const status: LogStatus =
+              row.search_params?.status === "error" ? "error" : (row.results_count || 0) > 0 ? "success" : "pending";
+            return {
+              id: `search_${row.id}`,
+              source: "api_search_logs",
+              action: status === "error" ? "error" : "search",
+              type: `${row.search_type || "unknown"}_search`,
+              provider: row.provider || "unknown",
+              status,
+              createdAt: row.created_at,
+              request: row.search_params || {},
+              response: {
+                results_count: row.results_count || 0,
+                response_time_ms: row.response_time_ms || 0,
+              },
+            };
+          }),
+        );
+      }
 
-      const bookingLogs: UnifiedApiLog[] = ((bookingRes.data || []) as BookingRow[]).map((b) => ({
-        id: `booking_${b.id}`,
-        source: "bookings",
-        action: "book",
-        type: `${b.flow}_booking`,
-        provider: b.api_provider || "internal",
-        status: statusFromBookingStatus(b.status || "pending"),
-        createdAt: b.created_at,
-        entityId: b.id,
-        request: {
-          flow: b.flow,
-          api_offer_id: b.api_offer_id,
-          details: b.details_json || {},
-        },
-        response: {
-          status: b.status,
-          amount: b.amount,
-          currency: b.currency,
-          api_confirmation_id: b.api_confirmation_id,
-        },
-      }));
+      if (bookingRes.status === "fulfilled" && !bookingRes.value.error) {
+        allFailed = false;
+        const rows = (bookingRes.value.data || []) as BookingRow[];
+        merged.push(
+          ...rows.map((row) => {
+            const details = asObject(row.details_json);
+            const type = `${row.booking_type || String(details.flow || "unknown")}_booking`;
+            const provider = String(details.api_provider || details.source || "internal");
+            return {
+              id: `booking_${row.id}`,
+              source: "bookings",
+              action: "book",
+              type,
+              provider,
+              status: statusFromBookingStatus(row.status || "", row.payment_status || ""),
+              createdAt: row.created_at,
+              entityId: row.id,
+              request: { booking_type: row.booking_type, details },
+              response: {
+                status: row.status,
+                payment_status: row.payment_status,
+                amount: row.total_price || 0,
+                currency: row.currency || "SAR",
+                api_offer_id: details.api_offer_id || details.amadeus_offer_id || null,
+                api_confirmation_id: details.api_confirmation_id || details.amadeus_order_id || null,
+              },
+            };
+          }),
+        );
+      }
 
-      const errorAuditLogs: UnifiedApiLog[] = ((auditRes.data || []) as AuditRow[])
-        .filter(isErrorAudit)
-        .map((a) => ({
-          id: `audit_${a.id}`,
-          source: "audit_logs",
-          action: "error",
-          type: a.entity_type || "api_error",
-          provider: (a.entity_type || "").includes("travelpayouts") ? "travelpayouts" : "amadeus",
-          status: "error",
-          createdAt: a.created_at,
-          entityId: a.entity_id,
-          actorAdminId: a.actor_admin_id,
-          request: a.before || {},
-          response: a.after || {},
-        }));
+      if (auditRes.status === "fulfilled" && !auditRes.value.error) {
+        allFailed = false;
+        const rows = (auditRes.value.data || []) as AuditRow[];
+        const errorRows = rows.filter(isErrorAudit);
+        merged.push(
+          ...errorRows.map((row) => ({
+            id: `audit_${row.id}`,
+            source: "audit_logs" as const,
+            action: "error" as const,
+            type: row.entity_type || "api_error",
+            provider: row.entity_type?.includes("travelpayouts") ? "travelpayouts" : "amadeus",
+            status: "error" as const,
+            createdAt: row.created_at,
+            entityId: row.entity_id,
+            actorAdminId: row.actor_admin_id,
+            request: row.before || {},
+            response: row.after || {},
+          })),
+        );
+      }
 
-      const merged = [...searchLogs, ...bookingLogs, ...errorAuditLogs].sort(
-        (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
-      );
+      merged.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
       setLogs(merged);
-    } catch {
-      toast({ title: "خطأ", description: "تعذر تحميل سجلات الـ APIs", variant: "destructive" });
+
+      if (allFailed) {
+        toast({ title: "خطأ", description: "تعذر تحميل سجلات الـ APIs", variant: "destructive" });
+      }
     } finally {
       setLoading(false);
     }
@@ -234,47 +256,41 @@ export default function AdminApiLogs() {
   }, []);
 
   const filtered = useMemo(() => {
-    return logs.filter((l) => {
-      if (typeFilter && l.type !== typeFilter) return false;
-      if (actionFilter && l.action !== actionFilter) return false;
+    return logs.filter((log) => {
+      if (typeFilter && log.type !== typeFilter) return false;
+      if (actionFilter && log.action !== actionFilter) return false;
       if (!search) return true;
       const needle = search.toLowerCase();
       return (
-        l.type.toLowerCase().includes(needle) ||
-        l.provider.toLowerCase().includes(needle) ||
-        (l.entityId || "").toLowerCase().includes(needle) ||
-        JSON.stringify(l.request).toLowerCase().includes(needle) ||
-        JSON.stringify(l.response).toLowerCase().includes(needle)
+        log.type.toLowerCase().includes(needle) ||
+        log.provider.toLowerCase().includes(needle) ||
+        (log.entityId || "").toLowerCase().includes(needle) ||
+        JSON.stringify(log.request).toLowerCase().includes(needle) ||
+        JSON.stringify(log.response).toLowerCase().includes(needle)
       );
     });
   }, [logs, typeFilter, actionFilter, search]);
 
-  useEffect(() => {
-    setPage(0);
-  }, [typeFilter, actionFilter, search]);
+  useEffect(() => setPage(0), [search, typeFilter, actionFilter]);
 
   const pageStart = page * PAGE_SIZE;
-  const pageEnd = pageStart + PAGE_SIZE;
-  const pageItems = filtered.slice(pageStart, pageEnd);
-
-  const formatDate = (d: string) => {
-    const date = new Date(d);
-    return `${date.toLocaleDateString("ar-SA")} ${date.toLocaleTimeString("ar-SA", { hour: "2-digit", minute: "2-digit" })}`;
-  };
+  const pageItems = filtered.slice(pageStart, pageStart + PAGE_SIZE);
 
   const stats = useMemo(() => {
     const searches = filtered.filter((l) => l.action === "search").length;
     const bookings = filtered.filter((l) => l.action === "book").length;
     const errors = filtered.filter((l) => l.action === "error" || l.status === "error").length;
-    const avgResponse = (() => {
-      const withTime = filtered
-        .map((l) => Number(l.response?.response_time_ms))
-        .filter((n) => Number.isFinite(n) && n > 0);
-      if (withTime.length === 0) return 0;
-      return Math.round(withTime.reduce((s, v) => s + v, 0) / withTime.length);
-    })();
+    const responseTimes = filtered
+      .map((l) => Number(l.response?.response_time_ms))
+      .filter((n) => Number.isFinite(n) && n > 0);
+    const avgResponse = responseTimes.length ? Math.round(responseTimes.reduce((s, n) => s + n, 0) / responseTimes.length) : 0;
     return { searches, bookings, errors, avgResponse };
   }, [filtered]);
+
+  const formatDate = (value: string) => {
+    const d = new Date(value);
+    return `${d.toLocaleDateString("ar-SA")} ${d.toLocaleTimeString("ar-SA", { hour: "2-digit", minute: "2-digit" })}`;
+  };
 
   return (
     <div>
@@ -283,9 +299,7 @@ export default function AdminApiLogs() {
           <h1 className="text-2xl font-bold flex items-center gap-3">
             <ScrollText className="w-7 h-7 text-primary" /> سجلات APIs
           </h1>
-          <p className="text-muted-foreground text-sm mt-1">
-            بحث + حجز + أخطاء من Amadeus وTravelpayouts والأنظمة المرتبطة
-          </p>
+          <p className="text-muted-foreground text-sm mt-1">بحث + حجز + أخطاء من Amadeus وTravelpayouts والأنظمة المرتبطة</p>
         </div>
         <Button variant="outline" size="sm" onClick={fetchLogs} disabled={loading}>
           <RefreshCw className={`w-4 h-4 ml-2 ${loading ? "animate-spin" : ""}`} />
@@ -315,18 +329,9 @@ export default function AdminApiLogs() {
       <div className="flex flex-col sm:flex-row gap-3 mb-6">
         <div className="relative flex-1">
           <Search className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-          <Input
-            placeholder="بحث في السجلات..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="pr-10 bg-muted/30"
-          />
+          <Input placeholder="بحث في السجلات..." value={search} onChange={(e) => setSearch(e.target.value)} className="pr-10 bg-muted/30" />
         </div>
-        <select
-          value={typeFilter}
-          onChange={(e) => setTypeFilter(e.target.value)}
-          className="px-4 py-2 rounded-xl bg-muted border border-border text-foreground text-sm"
-        >
+        <select value={typeFilter} onChange={(e) => setTypeFilter(e.target.value)} className="px-4 py-2 rounded-xl bg-muted border border-border text-foreground text-sm">
           {LOG_TYPES.map((t) => (
             <option key={t.value} value={t.value}>
               {t.label}
@@ -361,22 +366,15 @@ export default function AdminApiLogs() {
             const isExpanded = expandedId === log.id;
             return (
               <div key={log.id} className="rounded-xl bg-card border border-border overflow-hidden">
-                <button
-                  onClick={() => setExpandedId(isExpanded ? null : log.id)}
-                  className="w-full flex items-center gap-4 p-4 text-right hover:bg-muted/20 transition-colors"
-                >
-                  <div className="shrink-0">{getTypeIcon(log)}</div>
+                <button onClick={() => setExpandedId(isExpanded ? null : log.id)} className="w-full flex items-center gap-4 p-4 text-right hover:bg-muted/20 transition-colors">
+                  <div className="shrink-0">{iconFor(log)}</div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
                       <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${STATUS_STYLES[log.status]}`}>
                         {log.status === "success" ? "✓ نجاح" : log.status === "error" ? "✕ خطأ" : "◌ قيد التنفيذ"}
                       </span>
-                      <span className="text-xs px-2 py-0.5 rounded-full bg-muted text-muted-foreground">
-                        {log.action}
-                      </span>
-                      <span className="text-xs px-2 py-0.5 rounded-full bg-muted/60 text-muted-foreground">
-                        {log.provider}
-                      </span>
+                      <span className="text-xs px-2 py-0.5 rounded-full bg-muted text-muted-foreground">{log.action}</span>
+                      <span className="text-xs px-2 py-0.5 rounded-full bg-muted/60 text-muted-foreground">{log.provider}</span>
                       <span className="text-xs text-muted-foreground font-mono" dir="ltr">
                         {log.type}
                       </span>
@@ -400,11 +398,7 @@ export default function AdminApiLogs() {
                     </span>
                   )}
                   <span className="text-xs text-muted-foreground shrink-0">{formatDate(log.createdAt)}</span>
-                  {isExpanded ? (
-                    <ChevronUp className="w-4 h-4 text-muted-foreground shrink-0" />
-                  ) : (
-                    <ChevronDown className="w-4 h-4 text-muted-foreground shrink-0" />
-                  )}
+                  {isExpanded ? <ChevronUp className="w-4 h-4 text-muted-foreground shrink-0" /> : <ChevronDown className="w-4 h-4 text-muted-foreground shrink-0" />}
                 </button>
 
                 {isExpanded && (
@@ -441,12 +435,7 @@ export default function AdminApiLogs() {
         <span className="text-sm text-muted-foreground">
           صفحة {page + 1} من {Math.max(1, Math.ceil(filtered.length / PAGE_SIZE))}
         </span>
-        <Button
-          variant="outline"
-          size="sm"
-          disabled={pageEnd >= filtered.length}
-          onClick={() => setPage((p) => p + 1)}
-        >
+        <Button variant="outline" size="sm" disabled={pageStart + PAGE_SIZE >= filtered.length} onClick={() => setPage((p) => p + 1)}>
           التالي
         </Button>
       </div>

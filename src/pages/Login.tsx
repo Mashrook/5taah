@@ -12,16 +12,33 @@ const loginSchema = z.object({
   password: z.string().min(8, "كلمة المرور يجب أن تكون 8 أحرف على الأقل"),
 });
 
+const MAX_ATTEMPTS = 5;
+const LOCKOUT_MS = 60_000;
+
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [failedAttempts, setFailedAttempts] = useState(0);
+  const [lockoutUntil, setLockoutUntil] = useState<number | null>(null);
   const navigate = useNavigate();
   const { toast } = useToast();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Check lockout
+    if (lockoutUntil && Date.now() < lockoutUntil) {
+      const remaining = Math.ceil((lockoutUntil - Date.now()) / 1000);
+      toast({ title: "تم تجاوز الحد", description: `حاول مرة أخرى بعد ${remaining} ثانية`, variant: "destructive" });
+      return;
+    }
+    if (lockoutUntil && Date.now() >= lockoutUntil) {
+      setLockoutUntil(null);
+      setFailedAttempts(0);
+    }
+
     const result = loginSchema.safeParse({ email, password });
     if (!result.success) {
       toast({ title: "خطأ", description: result.error.errors[0].message, variant: "destructive" });
@@ -47,9 +64,16 @@ export default function Login() {
       }
 
       if (error) throw error;
+      setFailedAttempts(0);
+      setLockoutUntil(null);
       toast({ title: "مرحباً!", description: "تم تسجيل الدخول بنجاح" });
       navigate("/dashboard");
     } catch (err: unknown) {
+      const newAttempts = failedAttempts + 1;
+      setFailedAttempts(newAttempts);
+      if (newAttempts >= MAX_ATTEMPTS) {
+        setLockoutUntil(Date.now() + LOCKOUT_MS);
+      }
       const errorMessage = err instanceof Error ? err.message : "حدث خطأ";
       toast({
         title: "خطأ في تسجيل الدخول",

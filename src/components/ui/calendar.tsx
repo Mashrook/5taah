@@ -8,6 +8,8 @@ import { buttonVariants } from "@/components/ui/button";
 export type CalendarProps = React.ComponentProps<typeof DayPicker>;
 
 function Calendar({ className, classNames, showOutsideDays = true, ...props }: CalendarProps) {
+  const isRtl = props.dir === "rtl";
+
   return (
     <DayPicker
       showOutsideDays={showOutsideDays}
@@ -23,8 +25,8 @@ function Calendar({ className, classNames, showOutsideDays = true, ...props }: C
           buttonVariants({ variant: "outline" }),
           "h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100",
         ),
-        nav_button_previous: "absolute left-1",
-        nav_button_next: "absolute right-1",
+        nav_button_previous: isRtl ? "absolute right-1" : "absolute left-1",
+        nav_button_next: isRtl ? "absolute left-1" : "absolute right-1",
         dropdown: "appearance-none bg-transparent border border-border rounded-md px-2 py-0.5 text-sm font-medium focus:outline-none focus:ring-1 focus:ring-primary cursor-pointer",
         dropdown_month: "mr-1",
         dropdown_year: "",
@@ -47,8 +49,8 @@ function Calendar({ className, classNames, showOutsideDays = true, ...props }: C
         ...classNames,
       }}
       components={{
-        IconLeft: ({ ..._props }) => <ChevronLeft className="h-4 w-4" />,
-        IconRight: ({ ..._props }) => <ChevronRight className="h-4 w-4" />,
+        IconLeft: ({ ..._props }) => (isRtl ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />),
+        IconRight: ({ ..._props }) => (isRtl ? <ChevronLeft className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />),
       }}
       {...props}
     />

@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import { useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -50,13 +50,71 @@ const cityToIata: Record<string, string> = {
   "باريس": "CDG", "كوالالمبور": "KUL", "الباحة": "ABT",
 };
 
+const englishCityToIata: Record<string, string> = {
+  riyadh: "RUH",
+  jeddah: "JED",
+  dammam: "DMM",
+  madinah: "MED",
+  medina: "MED",
+  abha: "AHB",
+  tabuk: "TUU",
+  qassim: "ELQ",
+  hail: "HAS",
+  jazan: "GIZ",
+  najran: "EAM",
+  yanbu: "YNB",
+  taif: "TIF",
+  dubai: "DXB",
+  cairo: "CAI",
+  istanbul: "IST",
+  london: "LHR",
+  paris: "CDG",
+  "kuala lumpur": "KUL",
+  baha: "ABT",
+};
+
+function isOfferRenderable(offer: AmadeusFlightOffer | null | undefined) {
+  return Boolean(
+    offer &&
+      Array.isArray(offer.itineraries) &&
+      offer.itineraries[0] &&
+      Array.isArray(offer.itineraries[0].segments) &&
+      offer.itineraries[0].segments.length > 0,
+  );
+}
+
+function safeOfferTotal(offer: AmadeusFlightOffer | null | undefined): number {
+  const parsed = Number.parseFloat(offer?.price?.grandTotal || "");
+  return Number.isFinite(parsed) ? parsed : 0;
+}
+
+function safeFormatDuration(iso: string | null | undefined): string {
+  if (!iso || typeof iso !== "string") return "غير متاح";
+  try {
+    return formatDuration(iso);
+  } catch {
+    return "غير متاح";
+  }
+}
+
 function resolveIata(input: string): string {
-  if (/^[A-Z]{3}$/.test(input.trim())) return input.trim();
-  const mapped = cityToIata[input.trim()];
+  const normalized = input.trim();
+  if (!normalized) return "";
+  if (/^[A-Za-z]{3}$/.test(normalized)) return normalized.toUpperCase();
+
+  const mapped = cityToIata[normalized];
   if (mapped) return mapped;
-  const match = input.match(/\(([A-Z]{3})\)/);
+
+  const englishMapped = englishCityToIata[normalized.toLowerCase()];
+  if (englishMapped) return englishMapped;
+
+  const match = normalized.match(/\(([A-Za-z]{3})\)/);
   if (match) return match[1];
-  return input.trim().toUpperCase().slice(0, 3);
+
+  const token = normalized.match(/[A-Za-z]{3}/);
+  if (token) return token[0].toUpperCase();
+
+  return "";
 }
 
 const domesticDestinations = [
@@ -182,6 +240,10 @@ export default function Flights() {
       const originCode = resolveIata(fromParam);
       const destCode = resolveIata(toParam);
       const retParam = urlParams.get("return") || undefined;
+      if (!originCode || !destCode) {
+        setSearchError("يرجى اختيار مدينة صحيحة من القائمة أو إدخال كود مطار صالح (IATA).");
+        return;
+      }
       setSearching(true);
       amadeusSearch({
         origin: originCode,
@@ -225,6 +287,14 @@ export default function Flights() {
       toast({ title: "بيانات ناقصة", description: "يرجى تحديد مدينة المغادرة والوصول والتاريخ", variant: "destructive" });
       return;
     }
+    if (!originCode || !destCode) {
+      toast({
+        title: "بيانات ناقصة",
+        description: "يرجى اختيار مدينة صحيحة من القائمة أو إدخال كود مطار صالح",
+        variant: "destructive",
+      });
+      return;
+    }
     setSearching(true);
     setSearchResults(null);
     try {
@@ -260,13 +330,23 @@ export default function Flights() {
 
   // ── Select offer → init travelers array + go to traveler step ──
   const handleSelectOffer = async (offer: AmadeusFlightOffer) => {
+    if (!isOfferRenderable(offer)) {
+      toast({
+        title: "عرض غير مكتمل",
+        description: "تعذر متابعة هذا العرض بسبب نقص بيانات الرحلة. اختر عرضًا آخر.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setSelectedOffer(offer);
     setTravelers(Array(passengers).fill(null));
     setCurrentTravelerIdx(0);
     setPricing(true);
     try {
       const priced = await priceFlightOffer(offer);
-      setPricedOffer(priced?.data?.flightOffers?.[0] || offer);
+      const pricedCandidate = priced?.data?.flightOffers?.[0] as AmadeusFlightOffer | undefined;
+      setPricedOffer(isOfferRenderable(pricedCandidate) ? pricedCandidate : offer);
     } catch {
       setPricedOffer(offer);
     } finally {
@@ -292,7 +372,8 @@ export default function Flights() {
   // ── Step 3: Review → go to payment (NO booking happens here) ──
   const handleGoToPayment = async () => {
     const filledTravelers = travelers.filter(Boolean) as TravelerData[];
-    if (!pricedOffer || filledTravelers.length < passengers) {
+    const activeOffer = pricedOffer || selectedOffer;
+    if (!activeOffer || filledTravelers.length < passengers || !isOfferRenderable(activeOffer)) {
       toast({ title: "بيانات ناقصة", description: "يرجى إدخال بيانات جميع المسافرين", variant: "destructive" });
       return;
     }
@@ -302,17 +383,20 @@ export default function Flights() {
       setPaymentPreparing(true);
       try {
         const amadeusTravelers = filledTravelers.map((t, i) => buildAmadeusTraveler(t, String(i + 1)));
-        const totalPrice = parseFloat(pricedOffer.price.grandTotal) * passengers;
+        const totalPrice = safeOfferTotal(activeOffer) * passengers;
+        if (totalPrice <= 0) {
+          throw new Error("تعذر قراءة سعر الرحلة بشكل صحيح.");
+        }
 
         const created = await createPaymentSession({
           flow: "flight",
           amount: totalPrice,
-          currency: pricedOffer.price.currency || "SAR",
+          currency: activeOffer.price.currency || "SAR",
           payment_provider: "moyasar",
           tenant_id: tenant?.id || null,
           travelers_count: passengers,
           details_json: {
-            pricedOffer,
+            pricedOffer: activeOffer,
             passengers,
             travelers: filledTravelers,
             amadeusTravelers,
@@ -342,7 +426,11 @@ export default function Flights() {
   };
 
   const destList = destTab === "domestic" ? domesticDestinations : destTab === "international" ? internationalDestinations : middleEastDestinations;
-  const displayOffer = pricedOffer || selectedOffer;
+  const displayOffer = useMemo(() => {
+    if (isOfferRenderable(pricedOffer)) return pricedOffer;
+    if (isOfferRenderable(selectedOffer)) return selectedOffer;
+    return null;
+  }, [pricedOffer, selectedOffer]);
 
   return (
     <>
@@ -391,6 +479,20 @@ export default function Flights() {
         )}
 
         {/* ════════════════ STEP 1: SEARCH ════════════════ */}
+        {step !== "search" && !displayOffer && (
+          <section className="section-padding bg-background">
+            <div className="container mx-auto px-4 lg:px-8">
+              <div className="max-w-2xl mx-auto rounded-2xl border border-destructive/20 bg-destructive/5 p-5 text-center">
+                <p className="font-bold text-destructive mb-2">تعذر تحميل بيانات الرحلة</p>
+                <p className="text-sm text-muted-foreground mb-4">
+                  بيانات العرض غير مكتملة أو تغيرت بعد التسعير. اختر رحلة جديدة لإكمال الحجز.
+                </p>
+                <Button variant="outline" onClick={resetFlow}>العودة إلى نتائج البحث</Button>
+              </div>
+            </div>
+          </section>
+        )}
+
         {step === "search" && (
           <>
             {/* Hero + Search */}
@@ -530,9 +632,10 @@ export default function Flights() {
                     </div>
                     <div className="space-y-4">
                       {searchResults.map((offer) => {
-                        const outbound = offer.itineraries[0];
-                        const firstSeg = outbound.segments[0];
-                        const lastSeg = outbound.segments[outbound.segments.length - 1];
+                        const outbound = offer.itineraries?.[0];
+                        const firstSeg = outbound?.segments?.[0];
+                        const lastSeg = outbound?.segments?.[outbound.segments.length - 1];
+                        if (!outbound || !firstSeg || !lastSeg) return null;
                         const stops = outbound.segments.length - 1;
                         const airline = offer.validatingAirlineCodes?.[0] || firstSeg.carrierCode;
                         return (
@@ -553,7 +656,7 @@ export default function Flights() {
                                   <p className="text-xs text-muted-foreground font-medium">{firstSeg.departure.iataCode}</p>
                                 </div>
                                 <div className="flex-1 flex flex-col items-center gap-1">
-                                  <p className="text-xs text-muted-foreground flex items-center gap-1"><Clock className="w-3 h-3" />{formatDuration(outbound.duration)}</p>
+                                  <p className="text-xs text-muted-foreground flex items-center gap-1"><Clock className="w-3 h-3" />{safeFormatDuration(outbound.duration)}</p>
                                   <div className="w-full h-px bg-border relative"><div className="absolute left-1/2 -translate-x-1/2 -top-1 w-2 h-2 rounded-full bg-primary" /></div>
                                   <p className="text-xs text-muted-foreground">{stops === 0 ? "مباشر" : `${stops} توقف`}</p>
                                 </div>
@@ -562,14 +665,14 @@ export default function Flights() {
                                   <p className="text-xs text-muted-foreground font-medium">{lastSeg.arrival.iataCode}</p>
                                 </div>
                               </div>
-                              {offer.itineraries[1] && (
+                              {offer.itineraries[1] && offer.itineraries[1].segments?.length > 0 && (
                                 <div className="mt-3 pt-3 border-t border-border">
                                   <p className="text-xs text-muted-foreground mb-1">العودة</p>
                                   <div className="flex items-center gap-3 text-sm">
                                     <span className="font-medium">{offer.itineraries[1].segments[0].departure.iataCode}</span>
                                     <ArrowLeft className="w-3 h-3 text-muted-foreground" />
                                     <span className="font-medium">{offer.itineraries[1].segments[offer.itineraries[1].segments.length - 1].arrival.iataCode}</span>
-                                    <span className="text-muted-foreground text-xs">• {formatDuration(offer.itineraries[1].duration)}</span>
+                                    <span className="text-muted-foreground text-xs">• {safeFormatDuration(offer.itineraries[1].duration)}</span>
                                   </div>
                                 </div>
                               )}
@@ -688,7 +791,7 @@ export default function Flights() {
                   <div className="flex items-center justify-between mb-3">
                     <div>
                       <p className="text-2xl font-bold text-primary">
-                        {parseFloat(displayOffer.price.grandTotal).toLocaleString()} <span className="text-sm">{displayOffer.price.currency}</span>
+                        {safeOfferTotal(displayOffer).toLocaleString()} <span className="text-sm">{displayOffer.price.currency}</span>
                       </p>
                       {selectedOffer && pricedOffer && parseFloat(pricedOffer.price.grandTotal) !== parseFloat(selectedOffer.price.grandTotal) && (
                         <p className="text-xs text-muted-foreground mt-0.5">
@@ -772,7 +875,7 @@ export default function Flights() {
                       { label: "تاريخ المغادرة", value: new Date(displayOffer.itineraries[0].segments[0].departure.at).toLocaleDateString("ar", { year: "numeric", month: "long", day: "numeric" }) },
                       { label: "شركة الطيران", value: getAirlineName(displayOffer.validatingAirlineCodes?.[0] || displayOffer.itineraries[0].segments[0].carrierCode) },
                       { label: "عدد المسافرين", value: `${passengers} مسافر` },
-                      { label: "المدة", value: formatDuration(displayOffer.itineraries[0].duration) },
+                      { label: "المدة", value: safeFormatDuration(displayOffer.itineraries[0]?.duration) },
                     ].map((f) => (
                       <div key={f.label} className="bg-muted/30 rounded-xl p-3">
                         <p className="text-xs text-muted-foreground mb-0.5">{f.label}</p>
@@ -833,12 +936,12 @@ export default function Flights() {
                   <div className="space-y-2 text-sm">
                     <div className="flex justify-between">
                       <span className="font-bold text-primary text-lg">
-                        {(parseFloat(displayOffer.price.grandTotal) * passengers).toLocaleString()} {displayOffer.price.currency}
+                        {(safeOfferTotal(displayOffer) * passengers).toLocaleString()} {displayOffer.price.currency}
                       </span>
                       <span className="text-muted-foreground">الإجمالي</span>
                     </div>
                     <div className="flex justify-between text-muted-foreground">
-                      <span>{parseFloat(displayOffer.price.grandTotal).toLocaleString()} × {passengers} مسافر</span>
+                      <span>{safeOfferTotal(displayOffer).toLocaleString()} × {passengers} مسافر</span>
                       <span>سعر التذكرة × العدد</span>
                     </div>
                   </div>
@@ -887,7 +990,7 @@ export default function Flights() {
 
                 <div className="p-5 rounded-2xl bg-card border border-border">
                   <MoyasarPayment
-                    amount={parseFloat(displayOffer.price.grandTotal) * passengers}
+                    amount={safeOfferTotal(displayOffer) * passengers}
                     description={`Flight booking ${displayOffer.id}`}
                     callbackUrl={`${window.location.origin}/flights/payment-callback?session=${paymentSessionId}`}
                     methods={["creditcard", "applepay", "samsungpay"]}

@@ -15,6 +15,17 @@ function toYmdLocal(date: Date) {
   return `${y}-${m}-${d}`;
 }
 
+function parseYmdLocal(value: string): Date | null {
+  const m = value.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if (!m) return null;
+  const year = Number(m[1]);
+  const month = Number(m[2]);
+  const day = Number(m[3]);
+  if (!Number.isFinite(year) || !Number.isFinite(month) || !Number.isFinite(day)) return null;
+  if (month < 1 || month > 12 || day < 1 || day > 31) return null;
+  return new Date(year, month - 1, day);
+}
+
 const arabicMonths = [
   "يناير", "فبراير", "مارس", "أبريل", "مايو", "يونيو",
   "يوليو", "أغسطس", "سبتمبر", "أكتوبر", "نوفمبر", "ديسمبر",
@@ -46,8 +57,8 @@ function DropdownDatePicker({
   const parsed = React.useMemo(() => {
     if (!value) return null;
     try {
-      const d = parseISO(value);
-      return { year: d.getFullYear(), month: d.getMonth(), day: d.getDate() };
+      const d = parseYmdLocal(value) || parseISO(value);
+      return { year: d.getFullYear(), month: d.getMonth() + 1, day: d.getDate() };
     } catch {
       return null;
     }
@@ -70,7 +81,7 @@ function DropdownDatePicker({
   // Get days in month
   const daysInMonth = React.useMemo(() => {
     if (year === "" || month === "") return 31;
-    return new Date(year, month + 1, 0).getDate();
+    return new Date(year, month, 0).getDate();
   }, [year, month]);
 
   // Auto-correct day if exceeds month
@@ -83,10 +94,10 @@ function DropdownDatePicker({
   // Emit onChange when all 3 are selected
   React.useEffect(() => {
     if (year !== "" && month !== "" && day !== "") {
-      const dateStr = `${year}-${String(month + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+      const dateStr = `${year}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
       // Only check disabled if provided
       if (disabled) {
-        const d = new Date(year, month, day);
+        const d = new Date(year, month - 1, day);
         if (disabled(d)) return;
       }
       if (dateStr !== value) {
@@ -112,7 +123,8 @@ function DropdownDatePicker({
   const displayText = React.useMemo(() => {
     if (!value) return null;
     try {
-      return format(parseISO(value), "d MMMM yyyy", { locale: ar });
+      const parsedDate = parseYmdLocal(value) || parseISO(value);
+      return format(parsedDate, "d MMMM yyyy", { locale: ar });
     } catch {
       return null;
     }
@@ -172,7 +184,7 @@ function DropdownDatePicker({
             >
               <option value="">-- اختر الشهر --</option>
               {arabicMonths.map((name, idx) => (
-                <option key={idx} value={idx}>{name}</option>
+                <option key={idx} value={idx + 1}>{name}</option>
               ))}
             </select>
           </div>
@@ -218,7 +230,7 @@ function StandardDatePicker({
   const selected = React.useMemo(() => {
     if (!value) return undefined;
     try {
-      return parseISO(value);
+      return parseYmdLocal(value) || parseISO(value);
     } catch {
       return undefined;
     }
@@ -247,6 +259,7 @@ function StandardDatePicker({
           mode="single"
           selected={selected}
           onSelect={(d) => onChange(d ? toYmdLocal(d) : "")}
+          defaultMonth={selected || new Date()}
           disabled={disabled}
           initialFocus
           dir="rtl"

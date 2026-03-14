@@ -55,7 +55,7 @@ const offers: OfferPackage[] = [
     price: 2730,
     originalPrice: 4200,
     currency: "ر.س",
-    validUntil: "31-03-2026",
+    validUntil: "30-09-2026",
     destination: "العُلا، السعودية",
     includes: ["إقامة 3 ليالٍ", "جولة صحراوية مميزة", "تذاكر داخلية", "المنطقة القديمة"],
     beforeTravel: ["احجز قبل أسبوعين", "أفضل وقت: صباحاً", "ملابس مريحة"],

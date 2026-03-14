@@ -115,6 +115,7 @@ const App = () => (
               {/* Public Routes */}
               <Route path="/" element={<Layout><Index /></Layout>} />
               <Route path="/flights" element={<Layout><Flights /></Layout>} />
+              <Route path="/flights/book" element={<Layout><Flights /></Layout>} />
               <Route path="/flights/payment-callback" element={<Layout><FlightPaymentCallback /></Layout>} />
               <Route path="/hotels" element={<Layout><Hotels /></Layout>} />
               <Route path="/hotels/:id" element={<Layout><HotelDetails /></Layout>} />

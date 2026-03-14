@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import {
   Star, MapPin, Clock, ChevronLeft, ChevronRight, Users, ShieldCheck, ShoppingCart,
@@ -12,6 +12,7 @@ import DatePickerInput from "@/components/ui/date-picker-input";
 import { useToast } from "@/hooks/use-toast";
 import { hotels } from "@/data/hotelsData";
 import { useHotelCartStore, type CartItem } from "@/stores/hotelCartStore";
+import hotelFallbackImg from "@/assets/hotels/room-deluxe.jpg";
 
 const amenityIcons: Record<string, React.ReactNode> = {
   wifi: <Wifi className="w-5 h-5" />,
@@ -32,6 +33,21 @@ function getRatingLabel(rating: number) {
   return "مقبول";
 }
 
+const supportPhonesByCity: Record<string, string> = {
+  "الرياض": "+966114408800",
+  "جدة": "+966126188888",
+  "الدمام": "+966138090000",
+  "المدينة المنورة": "+966148201111",
+  "مكة المكرمة": "+966125678900",
+  "أبها": "+966172299333",
+};
+
+function imageFallbackHandler(img: HTMLImageElement, fallbackSrc: string) {
+  if (img.dataset.fallbackApplied === "1") return;
+  img.dataset.fallbackApplied = "1";
+  img.src = fallbackSrc;
+}
+
 export default function HotelDetails() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
@@ -43,6 +59,8 @@ export default function HotelDetails() {
   const [activeImage, setActiveImage] = useState(0);
   const [checkInDate, setCheckInDate] = useState("");
   const [checkOutDate, setCheckOutDate] = useState("");
+  const roomsSectionRef = useRef<HTMLDivElement | null>(null);
+  const supportPhone = supportPhonesByCity[hotel?.city || ""] || "+966114408800";
 
   if (!hotel) {
     return (
@@ -62,6 +80,15 @@ export default function HotelDetails() {
   };
 
   const handleBookRoom = (room: typeof hotel.rooms[0]) => {
+    if (!checkInDate || !checkOutDate) {
+      toast({
+        title: "حدد التواريخ أولاً",
+        description: "يرجى اختيار تاريخ الدخول والخروج قبل إضافة الغرفة للسلة.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     const nights = getNights();
     const cartItem: CartItem = {
       hotelId: hotel.id,
@@ -69,8 +96,8 @@ export default function HotelDetails() {
       roomId: room.id,
       roomName: room.name,
       roomImage: room.image,
-      checkIn: checkInDate || new Date().toISOString().split("T")[0],
-      checkOut: checkOutDate || new Date(Date.now() + 86400000).toISOString().split("T")[0],
+      checkIn: checkInDate,
+      checkOut: checkOutDate,
       nights,
       pricePerNight: room.pricePerNight,
       totalPrice: room.pricePerNight * nights,
@@ -78,6 +105,18 @@ export default function HotelDetails() {
     };
     addItem(cartItem);
     toast({ title: "تمت الإضافة للسلة ✓", description: `${room.name} - ${hotel.name}` });
+  };
+
+  const handleQuickBook = () => {
+    if (!checkInDate || !checkOutDate) {
+      toast({
+        title: "حدد التواريخ أولاً",
+        description: "يرجى اختيار تاريخ الدخول والخروج ثم متابعة الحجز.",
+        variant: "destructive",
+      });
+      return;
+    }
+    roomsSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
   };
 
   return (
@@ -100,7 +139,12 @@ export default function HotelDetails() {
         <div className="grid grid-cols-4 grid-rows-2 gap-2 h-72 md:h-96 lg:h-[420px] rounded-2xl overflow-hidden">
           {/* Main large image */}
           <div className="col-span-2 row-span-2 relative cursor-pointer" onClick={() => setActiveImage(0)}>
-            <img src={hotel.images[0]} alt={hotel.name} className="w-full h-full object-cover" />
+            <img
+              src={hotel.images[0]}
+              alt={hotel.name}
+              className="w-full h-full object-cover"
+              onError={(e) => imageFallbackHandler(e.currentTarget, hotelFallbackImg)}
+            />
             <div className="absolute bottom-3 left-3 flex items-center gap-1 bg-card px-3 py-1.5 rounded-lg text-xs">
               <ImageIcon className="w-3.5 h-3.5" />
               <span>{hotel.images.length} صور</span>
@@ -109,7 +153,12 @@ export default function HotelDetails() {
           {/* Smaller images */}
           {hotel.images.slice(1, 5).map((img, i) => (
             <div key={i} className="relative cursor-pointer overflow-hidden" onClick={() => setActiveImage(i + 1)}>
-              <img src={img} alt="" className="w-full h-full object-cover hover:scale-105 transition-transform duration-300" />
+              <img
+                src={img}
+                alt=""
+                className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                onError={(e) => imageFallbackHandler(e.currentTarget, hotelFallbackImg)}
+              />
             </div>
           ))}
           {/* Fill remaining slots if less than 4 extra images */}
@@ -167,7 +216,7 @@ export default function HotelDetails() {
               <div className="rounded-xl bg-card border border-border p-3 text-center">
                 <Phone className="w-5 h-5 text-primary mx-auto mb-1.5" />
                 <p className="text-[10px] text-muted-foreground">هاتف</p>
-                <p className="font-bold text-sm" dir="ltr">+966 12 XXX XXXX</p>
+                <p className="font-bold text-sm" dir="ltr">{supportPhone}</p>
               </div>
               <div className="rounded-xl bg-card border border-border p-3 text-center">
                 <MapPin className="w-5 h-5 text-primary mx-auto mb-1.5" />
@@ -196,7 +245,7 @@ export default function HotelDetails() {
                 </div>
               </div>
 
-              <Button variant="gold" size="lg" className="w-full mb-3">
+              <Button variant="gold" size="lg" className="w-full mb-3" onClick={handleQuickBook}>
                 احجز الآن
               </Button>
 
@@ -223,7 +272,7 @@ export default function HotelDetails() {
         </div>
 
         {/* About Hotel */}
-        <div className="mb-8">
+        <div className="mb-8" ref={roomsSectionRef}>
           <h2 className="text-lg font-bold mb-3 flex items-center gap-2">
             <Navigation className="w-5 h-5 text-primary" />
             عن الفندق
@@ -298,7 +347,12 @@ export default function HotelDetails() {
                     {/* Room Info */}
                     <div className="w-full">
                       <div className="flex items-center gap-3 mb-2">
-                        <img src={room.image} alt={room.name} className="w-16 h-12 rounded-lg object-cover shrink-0" />
+                        <img
+                          src={room.image}
+                          alt={room.name}
+                          className="w-16 h-12 rounded-lg object-cover shrink-0"
+                          onError={(e) => imageFallbackHandler(e.currentTarget, hotelFallbackImg)}
+                        />
                         <div>
                           <h4 className="font-bold text-sm">{room.name}</h4>
                           <div className="flex flex-wrap gap-1 mt-1">

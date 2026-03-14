@@ -52,6 +52,105 @@ const levelLabels: Record<string, string> = {
   diploma: "دبلوم",
 };
 
+const fallbackPrograms: StudyProgram[] = [
+  {
+    id: "fallback-london-lang",
+    title: "برنامج لغة إنجليزية مكثف",
+    city: "لندن",
+    country: "المملكة المتحدة",
+    country_code: "GB",
+    description: "برنامج لغوي مع سكن طلابي ودعم إجراءات القبول والتأشيرة.",
+    image_url: londonImg,
+    price: 18500,
+    currency: "SAR",
+    duration: "12 أسبوع",
+    level: "lang",
+    accommodation_type: "سكن طلابي",
+    university_name: "University College London",
+    tag: "الأكثر طلبًا",
+  },
+  {
+    id: "fallback-sydney-master",
+    title: "ماجستير إدارة الأعمال",
+    city: "سيدني",
+    country: "أستراليا",
+    country_code: "AU",
+    description: "خطة دراسية متكاملة مع متابعة أكاديمية وخيارات تمويل مرنة.",
+    image_url: sydneyImg,
+    price: 42000,
+    currency: "SAR",
+    duration: "18 شهر",
+    level: "master",
+    accommodation_type: "شقة مشتركة",
+    university_name: "University of Sydney",
+    tag: "فرص عمل بعد التخرج",
+  },
+  {
+    id: "fallback-singapore-bachelor",
+    title: "بكالوريوس علوم الحاسب",
+    city: "سنغافورة",
+    country: "سنغافورة",
+    country_code: "SG",
+    description: "برنامج تقني متقدم بشراكات مع شركات عالمية للتدريب العملي.",
+    image_url: singaporeImg,
+    price: 39500,
+    currency: "SAR",
+    duration: "4 سنوات",
+    level: "bachelor",
+    accommodation_type: "سكن جامعي",
+    university_name: "National University of Singapore",
+    tag: "تقني",
+  },
+  {
+    id: "fallback-brussels-diploma",
+    title: "دبلوم إدارة الضيافة",
+    city: "بروكسل",
+    country: "بلجيكا",
+    country_code: "BE",
+    description: "دبلوم تطبيقي مع تدريب ميداني في سلاسل فندقية أوروبية.",
+    image_url: brusselsImg,
+    price: 22800,
+    currency: "SAR",
+    duration: "10 أشهر",
+    level: "diploma",
+    accommodation_type: "سكن خارجي",
+    university_name: "Vatel Brussels",
+    tag: "عملي",
+  },
+  {
+    id: "fallback-kul-bachelor",
+    title: "بكالوريوس هندسة برمجيات",
+    city: "كوالالمبور",
+    country: "ماليزيا",
+    country_code: "MY",
+    description: "منهج حديث مع رسوم مناسبة وتكاليف معيشة منخفضة نسبيًا.",
+    image_url: kualalumpurImg,
+    price: 21000,
+    currency: "SAR",
+    duration: "3 سنوات",
+    level: "bachelor",
+    accommodation_type: "سكن طلابي",
+    university_name: "Asia Pacific University",
+    tag: "اقتصادي",
+  },
+  {
+    id: "fallback-venice-phd",
+    title: "دكتوراه في إدارة الفنون",
+    city: "فلورنسا",
+    country: "إيطاليا",
+    country_code: "IT",
+    description: "برنامج بحثي مع إشراف أكاديمي وخطة نشر علمي دولية.",
+    image_url: veniceImg,
+    price: 46000,
+    currency: "SAR",
+    duration: "3 سنوات",
+    level: "phd",
+    accommodation_type: "سكن مستقل",
+    university_name: "University of Florence",
+    tag: "بحثي",
+  },
+];
+
 const studyCountries = [
   { name: "المملكة المتحدة", flag: "🇬🇧", code: "GB", description: "جامعات عريقة مثل أكسفورد وكامبريدج، ثقافة أكاديمية رائدة ومعترف بها عالمياً." },
   { name: "الولايات المتحدة", flag: "🇺🇸", code: "US", description: "أكبر نظام تعليمي في العالم مع جامعات بحثية متميزة وتنوع ثقافي واسع." },
@@ -243,7 +342,9 @@ export default function StudyAbroad() {
     fetchPrograms();
   }, []);
 
-  const filtered = programs.filter((p) => {
+  const effectivePrograms = programs.length > 0 ? programs : fallbackPrograms;
+
+  const filtered = effectivePrograms.filter((p) => {
     if (countryFilter !== "all" && p.country !== countryFilter) return false;
     if (levelFilter !== "all" && p.level !== levelFilter) return false;
     if (searchQuery && !p.title.includes(searchQuery) && !p.city.includes(searchQuery) && !p.country.includes(searchQuery)) return false;
@@ -260,7 +361,7 @@ export default function StudyAbroad() {
     setApplyOpen(true);
   };
 
-  const uniqueCountries = [...new Set(programs.map((p) => p.country))];
+  const uniqueCountries = [...new Set(effectivePrograms.map((p) => p.country))];
 
   return (
     <div className="min-h-screen">

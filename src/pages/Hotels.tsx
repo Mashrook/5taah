@@ -43,6 +43,12 @@ function getHotelImage(hotelId: string): string {
   return hotelFallbackImages[Math.abs(hash) % hotelFallbackImages.length];
 }
 
+function imageFallbackHandler(img: HTMLImageElement, fallbackSrc = hotelImg1) {
+  if (img.dataset.fallbackApplied === "1") return;
+  img.dataset.fallbackApplied = "1";
+  img.src = fallbackSrc;
+}
+
 const cityToIata: Record<string, string> = {
   "الرياض": "RUH", "جدة": "JED", "الدمام": "DMM", "المدينة المنورة": "MED",
   "أبها": "AHB", "تبوك": "TUU", "الطائف": "TIF", "مكة المكرمة": "MKX",
@@ -403,7 +409,13 @@ export default function Hotels() {
                 <div key={hotel.id} className="rounded-2xl bg-card border border-border overflow-hidden hover:border-primary/30 transition-all group">
                   <div className="relative h-48 overflow-hidden">
                     {hotel.image_url ? (
-                      <img src={hotel.image_url} alt={hotel.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy" />
+                      <img
+                        src={hotel.image_url}
+                        alt={hotel.name}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                        loading="lazy"
+                        onError={(e) => imageFallbackHandler(e.currentTarget)}
+                      />
                     ) : (
                       <div className="w-full h-full bg-muted/30 flex items-center justify-center">
                         <HotelIcon className="w-12 h-12 text-muted-foreground/30" />
@@ -487,7 +499,12 @@ export default function Hotels() {
                   <div key={hotel.hotel.hotelId + offer.id} className="rounded-2xl bg-card border border-border hover:border-primary/30 transition-all overflow-hidden">
                     <div className="flex flex-col md:flex-row">
                       <div className="md:w-48 lg:w-56 h-40 md:h-auto shrink-0 overflow-hidden">
-                        <img src={getHotelImage(hotel.hotel.hotelId)} alt={hotel.hotel.name} className="w-full h-full object-cover" />
+                        <img
+                          src={getHotelImage(hotel.hotel.hotelId)}
+                          alt={hotel.hotel.name}
+                          className="w-full h-full object-cover"
+                          onError={(e) => imageFallbackHandler(e.currentTarget)}
+                        />
                       </div>
                       <div className="flex-1 p-5 lg:p-6">
                         <h3 className="text-lg font-bold mb-1">{hotel.hotel.name}</h3>
@@ -682,7 +699,13 @@ export default function Hotels() {
                     <div className="flex flex-col md:flex-row">
                       {/* Hotel Image */}
                       <div className="relative md:w-72 lg:w-80 h-56 md:h-auto shrink-0">
-                        <img src={hotel.images[0]} alt={hotel.name} className="w-full h-full object-cover" loading="lazy" />
+                        <img
+                          src={hotel.images[0]}
+                          alt={hotel.name}
+                          className="w-full h-full object-cover"
+                          loading="lazy"
+                          onError={(e) => imageFallbackHandler(e.currentTarget)}
+                        />
                         {/* Tags */}
                         <div className="absolute top-3 right-3 flex flex-wrap gap-1.5">
                           {hotel.tags.map((tag) => (
@@ -796,7 +819,13 @@ function FeaturedHotelsSection() {
         {hotels.map((h) => (
           <div key={h.id} className="rounded-2xl bg-card border border-border overflow-hidden hover:border-primary/30 transition-all">
             {h.image_url ? (
-              <img src={h.image_url} alt={h.name} className="w-full h-40 object-cover" loading="lazy" />
+              <img
+                src={h.image_url}
+                alt={h.name}
+                className="w-full h-40 object-cover"
+                loading="lazy"
+                onError={(e) => imageFallbackHandler(e.currentTarget)}
+              />
             ) : (
               <div className="w-full h-40 bg-muted/30 flex items-center justify-center">
                 <HotelIcon className="w-12 h-12 text-muted-foreground/30" />
